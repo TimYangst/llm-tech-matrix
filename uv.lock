@@ -79,7 +79,7 @@ wheels = [
 ]
 
 [[package]]
-name = "llm-oss-summary"
+name = "llm-tech-matrix"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

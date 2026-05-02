@@ -138,4 +138,4 @@ _Shared modules:_ Embedding layer and output head are shared with the main model
 
 ---
 
-_Generated from `data/extracted/deepseek-v3.json` by `python -m llm_oss_summary.extraction.render`. Edit the JSON, not this file._
+_Generated from `data/extracted/deepseek-v3.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._

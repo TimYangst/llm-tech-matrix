@@ -1,6 +1,6 @@
 ---
 name: extract-model
-description: Run a schema-strict extraction for one AI model. Reads sources from data/sources/<slug>/, produces data/extracted/<slug>.json validated against src/llm_oss_summary/schema.py plus a rendered <slug>.md, and updates tasks/ROADMAP.md. Use when the user asks to "extract <model>", "do the deepseek-v3 extraction", "run the pilot extraction", or similar per-model extraction work.
+description: Run a schema-strict extraction for one AI model. Reads sources from data/sources/<slug>/, produces data/extracted/<slug>.json validated against src/llm_tech_matrix/schema.py plus a rendered <slug>.md, and updates tasks/ROADMAP.md. Use when the user asks to "extract <model>", "do the deepseek-v3 extraction", "run the pilot extraction", or similar per-model extraction work.
 ---
 
 # extract-model
@@ -29,14 +29,14 @@ When in doubt, add to `open_questions` rather than guessing.
 Before starting extraction, ensure the cache is populated, sha256s match, and PDF text is derived:
 
 ```bash
-uv run python -m llm_oss_summary.sourcing verify <slug>
+uv run python -m llm_tech_matrix.sourcing verify <slug>
 # If anything is MISSING or MISMATCH:
-uv run python -m llm_oss_summary.sourcing fetch <slug>
+uv run python -m llm_tech_matrix.sourcing fetch <slug>
 # Derive .txt from any PDF assets (cheap text for the rest of the run):
-uv run python -m llm_oss_summary.sourcing.pdf_to_text <slug>
+uv run python -m llm_tech_matrix.sourcing.pdf_to_text <slug>
 ```
 
-If the manifest itself doesn't exist, the model isn't ready for extraction yet. Stop and ask the user to register sources via `python -m llm_oss_summary.sourcing add ...` (see `docs/conventions.md`).
+If the manifest itself doesn't exist, the model isn't ready for extraction yet. Stop and ask the user to register sources via `python -m llm_tech_matrix.sourcing add ...` (see `docs/conventions.md`).
 
 If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to make it pass** — that destroys reproducibility. Investigate whether upstream genuinely changed (new paper revision, vendor edited the config) and surface to the user.
 
@@ -46,7 +46,7 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
    - `docs/schema.md` — the field-by-field spec (current SCHEMA_VERSION wins over older extractions).
    - `docs/conventions.md` — naming, formatting, and the schema changelog.
    - `tasks/models/<slug>.md` — model-specific sources and prior open questions.
-   - `src/llm_oss_summary/schema.py` — the executable schema you must validate against.
+   - `src/llm_tech_matrix/schema.py` — the executable schema you must validate against.
    - `docs/glossary/README.md` — scan to know which techniques have entries; you'll touch this in step 7.
 
 2. **Read sources** in `data/sources/<slug>/`:
@@ -63,17 +63,17 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 
    For each field, prefer the most authoritative source. If two sources disagree, pick the official one and add an `open_questions` entry noting the discrepancy. Schema gaps belong in `open_questions` too — flag them; don't paper over with awkward field reuse.
 
-4. **Write** `data/extracted/<slug>.json`. Pretty-print with 2-space indent. Set `schema_version` to match `SCHEMA_VERSION` in `src/llm_oss_summary/schema.py`.
+4. **Write** `data/extracted/<slug>.json`. Pretty-print with 2-space indent. Set `schema_version` to match `SCHEMA_VERSION` in `src/llm_tech_matrix/schema.py`.
 
 5. **Validate** the JSON:
    ```bash
-   uv run python -c "import json; from llm_oss_summary.schema import ExtractedModel; ExtractedModel.model_validate(json.load(open('data/extracted/<slug>.json'))); print('OK')"
+   uv run python -c "import json; from llm_tech_matrix.schema import ExtractedModel; ExtractedModel.model_validate(json.load(open('data/extracted/<slug>.json'))); print('OK')"
    ```
    If validation fails, fix the JSON. **Do not loosen the schema to accommodate extraction shortcuts** — if the schema genuinely needs a new field, that's a separate change (bump `schema_version`, update `docs/schema.md`, document in `docs/conventions.md` schema changelog).
 
 6. **Render the human-readable Markdown:**
    ```bash
-   uv run python -m llm_oss_summary.extraction.render <slug>
+   uv run python -m llm_tech_matrix.extraction.render <slug>
    ```
    This produces `data/extracted/<slug>.md` deterministically from the JSON. Both files are committed.
 

@@ -7,6 +7,6 @@ No interpretation here — sourcing's only job is "get the bytes, record where t
 came from." See `manifest.py` for the schema and `fetch.py` for the CLI.
 """
 
-from llm_oss_summary.sourcing.manifest import Asset, AssetKind, SourceManifest
+from llm_tech_matrix.sourcing.manifest import Asset, AssetKind, SourceManifest
 
 __all__ = ["Asset", "AssetKind", "SourceManifest"]

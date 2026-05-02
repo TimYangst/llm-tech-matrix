@@ -5,8 +5,8 @@ in the data. This keeps the two from drifting; if you want to change the summary
 change the JSON (or the renderer).
 
 CLI:
-    uv run python -m llm_oss_summary.extraction.render <slug>
-    uv run python -m llm_oss_summary.extraction.render --all
+    uv run python -m llm_tech_matrix.extraction.render <slug>
+    uv run python -m llm_tech_matrix.extraction.render --all
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from llm_oss_summary.schema import ExtractedModel
+from llm_tech_matrix.schema import ExtractedModel
 
 EXTRACTED_DIR = Path("data/extracted")
 
@@ -270,7 +270,7 @@ def render(model: ExtractedModel) -> str:
     # ---- Footer ----
     parts.append("---")
     parts.append("")
-    parts.append(f"_Generated from `data/extracted/{md.name.lower().replace(' ', '-')}.json` by `python -m llm_oss_summary.extraction.render`. Edit the JSON, not this file._")
+    parts.append(f"_Generated from `data/extracted/{md.name.lower().replace(' ', '-')}.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._")
     parts.append("")
 
     return "\n".join(parts)
@@ -289,7 +289,7 @@ def render_slug(slug: str) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="python -m llm_oss_summary.extraction.render",
+        prog="python -m llm_tech_matrix.extraction.render",
         description="Render extracted model JSON(s) to Markdown summaries.",
     )
     parser.add_argument("slug", nargs="?", help="Model slug. Required unless --all.")

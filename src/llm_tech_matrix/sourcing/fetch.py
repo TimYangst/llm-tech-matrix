@@ -5,11 +5,11 @@ directory, verifies sha256 checksums, and updates the manifest. All cached files
 gitignored; only the manifest is committed.
 
 CLI:
-    uv run python -m llm_oss_summary.sourcing fetch <slug> [--force]
-    uv run python -m llm_oss_summary.sourcing add <slug> --name N --kind K --url U \\
+    uv run python -m llm_tech_matrix.sourcing fetch <slug> [--force]
+    uv run python -m llm_tech_matrix.sourcing add <slug> --name N --kind K --url U \\
         [--filename F] [--description D] [--archive-url A]
-    uv run python -m llm_oss_summary.sourcing verify <slug>
-    uv run python -m llm_oss_summary.sourcing list
+    uv run python -m llm_tech_matrix.sourcing verify <slug>
+    uv run python -m llm_tech_matrix.sourcing list
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from typing import Iterable, get_args
 import httpx
 from dotenv import load_dotenv
 
-from llm_oss_summary.sourcing.manifest import Asset, AssetKind, SourceManifest
+from llm_tech_matrix.sourcing.manifest import Asset, AssetKind, SourceManifest
 
 DATA_SOURCES_DIR = Path("data/sources")
 LARGE_FILE_WARN_BYTES = 50 * 1024 * 1024  # 50 MiB
@@ -208,7 +208,7 @@ def cmd_list(_args: argparse.Namespace) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="python -m llm_oss_summary.sourcing",
+        prog="python -m llm_tech_matrix.sourcing",
         description="Fetch and verify public source assets backing model extractions.",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)

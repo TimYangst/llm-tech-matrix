@@ -25,7 +25,7 @@
 
 ```
 docs/                  权威参考文档（愿景、Schema、流水线、约定、路线图）
-src/llm_oss_summary/   Python 包
+src/llm_tech_matrix/   Python 包
   schema.py            Pydantic 模型 —— docs/schema.md 的可执行版本
   sourcing/            第一层 —— 拉取 HF config、论文、博客
   extraction/          第二层 —— Schema 严格的 LLM 抽取
@@ -54,7 +54,7 @@ cp .env.example .env
 # 填入 HF_TOKEN
 
 # 运行入口
-uv run python -m llm_oss_summary
+uv run python -m llm_tech_matrix
 ```
 
 添加依赖：
@@ -68,7 +68,7 @@ uv add <package>
 1. 在 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) 中添加条目，状态为 `backlog`。
 2. 创建 `tasks/models/<model-slug>.md`，列出数据源 URL。
 3. 运行 `extract-model` skill（或参照 [`docs/schema.md`](./docs/schema.md) 手动抽取）。
-4. 用 `src/llm_oss_summary/schema.py` 校验输出文件 `data/extracted/<model-slug>.json`。
+4. 用 `src/llm_tech_matrix/schema.py` 校验输出文件 `data/extracted/<model-slug>.json`。
 5. 把路线图中的状态更新为 `extracted`。
 
 ## 铁律

@@ -13,7 +13,7 @@ and rationale.
 Register each source via:
 
 ```bash
-uv run python -m llm_oss_summary.sourcing add <slug> \
+uv run python -m llm_tech_matrix.sourcing add <slug> \
   --name <logical-name> --kind <hf_config|arxiv_pdf|tech_report|blog_html|model_card|other> \
   --url <public-url> [--filename <local>] [--description "..."]
 ```

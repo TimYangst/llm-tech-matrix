@@ -25,7 +25,7 @@ Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./do
 
 ```
 docs/                  Authoritative reference docs (vision, schema, pipeline, conventions, roadmap)
-src/llm_oss_summary/   Python package
+src/llm_tech_matrix/   Python package
   schema.py            Pydantic models — executable version of docs/schema.md
   sourcing/            Layer 1 — fetch HF configs, papers, blogs
   extraction/          Layer 2 — schema-strict LLM extraction
@@ -54,7 +54,7 @@ cp .env.example .env
 # fill in HF_TOKEN
 
 # Run the entry point
-uv run python -m llm_oss_summary
+uv run python -m llm_tech_matrix
 ```
 
 Adding a dependency:
@@ -68,7 +68,7 @@ uv add <package>
 1. Add an entry to [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) with status `backlog`.
 2. Create `tasks/models/<model-slug>.md` listing source URLs.
 3. Run the `extract-model` skill (or manual extraction following [`docs/schema.md`](./docs/schema.md)).
-4. Validate the output `data/extracted/<model-slug>.json` against `src/llm_oss_summary/schema.py`.
+4. Validate the output `data/extracted/<model-slug>.json` against `src/llm_tech_matrix/schema.py`.
 5. Update the roadmap status to `extracted`.
 
 ## Cardinal rule

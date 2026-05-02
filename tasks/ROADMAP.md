@@ -1,6 +1,21 @@
 # Per-Model Roadmap
 
-Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequencing), see [`../docs/roadmap.md`](../docs/roadmap.md).
+Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequencing), see [`../docs/roadmap.md`](../docs/roadmap.md). For how to pick up the project from a fresh session, see [`../docs/session-start.md`](../docs/session-start.md).
+
+## Current focus
+
+**Phase:** M1 — open-weight text models. **Schema v2** just landed (DeepSeek-V3 migrated).
+
+**Recommended next:** `llama-3.1-70b` — dense baseline. Validates that v2's hybrid-FFN
+and MLA additions don't bias the schema toward DeepSeek-specifics; exercises the full
+`dense_intermediate_size` + GQA path that DeepSeek-V3 doesn't touch.
+
+**Recently completed (2026-05-02):**
+- Schema v2 + DeepSeek-V3 migration + glossary scaffold (9 seed entries) + Markdown renderer
+- DeepSeek-V3 M1 pilot extraction (originally v1; the 7 schema gaps it surfaced drove v2)
+- Source manifest + fetcher + pdf_to_text infrastructure
+- Project scaffolding (docs/, src/, tasks/, .claude/skills/)
+
 
 ## Status enum
 

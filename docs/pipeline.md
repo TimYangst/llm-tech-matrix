@@ -36,7 +36,7 @@ Why this split: papers and configs can be tens of MB; mirroring them in git wast
 space and adds nothing — the canonical hosts (HF, arxiv) are already authoritative.
 The committed manifest plus sha256 gives us reproducibility without the bloat.
 
-Code: `src/llm_oss_summary/sourcing/`
+Code: `src/llm_tech_matrix/sourcing/`
 
 ## Layer 2: Information extraction
 
@@ -54,7 +54,7 @@ What lives here:
 
 What does **not** live here: cross-model logic. One model in, one JSON out.
 
-Code: `src/llm_oss_summary/extraction/` and `.claude/skills/extract-model/`
+Code: `src/llm_tech_matrix/extraction/` and `.claude/skills/extract-model/`
 
 ## Layer 3: Synthesis & analytics
 
@@ -69,7 +69,7 @@ What lives here:
 
 This layer is intentionally last: it cannot work until enough extractions exist. **Don't over-build it early.** Start with one or two reports driven by real questions, not infrastructure-first.
 
-Code: `src/llm_oss_summary/synthesis/`
+Code: `src/llm_tech_matrix/synthesis/`
 
 ## Why decoupled
 

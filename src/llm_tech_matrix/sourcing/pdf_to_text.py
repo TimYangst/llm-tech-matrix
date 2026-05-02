@@ -6,7 +6,7 @@ pypdf text extraction, and writes a sibling .txt file. The .txt is a derived art
 extraction than re-rendering pages.
 
 CLI:
-    uv run python -m llm_oss_summary.sourcing.pdf_to_text <slug> [--force]
+    uv run python -m llm_tech_matrix.sourcing.pdf_to_text <slug> [--force]
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-from llm_oss_summary.sourcing.fetch import DATA_SOURCES_DIR, load_manifest
+from llm_tech_matrix.sourcing.fetch import DATA_SOURCES_DIR, load_manifest
 
 PDF_KINDS = {"arxiv_pdf", "tech_report"}
 
@@ -56,7 +56,7 @@ def derive_for_slug(slug: str, *, force: bool = False) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="python -m llm_oss_summary.sourcing.pdf_to_text",
+        prog="python -m llm_tech_matrix.sourcing.pdf_to_text",
         description="Derive .txt artifacts from cached PDF assets in a model's manifest.",
     )
     parser.add_argument("slug")

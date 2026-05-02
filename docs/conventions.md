@@ -20,7 +20,7 @@ data/extracted/
 ```
 
 The `.txt` siblings are derived artifacts produced by
-`python -m llm_oss_summary.sourcing.pdf_to_text <slug>`. They are cheap to regenerate
+`python -m llm_tech_matrix.sourcing.pdf_to_text <slug>`. They are cheap to regenerate
 from the cached PDFs, so they are gitignored alongside the source files. LLM extraction
 reads the `.txt` rather than re-rendering the PDF.
 
@@ -28,7 +28,7 @@ reads the `.txt` rather than re-rendering the PDF.
 
 The `manifest.json` for each model **is committed**. The actual source files
 (config, paper, blog HTML) **are not** — they're gitignored and re-fetched on demand
-by `python -m llm_oss_summary.sourcing fetch <slug>`. Two reasons:
+by `python -m llm_tech_matrix.sourcing fetch <slug>`. Two reasons:
 
 1. PDFs and configs can be tens of MB and we don't need to mirror them — HF and
    arxiv are the canonical hosts.
@@ -46,7 +46,7 @@ re-sourced from any equivalent public location and the manifest updated.
 ### Adding a new source asset
 
 ```
-uv run python -m llm_oss_summary.sourcing add <slug> \
+uv run python -m llm_tech_matrix.sourcing add <slug> \
   --name <logical-name> \
   --kind <hf_config|arxiv_pdf|tech_report|blog_html|model_card|other> \
   --url <public-url> \
@@ -71,7 +71,7 @@ If a value is **public-but-not-officially-confirmed** (leaks, papers reverse-eng
 
 ## Schema changelog
 
-Schema changes are recorded here, newest first. The Pydantic models in `src/llm_oss_summary/schema.py` carry a `schema_version: int` field — bump it on any breaking change.
+Schema changes are recorded here, newest first. The Pydantic models in `src/llm_tech_matrix/schema.py` carry a `schema_version: int` field — bump it on any breaking change.
 
 | Version | Date | Change |
 |---|---|---|
