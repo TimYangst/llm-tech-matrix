@@ -10,13 +10,52 @@
 
 ```
 data/sources/<model-slug>/
-  manifest.json            # what was fetched, from where, when
-  config.json              # from HuggingFace
-  paper.pdf                # tech report (if any)
-  blog-<n>.html            # additional sources, numbered
+  manifest.json            # COMMITTED — URLs + sha256, the reproducibility contract
+  config.json              # gitignored — local cache of HF config
+  paper.pdf                # gitignored — local cache of tech report
+  paper.txt                # gitignored — derived from paper.pdf (via pdf_to_text)
+  blog-<n>.html            # gitignored — local cache of blog HTML
 data/extracted/
-  <model-slug>.json        # final extracted JSON, schema-validated
+  <model-slug>.json        # COMMITTED — schema-validated extraction output
 ```
+
+The `.txt` siblings are derived artifacts produced by
+`python -m llm_oss_summary.sourcing.pdf_to_text <slug>`. They are cheap to regenerate
+from the cached PDFs, so they are gitignored alongside the source files. LLM extraction
+reads the `.txt` rather than re-rendering the PDF.
+
+## Source assets: committed vs. cached
+
+The `manifest.json` for each model **is committed**. The actual source files
+(config, paper, blog HTML) **are not** — they're gitignored and re-fetched on demand
+by `python -m llm_oss_summary.sourcing fetch <slug>`. Two reasons:
+
+1. PDFs and configs can be tens of MB and we don't need to mirror them — HF and
+   arxiv are the canonical hosts.
+2. The manifest's sha256 lets us detect if upstream silently changed, which is
+   more useful than a frozen copy.
+
+**Only public, openly-accessible sources qualify.** If an asset requires payment,
+login, or non-public credentials beyond an HF account, do not list it — extract
+that model only from public materials, or skip it. This is a hard rule.
+
+For URL rot, optionally record an `archive_url` (web.archive.org snapshot) in the
+manifest entry. If an upstream URL dies and there's no archive, the asset can be
+re-sourced from any equivalent public location and the manifest updated.
+
+### Adding a new source asset
+
+```
+uv run python -m llm_oss_summary.sourcing add <slug> \
+  --name <logical-name> \
+  --kind <hf_config|arxiv_pdf|tech_report|blog_html|model_card|other> \
+  --url <public-url> \
+  [--filename <local-name>] \
+  [--description "<human description>"] \
+  [--archive-url <web-archive-url>]
+```
+
+The CLI downloads the file, computes its sha256, and appends to `manifest.json`.
 
 ## Marking unknowns
 

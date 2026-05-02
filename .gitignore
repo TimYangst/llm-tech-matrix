@@ -55,3 +55,11 @@ Thumbs.db
 scratch/
 tmp/
 *.local.*
+
+# --- Model source cache ---
+# Cached source assets (HF configs, papers, blogs) are NOT committed —
+# only the manifest.json per model is, so a fresh clone can re-fetch them.
+data/sources/**
+!data/sources/
+!data/sources/**/
+!data/sources/**/manifest.json

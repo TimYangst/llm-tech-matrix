@@ -20,10 +20,27 @@ When in doubt, add to `open_questions` rather than guessing.
 ## Inputs
 
 - **Model slug** (kebab-case): provided by the user, e.g. `deepseek-v3`. If not provided, ask.
-- **Notes file**: `tasks/models/<slug>.md`. Read it first — it lists source URLs and any prior open questions.
-- **Source directory**: `data/sources/<slug>/`. Should contain `config.json`, `paper.pdf`, blog HTML, and `manifest.json`.
+- **Notes file**: `tasks/models/<slug>.md`. Read it first — it documents source URLs (already in the manifest) and any prior open questions.
+- **Source manifest**: `data/sources/<slug>/manifest.json` (committed). Lists every public asset with URL + sha256.
+- **Cached sources**: `data/sources/<slug>/<filename>` (gitignored, re-fetched on demand).
 
-If sources are missing, stop and tell the user what's missing rather than proceeding with partial data.
+## Pre-flight: fetch sources if needed
+
+Before starting extraction, ensure the cache is populated and sha256s match:
+
+```bash
+uv run python -m llm_oss_summary.sourcing verify <slug>
+# If anything is MISSING or MISMATCH:
+uv run python -m llm_oss_summary.sourcing fetch <slug>
+```
+
+If the manifest itself doesn't exist, the model isn't ready for extraction yet. Stop
+and ask the user to register sources via `python -m llm_oss_summary.sourcing add ...`
+(see `docs/conventions.md`).
+
+If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to make
+it pass** — that destroys reproducibility. Investigate whether upstream genuinely
+changed (new paper revision, vendor edited the config) and surface to the user.
 
 ## Procedure
 
@@ -34,10 +51,10 @@ If sources are missing, stop and tell the user what's missing rather than procee
    - `src/llm_oss_summary/schema.py` — the executable schema you must validate against.
 
 2. **Read sources** in `data/sources/<slug>/`:
-   - `config.json` — primary source for architecture (layers, hidden_dim, num_heads, etc.). High-confidence.
-   - `paper.pdf` / tech report — primary source for training, optimizer, data, alignment. Medium-to-high confidence depending on disclosure.
-   - Blog posts — supporting context. Lower confidence than papers.
-   - `manifest.json` — record of where each file came from; cite these URLs in the `metadata.sources` field.
+   - `manifest.json` — every asset's URL goes into the extracted JSON's `metadata.sources` field.
+   - `config.json` (kind: `hf_config`) — primary source for architecture (layers, hidden_dim, num_heads, etc.). High-confidence.
+   - PDFs (kind: `arxiv_pdf` / `tech_report`) — primary source for training, optimizer, data, alignment. Medium-to-high confidence depending on disclosure.
+   - Blog HTML (kind: `blog_html`) — supporting context. Lower confidence than papers.
 
 3. **Extract** field by field, following the four schema groups in this order:
    1. Model metadata (name, family, release_date, openness, params, sources)

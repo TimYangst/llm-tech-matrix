@@ -13,17 +13,28 @@ Three decoupled layers. Each layer's input/output contract is the boundary — i
 
 ## Layer 1: Data sourcing
 
-**Input**: a model identifier (e.g. `deepseek-v3`) plus optional URL hints.
-**Output**: raw files written to `data/sources/<model>/`.
+**Input**: a model identifier (e.g. `deepseek-v3`) plus public URLs to source assets.
+**Output**: a `manifest.json` (committed) and locally cached files (gitignored) under
+`data/sources/<model>/`.
 
 What lives here:
 
-- HuggingFace `config.json` puller (uses `huggingface_hub`)
-- ArXiv paper fetcher (PDF or HTML)
-- Tech-blog HTML scraper (when needed)
-- A `manifest.json` per model listing where each file came from + fetch date
+- `manifest.py` — Pydantic schema for `SourceManifest` (committed) and `Asset` entries
+  (URL, sha256, filename, kind, optional archive_url).
+- `fetch.py` — CLI for downloading assets and verifying checksums:
+  - `add` — register a new asset (downloads, computes sha256, appends to manifest)
+  - `fetch` — re-download every asset listed in a manifest into the cache directory
+  - `verify` — compare cached files against recorded sha256 without re-downloading
+  - `list` — enumerate all manifests in the repo
 
-What does **not** live here: any interpretation of file content. Sourcing's only job is "get the bytes, record where they came from."
+What does **not** live here: any interpretation of file content. Sourcing's only job
+is "get the bytes, record where they came from." Sources must be **publicly accessible**
+(no paywalled or login-gated material — HF gated models with a personal token are OK,
+but the requirement is that the asset is reachable without privileged access).
+
+Why this split: papers and configs can be tens of MB; mirroring them in git wastes
+space and adds nothing — the canonical hosts (HF, arxiv) are already authoritative.
+The committed manifest plus sha256 gives us reproducibility without the bloat.
 
 Code: `src/llm_oss_summary/sourcing/`
 

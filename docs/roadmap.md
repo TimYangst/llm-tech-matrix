@@ -42,3 +42,4 @@ These are not tied to a specific milestone:
 - **Schema versioning** — establish the changelog discipline (`docs/conventions.md`) before the first breaking change.
 - **Reproducible sourcing** — every `data/sources/<model>/manifest.json` should let someone re-fetch the same files. Verify before extending sourcing logic.
 - **Skill library growth** — `.claude/skills/extract-model` is the seed. Add `compare-models` and `synthesize-trend` skills only when usage patterns justify them.
+- **TODO: `add-model-source` skill** — wrap the "create manifest entry + fetch + record sha256" workflow currently exposed as `python -m llm_oss_summary.sourcing add ...`. Defer until we've onboarded several models manually and seen what the friction points actually are.

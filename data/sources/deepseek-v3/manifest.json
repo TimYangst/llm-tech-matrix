@@ -1,0 +1,16 @@
+{
+  "slug": "deepseek-v3",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V3 HuggingFace config.json",
+      "sha256": "cbf0b95dc614de208a109bb5fd4e7eed11385e9c68411d2c17db5319443035d9",
+      "size_bytes": 1660,
+      "fetched_at": "2026-05-02"
+    }
+  ]
+}
