@@ -75,6 +75,7 @@ Schema changes are recorded here, newest first. The Pydantic models in `src/llm_
 
 | Version | Date | Change |
 |---|---|---|
+| 2 | 2026-05 | Pilot-driven additions/refactors. (a) `architecture.ffn` adds `"hybrid"` type, splits dense vs MoE intermediate sizes (`dense_intermediate_size` + `moe.expert_intermediate_size`), adds `layer_partition`. **Breaking**: v1's `ffn.intermediate_size` is removed; for MoE models its value moves into `ffn.moe.expert_intermediate_size`. (b) `architecture.attention` adds optional `mla` subobject mirroring HF config keys; `num_kv_heads` and `head_dim` may be UNKNOWN for MLA. (c) `architecture.backbone` adds `context_window_notes`. (d) `training.objectives` (with `multi_token_prediction`, `fill_in_middle`, `other`) becomes a first-class subobject. (e) `training.data_mix_notes` added. (f) RLAIF definition tightened: a model-based reward model trained on human preferences is RLHF, not RLAIF. |
 | 1 | 2026-05 | Initial schema (M1 text + multimodal). |
 
 ## Commit conventions

@@ -1,30 +1,35 @@
-"""Pydantic models for the extraction schema.
+"""Pydantic models for the extraction schema (v2).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
 
 Cardinal rule: when source material does not disclose a value, the field MUST hold the
 literal string UNKNOWN below. Do not use None, empty string, or invented values.
+
+Schema changelog: see docs/conventions.md.
 """
 
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
 RoPEType = Literal["standard", "yarn", "ntk", "none", "[Unknown/Not Disclosed]"]
-FFNType = Literal["dense", "moe"]
+FFNType = Literal["dense", "moe", "hybrid"]
 FusionType = Literal["native", "projected", "cross_attention", "other", "[Unknown/Not Disclosed]"]
 Confidence = Literal["low", "medium", "high"]
 
 
 class _Strict(BaseModel):
-    """Base model that forbids extra fields — extraction must match the schema exactly."""
+    """Forbid extra fields — extraction must match the schema exactly."""
 
     model_config = ConfigDict(extra="forbid")
+
+
+# ---------- 1. Metadata ----------
 
 
 class ModelMetadata(_Strict):
@@ -37,38 +42,77 @@ class ModelMetadata(_Strict):
     sources: list[str] = Field(description="URLs the extraction was sourced from")
 
 
+# ---------- 2. Architecture ----------
+
+
 class RoPEConfig(_Strict):
     type: RoPEType
     base: int | str = UNKNOWN
     scaling: dict | None = None
 
 
+class MLAConfig(_Strict):
+    """Multi-head Latent Attention specifics. Field names mirror HuggingFace config keys
+    so extractors can read them off config.json directly."""
+
+    kv_lora_rank: int | str = UNKNOWN
+    q_lora_rank: int | str = UNKNOWN
+    qk_nope_head_dim: int | str = UNKNOWN
+    qk_rope_head_dim: int | str = UNKNOWN
+    v_head_dim: int | str = UNKNOWN
+
+
 class Attention(_Strict):
     variant: str = Field(description='e.g. "MHA", "GQA", "MLA", "sliding_window"')
     num_heads: int | str = UNKNOWN
-    num_kv_heads: int | str = UNKNOWN
-    head_dim: int | str = UNKNOWN
+    num_kv_heads: int | str = Field(
+        default=UNKNOWN,
+        description="Meaningful for MHA/GQA. For MLA, set to UNKNOWN (use the mla subobject instead).",
+    )
+    head_dim: int | str = Field(
+        default=UNKNOWN, description="Meaningful for MHA/GQA. For MLA, the per-head dim is split across mla.qk_nope_head_dim + mla.qk_rope_head_dim."
+    )
     rope: RoPEConfig
+    mla: MLAConfig | None = Field(
+        default=None, description="Required when variant == 'MLA', otherwise None"
+    )
 
 
 class Backbone(_Strict):
     layers: int | str = UNKNOWN
     hidden_dim: int | str = UNKNOWN
-    context_window: int | str = UNKNOWN
+    context_window: int | str = Field(
+        description="Canonical user-facing max context length (e.g. 131072 for '128K')"
+    )
+    context_window_notes: str = Field(
+        default="",
+        description="Free-text for discrepancies (paper vs config), extension method, or caveats",
+    )
 
 
 class MoEConfig(_Strict):
     num_experts: int | str = UNKNOWN
     num_active_experts: int | str = UNKNOWN
-    routing: str
     shared_experts: int | str = UNKNOWN
+    expert_intermediate_size: int | str = Field(
+        default=UNKNOWN, description="Per-expert FFN intermediate width"
+    )
+    routing: str = Field(description="Routing algorithm description (free text)")
 
 
 class FFN(_Strict):
     ffn_type: FFNType
-    intermediate_size: int | str = UNKNOWN
+    dense_intermediate_size: int | str | None = Field(
+        default=None,
+        description='Dense FFN intermediate size. Required if ffn_type in {"dense","hybrid"}, else None.',
+    )
     moe: MoEConfig | None = Field(
-        default=None, description="Required when ffn_type == 'moe', otherwise None"
+        default=None,
+        description='Required if ffn_type in {"moe","hybrid"}, else None.',
+    )
+    layer_partition: str = Field(
+        default="",
+        description='Free text describing layer split for hybrids, e.g. "first 3 dense, remaining 58 MoE"',
     )
 
 
@@ -86,10 +130,51 @@ class Architecture(_Strict):
     parallelism_notes: str
 
 
+# ---------- 3. Training ----------
+
+
+class MTPConfig(_Strict):
+    """Multi-Token Prediction objective."""
+
+    depth: int | str = Field(
+        description="D in the paper — number of additional tokens predicted beyond next-token"
+    )
+    loss_weight_schedule: str = Field(
+        description='Free-text description of the loss weight, e.g. "0.3 first 10T tokens, then 0.1"'
+    )
+    shared_modules: str = Field(
+        default="",
+        description='Which modules are shared with the main model (e.g. "embedding and output head")',
+    )
+
+
+class FIMConfig(_Strict):
+    """Fill-in-Middle pre-training augmentation."""
+
+    format: str = Field(description='e.g. "PSM (Prefix-Suffix-Middle)"')
+    rate: str = Field(description='e.g. "0.1"')
+
+
+class TrainingObjectives(_Strict):
+    """Beyond next-token-prediction (which is implicit). Add new objectives here over time."""
+
+    multi_token_prediction: MTPConfig | None = None
+    fill_in_middle: FIMConfig | None = None
+    other: list[str] = Field(
+        default_factory=list, description="Free-form for novel objectives without a dedicated slot yet"
+    )
+
+
 class Alignment(_Strict):
     sft: str
     rl_method: str = Field(description='e.g. "PPO", "DPO", "GRPO", "RLHF", or UNKNOWN')
-    rlaif: bool | str = UNKNOWN
+    rlaif: bool | str = Field(
+        default=UNKNOWN,
+        description=(
+            "True only if AI generates the preference labels themselves (e.g. Constitutional AI). "
+            "A model-based reward model trained on human preferences is RLHF, NOT RLAIF."
+        ),
+    )
 
 
 class Advanced(_Strict):
@@ -104,8 +189,16 @@ class Training(_Strict):
     data_mix: dict[str, str] = Field(
         default_factory=dict, description='e.g. {"code": "17%", "math": "10%", "text": "73%"}'
     )
+    data_mix_notes: str = Field(
+        default="",
+        description="Free-text for qualitative descriptions when no percentages are disclosed",
+    )
+    objectives: TrainingObjectives = Field(default_factory=TrainingObjectives)
     alignment: Alignment
     advanced: Advanced
+
+
+# ---------- 4. Multimodal ----------
 
 
 class Multimodal(_Strict):
@@ -115,6 +208,9 @@ class Multimodal(_Strict):
     fusion_notes: str
 
 
+# ---------- 5. Top-level ----------
+
+
 class InferredField(_Strict):
     field: str = Field(description="Dotted path of the inferred field, e.g. 'architecture.backbone.layers'")
     basis: str = Field(description="Citation or reasoning for the inference")
@@ -122,10 +218,7 @@ class InferredField(_Strict):
 
 
 class ExtractedModel(_Strict):
-    """Top-level schema for an extracted model JSON.
-
-    One file per model: data/extracted/<slug>.json validates against this model.
-    """
+    """Top-level schema. One file per model: data/extracted/<slug>.json validates against this."""
 
     schema_version: int = SCHEMA_VERSION
     metadata: ModelMetadata

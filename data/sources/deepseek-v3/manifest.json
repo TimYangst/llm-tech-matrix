@@ -11,6 +11,17 @@
       "sha256": "cbf0b95dc614de208a109bb5fd4e7eed11385e9c68411d2c17db5319443035d9",
       "size_bytes": 1660,
       "fetched_at": "2026-05-02"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2412.19437",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "DeepSeek-V3 Technical Report (arXiv:2412.19437)",
+      "sha256": "812a3fd645c80725354de9d831a6785503007a60681461407f64e97305fa9330",
+      "size_bytes": 1887366,
+      "fetched_at": "2026-05-02"
     }
   ]
 }

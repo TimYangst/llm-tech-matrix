@@ -17,7 +17,7 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 | Slug | Family | Status | Notes file | Sources priority |
 |---|---|---|---|---|
-| `deepseek-v3` | DeepSeek | `backlog` | [`models/deepseek-v3.md`](./models/deepseek-v3.md) | **Pilot** — extensive paper, exercises MLA + MoE + FP8 |
+| `deepseek-v3` | DeepSeek | `extracted` | [`models/deepseek-v3.md`](./models/deepseek-v3.md) | **Pilot** — extensive paper, exercises MLA + MoE + FP8. Surfaced 7 schema gaps. |
 | `deepseek-r1` | DeepSeek | `backlog` | — | RL-focused, exercises `alignment.rl_method` |
 | `llama-3.1-70b` | Llama | `backlog` | — | Reference dense model with GQA |
 | `llama-3.1-405b` | Llama | `backlog` | — | Largest open dense model |

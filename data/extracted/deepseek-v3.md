@@ -1,0 +1,141 @@
+# DeepSeek-V3
+
+*Schema version: 2*
+
+## Overview
+
+| | |
+|---|---|
+| Family | DeepSeek |
+| Released | 2024-12 |
+| Openness | Open weights |
+| Total parameters | 671B |
+| Active parameters | 37B |
+
+## Sources
+
+- <https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/config.json>
+- <https://arxiv.org/pdf/2412.19437>
+
+## Architecture
+
+### Backbone
+
+| | |
+|---|---|
+| Layers | 61 |
+| Hidden dim | 7168 |
+| Context window | 131072 |
+
+**Context notes:** Paper validates 128K via the Needle-In-A-Haystack test. config.json sets max_position_embeddings=163840 (= YaRN scaling factor 40 x original 4096). 131072 is recorded as the canonical user-facing 128K spec.
+
+### Attention (MLA)
+
+| | |
+|---|---|
+| Variant | MLA |
+| Heads | 128 |
+| KV heads | [Unknown/Not Disclosed] |
+| Head dim | [Unknown/Not Disclosed] |
+
+**RoPE:** type=`yarn`, base=`10000`
+
+RoPE scaling:
+
+```json
+{
+  "factor": 40,
+  "beta_fast": 32,
+  "beta_slow": 1,
+  "mscale": 1.0,
+  "mscale_all_dim": 1.0,
+  "original_max_position_embeddings": 4096
+}
+```
+
+**MLA-specific:**
+
+| | |
+|---|---|
+| kv_lora_rank | 512 |
+| q_lora_rank | 1536 |
+| qk_nope_head_dim | 128 |
+| qk_rope_head_dim | 64 |
+| v_head_dim | 128 |
+
+### FFN (hybrid)
+
+**Dense intermediate size:** `18432`
+
+**MoE:**
+
+| | |
+|---|---|
+| Routed experts | 256 |
+| Active experts per token | 8 |
+| Shared experts | 1 |
+| Per-expert intermediate size | 2048 |
+
+**Routing:** Auxiliary-loss-free (DeepSeek-V3 / noaux_tc): sigmoid affinity scores per expert, plus a learnable per-expert bias that is dynamically adjusted based on per-step expert load (bias update speed gamma=0.001 for first 14.3T tokens, 0.0 for last 500B). Top-K selection uses (affinity + bias); gating value uses raw affinity. 8 expert groups; each token routed to top-4 groups, then to at most M=4 nodes (node-limited routing). Complementary sequence-wise balance loss with alpha=0.0001. No token dropping in train or inference.
+
+**Layer partition:** First 3 of 61 layers are dense (intermediate_size=18432); remaining 58 layers are MoE (per-expert intermediate_size=2048).
+
+### Components
+
+| | |
+|---|---|
+| Activation | SwiGLU (config reports hidden_act=silu; SwiGLU is the gated form used in the FFN) |
+| Normalization | RMSNorm (rms_norm_eps=1e-6); additional RMSNorm after MLA compressed latent vectors |
+
+**Embedding notes:** tie_word_embeddings=false (separate output head). Byte-level BPE tokenizer with 128K vocabulary (vocab_size=129280); pretokenizer optimized for multilingual compression and includes combined punctuation+linebreak tokens with random splitting during training to mitigate boundary bias.
+
+### Parallelism / infra
+
+16-way Pipeline Parallelism with custom DualPipe scheduling (bidirectional micro-batches, fewer bubbles than 1F1B/ZB1P, full overlap of all-to-all and PP communication). 64-way Expert Parallelism across 8 nodes. ZeRO-1 Data Parallelism. NO Tensor Parallelism. Trained on 2048 H800 GPUs via custom HAI-LLM framework. Cross-node all-to-all uses 20 SMs partitioned into 10 channels with warp-specialized PTX kernels; IB+NVLink fully overlapped. Recompute RMSNorm + MLA up-projections on backward; EMA params kept in CPU.
+
+## Training
+
+| | |
+|---|---|
+| Optimizer | AdamW (beta1=0.9, beta2=0.95, weight_decay=0.1); gradient clipping norm 1.0 |
+| Total training tokens | 14.8T |
+
+**LR schedule:** Linear warmup 0 -> 2.2e-4 over first 2K steps. Constant 2.2e-4 until 10T tokens consumed. Cosine decay 2.2e-4 -> 2.2e-5 over the next 4.3T tokens. For the final 500B tokens: constant 2.2e-5 for 333B tokens, then constant 7.3e-6 for the remaining 167B tokens. Pre-train sequence length 4K. Batch size schedule: linearly grown from 3072 to 15360 over first 469B tokens, then constant 15360.
+
+**Data mix notes:** Math/code ratio enhanced relative to DeepSeek-V2; multilingual coverage expanded beyond English and Chinese; data processing pipeline refined to minimize redundancy while maintaining diversity; document packing without cross-sample attention masking. No concrete percentage breakdown disclosed.
+
+### Training objectives (beyond next-token prediction)
+
+**Multi-Token Prediction (MTP):**
+
+| | |
+|---|---|
+| Depth (D) | 1 |
+| Loss weight schedule | lambda=0.3 for first 10T tokens, 0.1 for remaining 4.8T tokens |
+
+_Shared modules:_ Embedding layer and output head are shared with the main model. Under DualPipe scheduling, the shallowest layers (with embedding) and deepest layers (with output head) are co-located on the same PP rank to enable physical parameter and gradient sharing between MTP modules and the main model. MTP modules can be discarded for standard inference, or repurposed for speculative decoding.
+
+**Fill-in-Middle (FIM):**
+
+| | |
+|---|---|
+| Format | PSM (Prefix-Suffix-Middle): <|fim_begin|>f_pre<|fim_hole|>f_suf<|fim_end|>f_middle<|eos_token|>, applied at document level during pre-packing |
+| Rate | 0.1 |
+
+### Alignment
+
+**SFT:** 1.5M instances across multiple domains. Reasoning data (math, code competition, logic puzzles) is generated by an internal DeepSeek-R1 model; for each problem two SFT samples are produced - <problem, original_response> and <system_prompt, problem, R1_response> - then per-domain expert models trained via SFT+RL serve as data generators with rejection sampling. Non-reasoning data (creative writing, role-play, simple QA) is generated by DeepSeek-V2.5 and verified by human annotators. SFT trains for 2 epochs with cosine LR decay 5e-6 -> 1e-6, sequences packed from multiple samples with sample masking to keep them mutually invisible.
+
+**RL method:** GRPO (Group Relative Policy Optimization) - foregoes a separate critic model and estimates the baseline from group-sampled outputs. Reward signal combines a rule-based RM (deterministic checks for math final answers, compiler tests for code/LeetCode) and a model-based RM (trained from DeepSeek-V3 SFT checkpoints on human preference data, predicts a chain-of-thought leading to the final reward to mitigate reward hacking).
+
+**RLAIF:** `False`
+
+### Advanced
+
+**Self-distillation:** Yes - reasoning capability is distilled from the DeepSeek-R1 series (long-CoT model) into DeepSeek-V3 via the SFT data-generation pipeline described above; verification and reflection patterns from R1 are incorporated while output style and length are kept under control.
+
+**Mixed precision:** FP8 (E4M3 format on all tensors - both Fprop and Dgrad/Wgrad - departing from prior E4M3+E5M2 hybrids) for compute-density GEMMs. Fine-grained quantization: 1x128 tile-wise scaling for activations, 128x128 block-wise scaling for weights. Increased accumulation precision via promotion to CUDA cores (FP32 register accumulation every Nc=128 elements). Online quantization (no delayed/historical max). High precision (BF16/FP32) retained for: embedding, output head, MoE gating, normalization, attention. AdamW first/second moments stored in BF16; master weights and gradients in FP32. Activations cached in FP8 for backward.
+
+---
+
+_Generated from `data/extracted/deepseek-v3.json` by `python -m llm_oss_summary.extraction.render`. Edit the JSON, not this file._
