@@ -1,45 +1,54 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository. This file is always loaded into context — keep it short. For details, follow links into `docs/`.
 
 ## Project status
 
-This repository is at **inception**. Only `uv init` scaffolding (`main.py`, `pyproject.toml`, `.python-version`) and `README.md` exist — no implementation yet. The README is a design document, not a description of existing code. When building features, treat README as spec and verify it still reflects current intent before relying on it.
+Inception-phase. Scaffolding and design docs exist; **no extractions have run yet**. Treat the `docs/` files as spec, not as a description of finished work.
 
-## Project intent (from README.md)
+## What this project is
 
-Build a structured, updatable knowledge base that tracks and decomposes the technical stacks of mainstream AI models (text, multimodal, diffusion) for both **horizontal comparison** (cross-vendor differences) and **vertical analysis** (lifecycle of a single technique, e.g. optimizer evolution Adam → Muon).
+A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI models (text, multimodal, diffusion). Three decoupled layers: **sourcing → extraction → synthesis**.
 
-Milestones:
-- **M1 (current focus)**: text + multimodal LLMs — Qwen, Llama, DeepSeek, GLM, GPT-4, Kimi, MiniMax. Open-weight models analyzed deeply via HuggingFace `config.json` + tech reports; closed models inferred from public signals.
-- **M2 (future)**: diffusion / image / video — Stable Diffusion, Flux, Sora, Veo, etc.
+- Vision and milestones: [`docs/vision.md`](./docs/vision.md), [`docs/roadmap.md`](./docs/roadmap.md)
+- Extraction schema (the contract): [`docs/schema.md`](./docs/schema.md) ← read before any extraction work
+- Pipeline architecture: [`docs/pipeline.md`](./docs/pipeline.md)
+- Naming, file layout, schema versioning: [`docs/conventions.md`](./docs/conventions.md)
+- Per-model status: [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)
 
-## Core data schema (the contract for extraction)
+## Cardinal rules (load-bearing)
 
-All extraction output must conform to this schema. When adding extraction logic or prompts, keep these field groups intact — downstream synthesis depends on uniform structure across models:
+These rules underpin the project's value. Do not violate them, even if asked to "just fill it in":
 
-1. **Model metadata** — release date + family, open-source status (Open Weights / Open Source / Closed), total params + active params.
-2. **Architecture** — backbone (layers, hidden dim, context window); attention variant (MHA/GQA/MLA, RoPE details); FFN/MoE (expert count, active experts, routing algo, shared experts); base components (activation, normalization, embedding); infra hooks (SP/EP-friendly design).
-3. **Training & optimization** — optimizer + LR schedule; data (total tokens, code/math/text mix); alignment (SFT, RLHF/PPO/DPO/GRPO, RLAIF); advanced (self-distillation, FP8/BF16 mixed precision).
-4. **Multimodal specifics** (multimodal models only) — vision/audio encoder; fusion mechanism (MLP projection, cross-attention; native vs concatenated).
+1. **No hallucination.** Missing information is the literal string `"[Unknown/Not Disclosed]"`. Never guess from training-data priors. See [`docs/schema.md`](./docs/schema.md#cardinal-rule-no-hallucination).
+2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_oss_summary/schema.py`. Do not invent fields, rename fields, or skip required groups.
+3. **Closed-model inferences go in `inferred_fields`.** The primary field stays `"[Unknown/Not Disclosed]"`. Synthesis tools opt in to inferred values; default is to ignore them.
+4. **Schema changes are versioned.** Bump `schema_version` and update [`docs/conventions.md`](./docs/conventions.md#schema-changelog) on any breaking change.
 
-When information is missing, mark `[Unknown/Not Disclosed]` — **never hallucinate**. The extraction prompt frames the AI as a "Senior AI Researcher" and this no-hallucination rule is load-bearing for the project's value.
+## Layer boundaries
 
-## Intended pipeline architecture
+When implementing, keep the three layers decoupled:
 
-Three layers — keep them decoupled when implementing:
+- **Sourcing** (`src/llm_oss_summary/sourcing/`) writes raw bytes + a `manifest.json` to `data/sources/<model>/`. No interpretation.
+- **Extraction** (`src/llm_oss_summary/extraction/`, `.claude/skills/extract-model/`) reads `data/sources/<model>/`, writes one validated JSON to `data/extracted/<model>.json`. One model in, one JSON out.
+- **Synthesis** (`src/llm_oss_summary/synthesis/`) reads only `data/extracted/*.json` and produces reports in `data/reports/`. Never re-trigger extraction.
 
-1. **Data sourcing** — pull HuggingFace `config.json`; ingest ArXiv papers / official tech blog URLs.
-2. **Information extraction** — LLM-driven, schema-strict extraction from long-form text into structured JSON.
-3. **Synthesis & analytics** — merge JSON into a database/charts; generate trend reports (e.g. "Adam → Muon evolution").
+The contract between layers is the JSON file. As long as JSON validates, layers iterate independently.
 
 ## Tooling
 
-- **Package manager**: `uv` (project was created with `uv init`; `.venv/` is committed-adjacent and `pyproject.toml` is the source of truth).
-- **Python**: 3.13 (pinned via `.python-version` and `requires-python` in `pyproject.toml`).
+- **Package manager**: `uv`. Source of truth is `pyproject.toml`.
+- **Python**: 3.13 (pinned in `.python-version` and `pyproject.toml`).
 - **Common commands**:
-  - `uv run main.py` — run entry point
-  - `uv add <pkg>` — add a dependency (edits `pyproject.toml` + lockfile)
-  - `uv sync` — install/refresh the venv from lockfile
+  - `uv sync` — install/refresh venv from lockfile
+  - `uv run python -m llm_oss_summary` — run entry point
+  - `uv add <pkg>` — add a dependency
 
-There are no tests, lint config, or build pipeline yet — add them as the project grows rather than assuming they exist.
+There is no test suite, lint config, or CI yet — add them as the project grows. Don't assume they exist.
+
+## Working style notes for Claude
+
+- The Python package layout is `src/llm_oss_summary/`. Imports use that name.
+- Per-model task files (`tasks/models/<model>.md`) are the right place to record open questions, not commit messages.
+- When uncertain about a field during extraction, add to `open_questions` rather than guessing.
+- Worktrees are useful for parallel model extractions or experimental schema changes — see `.worktreeinclude` (already configured to copy `.env` into worktrees).

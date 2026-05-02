@@ -37,6 +37,9 @@ htmlcov/
 .tox/
 .nox/
 
+# --- Claude Code worktrees (created by `claude --worktree`) ---
+.claude/worktrees/
+
 # --- IDE / OS ---
 .idea/
 .vscode/
