@@ -65,27 +65,15 @@ uv add <package>
 
 ## 开发环境
 
-Lint 和格式工具对齐
-[Google Python](https://google.github.io/styleguide/pyguide.html) 和
-[Markdown](https://google.github.io/styleguide/docguide/style.html) style
-guide，由 `ruff` + `mdformat` + `pre-commit` 强制执行。
+clone 后一次性执行：
 
 ```bash
-# 一次性：安装 git pre-commit hook
-uv run pre-commit install
-
-# 在整个仓库上运行所有 hook（CI 也跑这套）
-uv run pre-commit run --all-files
-
-# 校验每个 data/extracted/*.json 是否符合 schema
-uv run python scripts/validate_extractions.py
+uv sync                       # 安装依赖（runtime + dev）
+uv run pre-commit install     # 激活 git hook
 ```
 
-PR 会触发轻量级 GitHub Actions（`.github/workflows/ci.yml`）：执行同一套 hook
-和 schema 校验。AI 代码评审由
-[Gemini Code Assist GitHub app](https://github.com/apps/gemini-code-assist)
-提供（个人账户免费），在你的 fork 或本仓库安装即可启用，评审规则见
-`.gemini/styleguide.md`。
+完整开发指南（代码风格、lint/format 命令、CI、AI 代码评审、PR 规范）见
+[`docs/development.md`](./docs/development.md)。
 
 ## 添加一个新模型抽取
 
