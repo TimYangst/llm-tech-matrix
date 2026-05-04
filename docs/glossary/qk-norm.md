@@ -24,10 +24,10 @@ the replacement for the QKV-bias used in Qwen2.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
-| Qwen3-32B | RMSNorm-style QK-Norm inside each attention block. Replaces the QKV-bias used in Qwen2 (config `attention_bias=false`). Cited by Qwen3 paper as a stability requirement for the deeper / larger Qwen3 architectures. |
-| Qwen3-235B-A22B | Same architectural choice as the rest of Qwen3 (dense and MoE share the QK-Norm + no-QKV-bias decision). |
+| Model           | Variation / details                                                                                                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Qwen3-32B       | RMSNorm-style QK-Norm inside each attention block. Replaces the QKV-bias used in Qwen2 (config `attention_bias=false`). Cited by Qwen3 paper as a stability requirement for the deeper / larger Qwen3 architectures. |
+| Qwen3-235B-A22B | Same architectural choice as the rest of Qwen3 (dense and MoE share the QK-Norm + no-QKV-bias decision).                                                                                                             |
 
 ## Related techniques
 

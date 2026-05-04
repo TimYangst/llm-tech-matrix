@@ -25,15 +25,15 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 
 ### 1. Model metadata
 
-| Field | Type | Notes |
-|---|---|---|
-| `name` | string | Canonical name, e.g. `"DeepSeek-V3"`, `"Llama-3.1-70B"` |
-| `family` | string | Family name, e.g. `"DeepSeek"`, `"Llama"` |
-| `release_date` | string (`YYYY-MM`) | Public release/announcement date |
-| `openness` | enum | `"open_source"` / `"open_weights"` / `"closed"` |
-| `params_total` | string | e.g. `"671B"`, `"70B"` — keep human-readable units |
-| `params_active` | string | For MoE; equals total for dense models |
-| `sources` | list of URLs | Where this extraction was sourced from (paper, HF, blog) |
+| Field           | Type               | Notes                                                    |
+| --------------- | ------------------ | -------------------------------------------------------- |
+| `name`          | string             | Canonical name, e.g. `"DeepSeek-V3"`, `"Llama-3.1-70B"`  |
+| `family`        | string             | Family name, e.g. `"DeepSeek"`, `"Llama"`                |
+| `release_date`  | string (`YYYY-MM`) | Public release/announcement date                         |
+| `openness`      | enum               | `"open_source"` / `"open_weights"` / `"closed"`          |
+| `params_total`  | string             | e.g. `"671B"`, `"70B"` — keep human-readable units       |
+| `params_active` | string             | For MoE; equals total for dense models                   |
+| `sources`       | list of URLs       | Where this extraction was sourced from (paper, HF, blog) |
 
 ### 2. Architecture
 

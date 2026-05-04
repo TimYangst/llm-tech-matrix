@@ -68,8 +68,7 @@ synthesis tooling; this section is for human-readable context.)
   with 3× more languages (29 → 119).
 - **Q: Is thinking-budget trained or inference-only?** ✅ Inference-only; capability
   emerges naturally from Thinking Mode Fusion. Implementation: insert the fixed
-  sentinel `"Considering the limited time by the user, I have to give the solution
-  based on the thinking directly now. </think>"` at a user-defined token threshold.
+  sentinel `"Considering the limited time by the user, I have to give the solution based on the thinking directly now. </think>"` at a user-defined token threshold.
   [Paper §4.3]
 
 ## Inferred fields (closed models only)

@@ -12,14 +12,14 @@
 
 ## 文档导航
 
-| 你想了解 | 请看 |
-|---|---|
-| 项目为什么存在 | [`docs/vision.md`](./docs/vision.md) |
-| 抽取的字段到底是什么 | [`docs/schema.md`](./docs/schema.md) |
-| 数据获取 → 信息抽取 → 综合分析的流程 | [`docs/pipeline.md`](./docs/pipeline.md) |
-| 命名、文件布局、Schema 版本管理规则 | [`docs/conventions.md`](./docs/conventions.md) |
-| 战略路线图（里程碑、范围） | [`docs/roadmap.md`](./docs/roadmap.md) |
-| 每个模型的进度（待抽取 / 已抽取 / 已审阅） | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) |
+| 你想了解                                   | 请看                                           |
+| ------------------------------------------ | ---------------------------------------------- |
+| 项目为什么存在                             | [`docs/vision.md`](./docs/vision.md)           |
+| 抽取的字段到底是什么                       | [`docs/schema.md`](./docs/schema.md)           |
+| 数据获取 → 信息抽取 → 综合分析的流程       | [`docs/pipeline.md`](./docs/pipeline.md)       |
+| 命名、文件布局、Schema 版本管理规则        | [`docs/conventions.md`](./docs/conventions.md) |
+| 战略路线图（里程碑、范围）                 | [`docs/roadmap.md`](./docs/roadmap.md)         |
+| 每个模型的进度（待抽取 / 已抽取 / 已审阅） | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)       |
 
 ## 目录结构
 

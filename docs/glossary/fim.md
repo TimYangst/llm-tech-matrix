@@ -28,8 +28,8 @@ operation than "continue from the cursor."
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
 | DeepSeek-V3 | PSM format, rate 0.1, applied at document level during pre-packing (no cross-sample attention masking). |
 
 ## Related techniques

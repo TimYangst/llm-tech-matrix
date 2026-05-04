@@ -1,28 +1,28 @@
-# &lt;Technique Name&gt;
+# \<Technique Name>
 
 **Slug:** `<kebab-case-slug>`
 **Category:** attention | ffn / moe | optimizer | training-objective | alignment | infra | quantization | other
-**One-line:** &lt;what it does, in one sentence&gt;
-**First introduced in:** &lt;Paper Title (Authors, Year) — link&gt;
+**One-line:** \<what it does, in one sentence>
+**First introduced in:** \<Paper Title (Authors, Year) — link>
 
 ## Description
 
-&lt;1-3 short paragraphs. Explain what it is, why it matters, and what problem it solves.
-Link to the canonical paper rather than re-deriving math.&gt;
+\<1-3 short paragraphs. Explain what it is, why it matters, and what problem it solves.
+Link to the canonical paper rather than re-deriving math.>
 
 ## Reference materials
 
-- Original paper: &lt;link&gt;
-- Reference implementation: &lt;link or "—"&gt;
-- Relevant blog/post: &lt;link or "—"&gt;
+- Original paper: \<link>
+- Reference implementation: \<link or "—">
+- Relevant blog/post: \<link or "—">
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
-| &lt;model-name&gt; | &lt;how it's used in that specific model&gt; |
+| Model         | Variation / details                     |
+| ------------- | --------------------------------------- |
+| \<model-name> | \<how it's used in that specific model> |
 
 ## Related techniques
 
-- [&lt;related-1&gt;](./&lt;related-1&gt;.md)
-- [&lt;related-2&gt;](./&lt;related-2&gt;.md)
+- [\<related-1>](./%3Crelated-1%3E.md)
+- [\<related-2>](./%3Crelated-2%3E.md)

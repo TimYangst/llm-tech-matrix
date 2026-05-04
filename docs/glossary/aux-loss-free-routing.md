@@ -30,8 +30,8 @@ the bias adjustment.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | DeepSeek-V3 | bias update speed γ=0.001 for first 14.3T tokens, 0 for last 500B; complementary sequence-wise balance loss α=0.0001; node-limited routing (M=4 nodes, 8 expert groups). |
 
 ## Related techniques

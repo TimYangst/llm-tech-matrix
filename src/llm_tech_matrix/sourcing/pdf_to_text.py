@@ -40,7 +40,10 @@ def derive_for_slug(slug: str, *, force: bool = False) -> int:
             continue
         pdf_path = src_dir / asset.filename
         if not pdf_path.exists():
-            print(f"  SKIP   {asset.filename}  (PDF not cached — run `fetch {slug}` first)", file=sys.stderr)
+            print(
+                f"  SKIP   {asset.filename}  (PDF not cached — run `fetch {slug}` first)",
+                file=sys.stderr,
+            )
             continue
         txt_path = pdf_path.with_suffix(".txt")
         if txt_path.exists() and not force:
@@ -60,7 +63,9 @@ def main(argv: list[str] | None = None) -> int:
         description="Derive .txt artifacts from cached PDF assets in a model's manifest.",
     )
     parser.add_argument("slug")
-    parser.add_argument("--force", action="store_true", help="Regenerate even if .txt already exists")
+    parser.add_argument(
+        "--force", action="store_true", help="Regenerate even if .txt already exists"
+    )
     args = parser.parse_args(argv)
     return derive_for_slug(args.slug, force=args.force)
 

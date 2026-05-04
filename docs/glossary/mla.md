@@ -29,8 +29,8 @@ quality, which is what makes long-context inference economical for very large mo
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ |
 | DeepSeek-V3 | `kv_lora_rank=512`, `q_lora_rank=1536`, `qk_nope_head_dim=128`, `qk_rope_head_dim=64`, `v_head_dim=128`, 128 heads |
 
 ## Related techniques
