@@ -40,6 +40,9 @@ htmlcov/
 # --- Claude Code worktrees (created by `claude --worktree`) ---
 .claude/worktrees/
 
+# --- Local-only Claude Code scratch (e.g. PR drafts produced by the draft-pr skill) ---
+.claude/drafts/
+
 # --- IDE / OS ---
 .idea/
 .vscode/
