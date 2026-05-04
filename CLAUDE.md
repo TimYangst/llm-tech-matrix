@@ -8,7 +8,7 @@ Read [`docs/session-start.md`](./docs/session-start.md) first. It has the three-
 
 ## Project status
 
-M1 in progress. DeepSeek-V3 extracted (schema v2). Glossary scaffold seeded.
+M1 in progress. For the live "where we are" — phase, recent completions, recommended next model — see [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)'s **Current focus** block. Don't restate it here; that's how this file rots.
 
 ## What this project is
 

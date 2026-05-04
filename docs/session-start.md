@@ -55,8 +55,9 @@ In rough priority order:
    extractions compounds the cleanup cost.
 
 2. **Add a model from a different family** than the most recent one. Cross-family data
-   points stress-test the schema better than re-extracting a sibling. After DeepSeek-V3,
-   prefer Llama / Qwen / GLM, not DeepSeek-R1.
+   points stress-test the schema better than re-extracting a sibling. If the last few
+   extractions are all Qwen / DeepSeek, rotate to Llama / Mistral / GLM / Kimi before
+   adding another sibling in the same family.
 
 3. **Pick what stresses a different schema region.** Just did MoE? Do a dense model
    next. Just did open weights? Do a closed model to exercise `inferred_fields`. Just

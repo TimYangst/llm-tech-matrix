@@ -4,9 +4,10 @@ This document tracks the **strategic** roadmap (milestones, scope, sequencing). 
 
 ## Where we are
 
-**Phase**: project inception. Scaffolding done, no extractions yet.
-
-**Next milestone**: M1 first extraction — pick one open-weight model with a strong public tech report and run it through the full pipeline end-to-end. Recommended: **DeepSeek-V3** (extensive paper, novel MLA + MoE design, exercises most schema fields).
+This document covers strategic milestones (M1 / M2 scope and exit criteria). For the
+**live tactical state** — current phase, recent completions, recommended next model
+— see [`../tasks/ROADMAP.md`](../tasks/ROADMAP.md)'s **Current focus** block. That's
+the single source of truth; this section deliberately does not restate it.
 
 ## M1 — Text + multimodal LLMs
 
