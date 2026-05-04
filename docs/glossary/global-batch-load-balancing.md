@@ -31,8 +31,8 @@ the two main schools of MoE balancing currently in use.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model           | Variation / details                                                                                                                                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Qwen3-235B-A22B | `router_aux_loss_coef=0.001` in HF config. 128 experts / 8 active, no shared experts; balancing is the only routing-balance signal documented in the paper (paper §2). Combined with fine-grained expert segmentation à la DeepSeekMoE. |
 
 ## Related techniques

@@ -33,8 +33,8 @@ The reported relative loss error vs. BF16 is consistently below 0.25%.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                         |
+| ----------- | ----------------------------------------------------------------------------------------------------------- |
 | DeepSeek-V3 | Recipe described above. Validated on V2-Lite and V2-scale baselines for ~1T tokens before full V3 training. |
 
 ## Related techniques

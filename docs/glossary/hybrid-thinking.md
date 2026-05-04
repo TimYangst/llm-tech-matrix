@@ -40,10 +40,10 @@ budget for explicit reasoning over a single model.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
-| Qwen3-32B | `/think` (default) vs `/no_think` directives in user/system message; `<think>...</think>` delimits the reasoning block. Distinct sampling defaults per mode (thinking: T=0.6, top-p=0.95, top-k=20; non-thinking: T=0.7, top-p=0.8, top-k=20, presence_penalty=1.5). Thinking-budget control via inserted sentinel `"Considering the limited time by the user, I have to give the solution based on the thinking directly now. </think>"`. |
-| Qwen3-235B-A22B | Same recipe as Qwen3-32B (the four-stage pipeline including Thinking Mode Fusion is shared across the two flagships). The 235B-A22B serves as one of the two distillation teachers (alongside 32B) that pass thinking + non-thinking behavior to the smaller Qwen3 sizes via Strong-to-Weak Distillation. |
+| Model           | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Qwen3-32B       | `/think` (default) vs `/no_think` directives in user/system message; `<think>...</think>` delimits the reasoning block. Distinct sampling defaults per mode (thinking: T=0.6, top-p=0.95, top-k=20; non-thinking: T=0.7, top-p=0.8, top-k=20, presence_penalty=1.5). Thinking-budget control via inserted sentinel `"Considering the limited time by the user, I have to give the solution based on the thinking directly now. </think>"`. |
+| Qwen3-235B-A22B | Same recipe as Qwen3-32B (the four-stage pipeline including Thinking Mode Fusion is shared across the two flagships). The 235B-A22B serves as one of the two distillation teachers (alongside 32B) that pass thinking + non-thinking behavior to the smaller Qwen3 sizes via Strong-to-Weak Distillation.                                                                                                                                  |
 
 ## Related techniques
 

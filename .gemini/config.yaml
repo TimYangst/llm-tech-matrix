@@ -1,0 +1,23 @@
+# Gemini Code Assist for GitHub configuration.
+# Reference: https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github
+#
+# The bot reviews pull requests using `.gemini/styleguide.md` as its rubric.
+
+have_fun: false
+
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM  # LOW | MEDIUM | HIGH | CRITICAL
+  pull_request_opened:
+    summary: true
+    code_review: true
+    help: false
+
+# Files Gemini should not review or comment on.
+ignore_patterns:
+  - "data/sources/**"       # raw fetched assets — not authored content
+  - "data/extracted/*.md"   # pipeline-rendered output, regenerated from JSON
+  - ".venv/**"
+  - "uv.lock"
+  - ".claude/**"            # Claude Code session state
+  - "memory/**"             # auto-memory store

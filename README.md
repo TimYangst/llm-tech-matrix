@@ -12,14 +12,14 @@ Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./do
 
 ## Where to find things
 
-| If you want to … | Read |
-|---|---|
-| Understand why this project exists | [`docs/vision.md`](./docs/vision.md) |
-| Know exactly what fields get extracted | [`docs/schema.md`](./docs/schema.md) |
-| Understand the sourcing → extraction → synthesis flow | [`docs/pipeline.md`](./docs/pipeline.md) |
-| Follow naming, file layout, schema-versioning rules | [`docs/conventions.md`](./docs/conventions.md) |
-| See the strategic roadmap (milestones, scope) | [`docs/roadmap.md`](./docs/roadmap.md) |
-| See which models are queued / extracted / reviewed | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) |
+| If you want to …                                      | Read                                           |
+| ----------------------------------------------------- | ---------------------------------------------- |
+| Understand why this project exists                    | [`docs/vision.md`](./docs/vision.md)           |
+| Know exactly what fields get extracted                | [`docs/schema.md`](./docs/schema.md)           |
+| Understand the sourcing → extraction → synthesis flow | [`docs/pipeline.md`](./docs/pipeline.md)       |
+| Follow naming, file layout, schema-versioning rules   | [`docs/conventions.md`](./docs/conventions.md) |
+| See the strategic roadmap (milestones, scope)         | [`docs/roadmap.md`](./docs/roadmap.md)         |
+| See which models are queued / extracted / reviewed    | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)       |
 
 ## Repository layout
 
@@ -62,6 +62,18 @@ Adding a dependency:
 ```bash
 uv add <package>
 ```
+
+## Development setup
+
+Once after cloning:
+
+```bash
+uv sync                       # install deps (runtime + dev)
+uv run pre-commit install     # activate the git hook
+```
+
+Full guide — style, lint/format commands, CI, AI code review, PR
+conventions — in [`docs/development.md`](./docs/development.md).
 
 ## Contributing a new model extraction
 

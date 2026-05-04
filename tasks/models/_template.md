@@ -1,4 +1,4 @@
-# &lt;Model Name&gt;
+# \<Model Name>
 
 Slug: `<model-slug>`
 Family: `<family-slug>`
@@ -44,8 +44,8 @@ If applicable, list values that are public-but-not-officially-confirmed. Mirror 
 into the `inferred_fields` array of the extracted JSON.
 
 | Field | Inferred value | Basis | Confidence |
-|---|---|---|---|
-| | | | |
+| ----- | -------------- | ----- | ---------- |
+|       |                |       |            |
 
 ## Notes
 

@@ -40,7 +40,9 @@ def _bullets(items: list[str]) -> str:
 
 
 def _openness_label(o: str) -> str:
-    return {"open_source": "Open source", "open_weights": "Open weights", "closed": "Closed"}.get(o, o)
+    return {"open_source": "Open source", "open_weights": "Open weights", "closed": "Closed"}.get(
+        o, o
+    )
 
 
 def render(model: ExtractedModel) -> str:
@@ -59,13 +61,17 @@ def render(model: ExtractedModel) -> str:
     # ---- Overview ----
     parts.append("## Overview")
     parts.append("")
-    parts.append(_table([
-        ("Family", md.family),
-        ("Released", md.release_date),
-        ("Openness", _openness_label(md.openness)),
-        ("Total parameters", md.params_total),
-        ("Active parameters", md.params_active),
-    ]))
+    parts.append(
+        _table(
+            [
+                ("Family", md.family),
+                ("Released", md.release_date),
+                ("Openness", _openness_label(md.openness)),
+                ("Total parameters", md.params_total),
+                ("Active parameters", md.params_active),
+            ]
+        )
+    )
     parts.append("")
 
     # ---- Sources ----
@@ -81,11 +87,15 @@ def render(model: ExtractedModel) -> str:
     parts.append("### Backbone")
     parts.append("")
     bb = arch.backbone
-    parts.append(_table([
-        ("Layers", bb.layers),
-        ("Hidden dim", bb.hidden_dim),
-        ("Context window", bb.context_window),
-    ]))
+    parts.append(
+        _table(
+            [
+                ("Layers", bb.layers),
+                ("Hidden dim", bb.hidden_dim),
+                ("Context window", bb.context_window),
+            ]
+        )
+    )
     if bb.context_window_notes:
         parts.append("")
         parts.append(f"**Context notes:** {bb.context_window_notes}")
@@ -94,13 +104,17 @@ def render(model: ExtractedModel) -> str:
         parts.append("")
         parts.append("**Context extension:**")
         parts.append("")
-        parts.append(_table([
-            ("Method", ce.method),
-            ("Trained max", ce.trained_max),
-            ("Extended max", ce.extended_max),
-            ("Factor", ce.factor),
-            ("Original max (RoPE)", ce.original_max),
-        ]))
+        parts.append(
+            _table(
+                [
+                    ("Method", ce.method),
+                    ("Trained max", ce.trained_max),
+                    ("Extended max", ce.extended_max),
+                    ("Factor", ce.factor),
+                    ("Original max (RoPE)", ce.original_max),
+                ]
+            )
+        )
         if ce.notes:
             parts.append("")
             parts.append(f"_Notes:_ {ce.notes}")
@@ -132,13 +146,17 @@ def render(model: ExtractedModel) -> str:
     if att.mla is not None:
         parts.append("**MLA-specific:**")
         parts.append("")
-        parts.append(_table([
-            ("kv_lora_rank", att.mla.kv_lora_rank),
-            ("q_lora_rank", att.mla.q_lora_rank),
-            ("qk_nope_head_dim", att.mla.qk_nope_head_dim),
-            ("qk_rope_head_dim", att.mla.qk_rope_head_dim),
-            ("v_head_dim", att.mla.v_head_dim),
-        ]))
+        parts.append(
+            _table(
+                [
+                    ("kv_lora_rank", att.mla.kv_lora_rank),
+                    ("q_lora_rank", att.mla.q_lora_rank),
+                    ("qk_nope_head_dim", att.mla.qk_nope_head_dim),
+                    ("qk_rope_head_dim", att.mla.qk_rope_head_dim),
+                    ("v_head_dim", att.mla.v_head_dim),
+                ]
+            )
+        )
         parts.append("")
 
     parts.append(f"### FFN ({arch.ffn.ffn_type})")
@@ -150,12 +168,16 @@ def render(model: ExtractedModel) -> str:
     if ffn.moe is not None:
         parts.append("**MoE:**")
         parts.append("")
-        parts.append(_table([
-            ("Routed experts", ffn.moe.num_experts),
-            ("Active experts per token", ffn.moe.num_active_experts),
-            ("Shared experts", ffn.moe.shared_experts),
-            ("Per-expert intermediate size", ffn.moe.expert_intermediate_size),
-        ]))
+        parts.append(
+            _table(
+                [
+                    ("Routed experts", ffn.moe.num_experts),
+                    ("Active experts per token", ffn.moe.num_active_experts),
+                    ("Shared experts", ffn.moe.shared_experts),
+                    ("Per-expert intermediate size", ffn.moe.expert_intermediate_size),
+                ]
+            )
+        )
         parts.append("")
         parts.append(f"**Routing:** {ffn.moe.routing}")
         parts.append("")
@@ -165,10 +187,14 @@ def render(model: ExtractedModel) -> str:
 
     parts.append("### Components")
     parts.append("")
-    parts.append(_table([
-        ("Activation", arch.components.activation),
-        ("Normalization", arch.components.normalization),
-    ]))
+    parts.append(
+        _table(
+            [
+                ("Activation", arch.components.activation),
+                ("Normalization", arch.components.normalization),
+            ]
+        )
+    )
     parts.append("")
     parts.append(f"**Embedding notes:** {arch.components.embedding_notes}")
     parts.append("")
@@ -181,10 +207,14 @@ def render(model: ExtractedModel) -> str:
     # ---- Training ----
     parts.append("## Training")
     parts.append("")
-    parts.append(_table([
-        ("Optimizer", train.optimizer),
-        ("Total training tokens", train.data_total_tokens),
-    ]))
+    parts.append(
+        _table(
+            [
+                ("Optimizer", train.optimizer),
+                ("Total training tokens", train.data_total_tokens),
+            ]
+        )
+    )
     parts.append("")
 
     parts.append(f"**LR schedule:** {train.lr_schedule}")
@@ -201,9 +231,7 @@ def render(model: ExtractedModel) -> str:
 
     # Objectives
     obj = train.objectives
-    has_obj = (obj.multi_token_prediction is not None
-               or obj.fill_in_middle is not None
-               or obj.other)
+    has_obj = obj.multi_token_prediction is not None or obj.fill_in_middle is not None or obj.other
     if has_obj:
         parts.append("### Training objectives (beyond next-token prediction)")
         parts.append("")
@@ -211,10 +239,14 @@ def render(model: ExtractedModel) -> str:
             mtp = obj.multi_token_prediction
             parts.append("**Multi-Token Prediction (MTP):**")
             parts.append("")
-            parts.append(_table([
-                ("Depth (D)", mtp.depth),
-                ("Loss weight schedule", mtp.loss_weight_schedule),
-            ]))
+            parts.append(
+                _table(
+                    [
+                        ("Depth (D)", mtp.depth),
+                        ("Loss weight schedule", mtp.loss_weight_schedule),
+                    ]
+                )
+            )
             if mtp.shared_modules:
                 parts.append("")
                 parts.append(f"_Shared modules:_ {mtp.shared_modules}")
@@ -223,10 +255,14 @@ def render(model: ExtractedModel) -> str:
             fim = obj.fill_in_middle
             parts.append("**Fill-in-Middle (FIM):**")
             parts.append("")
-            parts.append(_table([
-                ("Format", fim.format),
-                ("Rate", fim.rate),
-            ]))
+            parts.append(
+                _table(
+                    [
+                        ("Format", fim.format),
+                        ("Rate", fim.rate),
+                    ]
+                )
+            )
             parts.append("")
         if obj.other:
             parts.append("**Other objectives:**")
@@ -274,11 +310,15 @@ def render(model: ExtractedModel) -> str:
         mm = model.multimodal
         parts.append("## Multimodal")
         parts.append("")
-        parts.append(_table([
-            ("Vision encoder", mm.vision_encoder),
-            ("Audio encoder", mm.audio_encoder),
-            ("Fusion", mm.fusion),
-        ]))
+        parts.append(
+            _table(
+                [
+                    ("Vision encoder", mm.vision_encoder),
+                    ("Audio encoder", mm.audio_encoder),
+                    ("Fusion", mm.fusion),
+                ]
+            )
+        )
         if mm.fusion_notes:
             parts.append("")
             parts.append(f"**Fusion notes:** {mm.fusion_notes}")
@@ -303,7 +343,9 @@ def render(model: ExtractedModel) -> str:
     # ---- Footer ----
     parts.append("---")
     parts.append("")
-    parts.append(f"_Generated from `data/extracted/{md.name.lower().replace(' ', '-')}.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._")
+    parts.append(
+        f"_Generated from `data/extracted/{md.name.lower().replace(' ', '-')}.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._"
+    )
     parts.append("")
 
     return "\n".join(parts)

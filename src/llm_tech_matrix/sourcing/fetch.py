@@ -1,4 +1,4 @@
-"""Fetch CLI for source assets.
+r"""Fetch CLI for source assets.
 
 Reads data/sources/<slug>/manifest.json, downloads the listed assets into the same
 directory, verifies sha256 checksums, and updates the manifest. All cached files are
@@ -18,9 +18,10 @@ import argparse
 import hashlib
 import os
 import sys
+from collections.abc import Iterable
 from datetime import date
 from pathlib import Path
-from typing import Iterable, get_args
+from typing import get_args
 
 import httpx
 from dotenv import load_dotenv
@@ -182,10 +183,15 @@ def cmd_verify(args: argparse.Namespace) -> int:
         if actual == asset.sha256:
             print(f"  ok         {asset.filename}")
         else:
-            print(f"  MISMATCH   {asset.filename}  (expected {asset.sha256[:12]}…, got {actual[:12]}…)")
+            print(
+                f"  MISMATCH   {asset.filename}  (expected {asset.sha256[:12]}…, got {actual[:12]}…)"
+            )
             failures += 1
     if failures:
-        print(f"\n{failures} verification failure(s). Run `fetch {args.slug}` to repair.", file=sys.stderr)
+        print(
+            f"\n{failures} verification failure(s). Run `fetch {args.slug}` to repair.",
+            file=sys.stderr,
+        )
     return 1 if failures else 0
 
 
@@ -215,10 +221,14 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_fetch = sub.add_parser("fetch", help="Download all assets in a model's manifest")
     p_fetch.add_argument("slug")
-    p_fetch.add_argument("--force", action="store_true", help="Re-download even if cached and sha matches")
+    p_fetch.add_argument(
+        "--force", action="store_true", help="Re-download even if cached and sha matches"
+    )
     p_fetch.set_defaults(func=cmd_fetch)
 
-    p_add = sub.add_parser("add", help="Append a new asset URL to a model's manifest, downloading it")
+    p_add = sub.add_parser(
+        "add", help="Append a new asset URL to a model's manifest, downloading it"
+    )
     p_add.add_argument("slug")
     p_add.add_argument("--name", required=True, help="Logical asset name (e.g. 'config', 'paper')")
     p_add.add_argument("--kind", required=True, choices=list(get_args(AssetKind)))

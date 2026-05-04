@@ -31,8 +31,8 @@ absorbs this because the dominant memory cost is expert weights, not activations
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | DeepSeek-V3 | 16-way PP, 64-way EP across 8 nodes, ZeRO-1 DP, no Tensor Parallelism. 2048 H800 GPUs. Cross-node all-to-all kernels use 20 SMs (10 channels) with warp-specialized PTX. |
 
 ## Related techniques

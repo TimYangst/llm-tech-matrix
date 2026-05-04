@@ -18,6 +18,7 @@ A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI
 - Extraction schema (the contract): [`docs/schema.md`](./docs/schema.md) ← read before any extraction work
 - Pipeline architecture: [`docs/pipeline.md`](./docs/pipeline.md)
 - Naming, file layout, schema versioning: [`docs/conventions.md`](./docs/conventions.md)
+- Dev environment, lint, CI, AI review, PR conventions: [`docs/development.md`](./docs/development.md)
 - Per-model status: [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)
 
 ## Cardinal rules (load-bearing)
@@ -43,12 +44,16 @@ The contract between layers is the JSON file. As long as JSON validates, layers 
 
 - **Package manager**: `uv`. Source of truth is `pyproject.toml`.
 - **Python**: 3.13 (pinned in `.python-version` and `pyproject.toml`).
+- **Lint + format**: `ruff` (Python) and `mdformat` (Markdown), wired through `pre-commit`. Aligned with Google style guides; details in [`docs/development.md`](./docs/development.md).
+- **CI**: `.github/workflows/ci.yml` runs the same `pre-commit` hooks plus `scripts/validate_extractions.py` (schema gate) on every PR and push to main.
+- **AI code review**: [Gemini Code Assist](https://github.com/apps/gemini-code-assist) on PRs, configured by `.gemini/`.
 - **Common commands**:
   - `uv sync` — install/refresh venv from lockfile
+  - `uv run pre-commit run --all-files` — run the same checks CI runs
   - `uv run python -m llm_tech_matrix` — run entry point
   - `uv add <pkg>` — add a dependency
 
-There is no test suite, lint config, or CI yet — add them as the project grows. Don't assume they exist.
+No test suite yet — add tests as the project grows. Don't assume they exist.
 
 ## Working style notes for Claude
 

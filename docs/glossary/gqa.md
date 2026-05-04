@@ -14,6 +14,7 @@ drops. GQA is the middle ground: queries are partitioned into G groups, and each
 shares one K/V head, giving `num_kv_heads = num_heads / group_size`.
 
 Two practical wins:
+
 - **KV cache shrink**: linear in `num_heads / num_kv_heads`. Critical for long-context
   serving — KV cache is often the memory bottleneck at inference, not weights.
 - **Up-conversion path**: the paper shows you can up-convert an existing MHA checkpoint
@@ -30,10 +31,10 @@ goes further by compressing K/V into a low-rank latent.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
-| Qwen3-32B | 64 query heads, 8 KV heads (group size 8), `head_dim=128`. Combined with **QK-Norm** inside the attention block; QKV-bias removed (config sets `attention_bias=false`). All Qwen3 dense models use 8 KV heads regardless of size; MoE models use 4. |
-| Qwen3-235B-A22B | 64 query heads, **4 KV heads** (group size 16, twice as aggressive as the dense 32B), `head_dim=128`. Same QK-Norm + no-QKV-bias as the rest of Qwen3. Larger groups make sense at this scale because KV cache pressure dominates serving cost. |
+| Model           | Variation / details                                                                                                                                                                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Qwen3-32B       | 64 query heads, 8 KV heads (group size 8), `head_dim=128`. Combined with **QK-Norm** inside the attention block; QKV-bias removed (config sets `attention_bias=false`). All Qwen3 dense models use 8 KV heads regardless of size; MoE models use 4. |
+| Qwen3-235B-A22B | 64 query heads, **4 KV heads** (group size 16, twice as aggressive as the dense 32B), `head_dim=128`. Same QK-Norm + no-QKV-bias as the rest of Qwen3. Larger groups make sense at this scale because KV cache pressure dominates serving cost.     |
 
 ## Related techniques
 

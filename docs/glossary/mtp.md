@@ -31,8 +31,8 @@ repurposed as speculative-decoding draft heads.
 
 ## Used by
 
-| Model | Variation / details |
-|---|---|
+| Model       | Variation / details                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | DeepSeek-V3 | Sequential variant, D=1 (one extra prediction depth). Embedding + output head shared with main model. Loss weight λ=0.3 for first 10T tokens, then 0.1 for remaining 4.8T. MTP modules discarded at inference (or repurposed for speculative decoding). |
 
 ## Related techniques

@@ -26,24 +26,24 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 
 ## File map
 
-| Location | Purpose |
-|---|---|
-| `CLAUDE.md` | Always loaded by Claude Code. Cardinal rules + pointers. |
-| `docs/` | Authoritative reference docs. |
-| `docs/schema.md` | Field-by-field extraction spec (current version). |
-| `docs/conventions.md` | Naming, file layout, **schema changelog**. |
-| `docs/glossary/` | Per-technique wiki — short entries, "Used by" tables. |
-| `docs/roadmap.md` | Strategic milestones (M1/M2 scope). |
-| `tasks/ROADMAP.md` | Per-model status table + **Current focus**. |
-| `tasks/models/<slug>.md` | Per-model notes, sources, open questions. |
-| `data/sources/<slug>/manifest.json` | Source URLs + sha256 (**committed**). |
-| `data/sources/<slug>/<file>` | Cached source files (gitignored). |
-| `data/extracted/<slug>.json` | Schema-validated extraction (**committed**). |
-| `data/extracted/<slug>.md` | Rendered readable summary (**committed**; deterministic from .json). |
-| `src/llm_tech_matrix/schema.py` | Pydantic schema (executable spec; wins over docs/schema.md on conflict). |
-| `src/llm_tech_matrix/sourcing/` | Fetch CLI, manifest schema, pdf_to_text. |
-| `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer. |
-| `.claude/skills/extract-model/` | The Senior AI Researcher skill — invoke when extracting. |
+| Location                                   | Purpose                                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| `CLAUDE.md`                                | Always loaded by Claude Code. Cardinal rules + pointers.                 |
+| `docs/`                                    | Authoritative reference docs.                                            |
+| `docs/schema.md`                           | Field-by-field extraction spec (current version).                        |
+| `docs/conventions.md`                      | Naming, file layout, **schema changelog**.                               |
+| `docs/glossary/`                           | Per-technique wiki — short entries, "Used by" tables.                    |
+| `docs/roadmap.md`                          | Strategic milestones (M1/M2 scope).                                      |
+| `tasks/ROADMAP.md`                         | Per-model status table + **Current focus**.                              |
+| `tasks/models/<slug>.md`                   | Per-model notes, sources, open questions.                                |
+| `data/sources/<slug>/manifest.json`        | Source URLs + sha256 (**committed**).                                    |
+| `data/sources/<slug>/<file>`               | Cached source files (gitignored).                                        |
+| `data/extracted/<slug>.json`               | Schema-validated extraction (**committed**).                             |
+| `data/extracted/<slug>.md`                 | Rendered readable summary (**committed**; deterministic from .json).     |
+| `src/llm_tech_matrix/schema.py`            | Pydantic schema (executable spec; wins over docs/schema.md on conflict). |
+| `src/llm_tech_matrix/sourcing/`            | Fetch CLI, manifest schema, pdf_to_text.                                 |
+| `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer.                                                |
+| `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                 |
 
 ## How to pick a next task
 

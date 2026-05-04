@@ -52,8 +52,11 @@ class RoPEConfig(_Strict):
 
 
 class MLAConfig(_Strict):
-    """Multi-head Latent Attention specifics. Field names mirror HuggingFace config keys
-    so extractors can read them off config.json directly."""
+    """Multi-head Latent Attention specifics.
+
+    Field names mirror HuggingFace config keys so extractors can read them off
+    config.json directly.
+    """
 
     kv_lora_rank: int | str = UNKNOWN
     q_lora_rank: int | str = UNKNOWN
@@ -70,7 +73,8 @@ class Attention(_Strict):
         description="Meaningful for MHA/GQA. For MLA, set to UNKNOWN (use the mla subobject instead).",
     )
     head_dim: int | str = Field(
-        default=UNKNOWN, description="Meaningful for MHA/GQA. For MLA, the per-head dim is split across mla.qk_nope_head_dim + mla.qk_rope_head_dim."
+        default=UNKNOWN,
+        description="Meaningful for MHA/GQA. For MLA, the per-head dim is split across mla.qk_nope_head_dim + mla.qk_rope_head_dim.",
     )
     rope: RoPEConfig
     mla: MLAConfig | None = Field(
@@ -195,7 +199,8 @@ class TrainingObjectives(_Strict):
     multi_token_prediction: MTPConfig | None = None
     fill_in_middle: FIMConfig | None = None
     other: list[str] = Field(
-        default_factory=list, description="Free-form for novel objectives without a dedicated slot yet"
+        default_factory=list,
+        description="Free-form for novel objectives without a dedicated slot yet",
     )
 
 
@@ -209,9 +214,7 @@ class AlignmentStage(_Strict):
     """
 
     name: str = Field(description='e.g. "Long-CoT Cold Start", "Reasoning RL"')
-    method: str = Field(
-        description='e.g. "sft", "rl", "distillation", "rejection_sampling+sft"'
-    )
+    method: str = Field(description='e.g. "sft", "rl", "distillation", "rejection_sampling+sft"')
     description: str = Field(description="Data, signals, key recipe details")
 
 
@@ -291,7 +294,9 @@ class Multimodal(_Strict):
 
 
 class InferredField(_Strict):
-    field: str = Field(description="Dotted path of the inferred field, e.g. 'architecture.backbone.layers'")
+    field: str = Field(
+        description="Dotted path of the inferred field, e.g. 'architecture.backbone.layers'"
+    )
     basis: str = Field(description="Citation or reasoning for the inference")
     confidence: Confidence
 

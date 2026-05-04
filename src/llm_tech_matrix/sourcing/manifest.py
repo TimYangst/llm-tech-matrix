@@ -12,12 +12,12 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 AssetKind = Literal[
-    "hf_config",     # config.json from HuggingFace
-    "arxiv_pdf",     # PDF from arxiv.org
-    "tech_report",   # PDF hosted by the lab/vendor (non-arxiv)
-    "blog_html",     # blog post / release notes (HTML)
-    "model_card",    # HuggingFace model card or vendor model card
-    "other",         # everything else; describe in `description`
+    "hf_config",  # config.json from HuggingFace
+    "arxiv_pdf",  # PDF from arxiv.org
+    "tech_report",  # PDF hosted by the lab/vendor (non-arxiv)
+    "blog_html",  # blog post / release notes (HTML)
+    "model_card",  # HuggingFace model card or vendor model card
+    "other",  # everything else; describe in `description`
 ]
 
 
@@ -35,7 +35,9 @@ class Asset(_Strict):
     filename: str = Field(description="Local filename relative to data/sources/<slug>/")
     description: str
     sha256: str | None = Field(default=None, description="Populated after first successful fetch")
-    size_bytes: int | None = Field(default=None, description="Populated after first successful fetch")
+    size_bytes: int | None = Field(
+        default=None, description="Populated after first successful fetch"
+    )
     fetched_at: date | None = Field(default=None, description="Date of last successful fetch")
 
 

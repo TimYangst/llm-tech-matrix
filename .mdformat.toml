@@ -1,0 +1,6 @@
+# mdformat configuration. See https://mdformat.readthedocs.io/en/stable/users/configuration_file.html
+# Plugins (mdformat-gfm, mdformat-tables, mdformat-frontmatter) auto-activate when installed.
+
+wrap = "keep"          # don't reflow paragraphs — preserves authored line breaks
+number = true          # keep sequential numbering (1. 2. 3.) instead of all-"1."
+end_of_line = "lf"
