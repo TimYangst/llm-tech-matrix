@@ -32,6 +32,7 @@ reward gives you a low-variance baseline for free, and the critic was redundant.
 | Model | Variation / details |
 |---|---|
 | DeepSeek-V3 | Reward signal mixes a rule-based RM (math final-answer checks, compiler tests on code) and a model-based RM trained from V3 SFT checkpoints with chain-of-thought rewards to mitigate reward hacking. |
+| Qwen3-32B | Used in the **Reasoning RL** stage on 3,995 filtered query-verifier pairs (unused-in-cold-start, learnable, challenging, sub-domain-diverse). Large batch + many rollouts + off-policy training; entropy steered to grow steadily for exploration/exploitation balance. Reported example: 235B-A22B AIME'24 70.1 → 85.1 in 170 steps with no manual hyperparameter intervention. |
 
 ## Related techniques
 

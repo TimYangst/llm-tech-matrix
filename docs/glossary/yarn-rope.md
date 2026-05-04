@@ -29,8 +29,10 @@ effective sequence length. The extension typically requires only a short fine-tu
 
 | Model | Variation / details |
 |---|---|
-| DeepSeek-V3 | Applied **only** to the decoupled RoPE key in MLA (`k_t^R`). Two-phase extension: 4K→32K→128K, 1000 steps each. Config: `factor=40` (40 × 4096 original = 163840 max), `beta_fast=32`, `beta_slow=1`, `mscale=1.0`. |
+| DeepSeek-V3 | Applied **only** to the decoupled RoPE key in MLA (`k_t^R`). Two-phase extension: 4K→32K→128K, 1000 steps each. Config: `factor=40` (40 × 4096 original = 163840 max), `beta_fast=32`, `beta_slow=1`, `mscale=1.0`. Baked into HF `config.json` `rope_scaling`. |
+| Qwen3-32B | Combined with **Dual Chunk Attention** for a 4× extension at deployment (32K trained → 128K served). Pre-train Long-Context Stage first lifts RoPE base 10K → 1M via ABF and trains at 32,768; YaRN+DCA is applied at inference time (vLLM/SGLang configs) and deliberately *not* baked into HF `config.json` (`rope_scaling=null`). |
 
 ## Related techniques
 
 - [MLA](./mla.md) — DeepSeek-V3's MLA carries RoPE only on a small decoupled key vector, so YaRN is applied surgically rather than across all KV
+- [Dual Chunk Attention](./dual-chunk-attention.md) — Qwen3 stacks DCA with YaRN to reach the 4× extension in a way that preserves accuracy at long context

@@ -25,6 +25,8 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 ### Attention
 
 - [Multi-head Latent Attention (MLA)](./mla.md)
+- [Grouped Query Attention (GQA)](./gqa.md)
+- [QK-Norm](./qk-norm.md)
 
 ### FFN / MoE
 
@@ -39,10 +41,12 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 ### Alignment / RL
 
 - [Group Relative Policy Optimization (GRPO)](./grpo.md)
+- [Hybrid Thinking (chat-template thinking-mode fusion)](./hybrid-thinking.md)
 
-### Position embedding
+### Position embedding / long context
 
 - [YaRN RoPE scaling](./yarn-rope.md)
+- [Dual Chunk Attention (DCA)](./dual-chunk-attention.md)
 
 ### Quantization / mixed precision
 
