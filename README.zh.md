@@ -63,6 +63,30 @@ uv run python -m llm_tech_matrix
 uv add <package>
 ```
 
+## 开发环境
+
+Lint 和格式工具对齐
+[Google Python](https://google.github.io/styleguide/pyguide.html) 和
+[Markdown](https://google.github.io/styleguide/docguide/style.html) style
+guide，由 `ruff` + `mdformat` + `pre-commit` 强制执行。
+
+```bash
+# 一次性：安装 git pre-commit hook
+uv run pre-commit install
+
+# 在整个仓库上运行所有 hook（CI 也跑这套）
+uv run pre-commit run --all-files
+
+# 校验每个 data/extracted/*.json 是否符合 schema
+uv run python scripts/validate_extractions.py
+```
+
+PR 会触发轻量级 GitHub Actions（`.github/workflows/ci.yml`）：执行同一套 hook
+和 schema 校验。AI 代码评审由
+[Gemini Code Assist GitHub app](https://github.com/apps/gemini-code-assist)
+提供（个人账户免费），在你的 fork 或本仓库安装即可启用，评审规则见
+`.gemini/styleguide.md`。
+
 ## 添加一个新模型抽取
 
 1. 在 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) 中添加条目，状态为 `backlog`。

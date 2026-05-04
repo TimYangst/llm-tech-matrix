@@ -63,6 +63,31 @@ Adding a dependency:
 uv add <package>
 ```
 
+## Development setup
+
+Lint and format are aligned with the
+[Google Python](https://google.github.io/styleguide/pyguide.html) and
+[Markdown](https://google.github.io/styleguide/docguide/style.html) style
+guides, enforced by `ruff` and `mdformat` via `pre-commit`.
+
+```bash
+# One-time: install the git pre-commit hook
+uv run pre-commit install
+
+# Run all hooks across the repo (also what CI runs)
+uv run pre-commit run --all-files
+
+# Validate every data/extracted/*.json against the schema
+uv run python scripts/validate_extractions.py
+```
+
+Pull requests trigger a lightweight GitHub Actions workflow
+(`.github/workflows/ci.yml`) that runs the same hooks plus schema
+validation. AI code review is provided by the
+[Gemini Code Assist GitHub app](https://github.com/apps/gemini-code-assist)
+(free for individual accounts) — install it on your fork or this repo to
+opt in. Its review rubric lives in `.gemini/styleguide.md`.
+
 ## Contributing a new model extraction
 
 1. Add an entry to [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) with status `backlog`.
