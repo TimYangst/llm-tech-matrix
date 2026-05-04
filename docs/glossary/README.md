@@ -32,6 +32,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 
 - [DeepSeekMoE (fine-grained + shared experts)](./deepseekmoe.md)
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.md)
+- [Global-batch load balancing](./global-batch-load-balancing.md)
 
 ### Training objectives
 

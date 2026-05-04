@@ -33,6 +33,7 @@ goes further by compressing K/V into a low-rank latent.
 | Model | Variation / details |
 |---|---|
 | Qwen3-32B | 64 query heads, 8 KV heads (group size 8), `head_dim=128`. Combined with **QK-Norm** inside the attention block; QKV-bias removed (config sets `attention_bias=false`). All Qwen3 dense models use 8 KV heads regardless of size; MoE models use 4. |
+| Qwen3-235B-A22B | 64 query heads, **4 KV heads** (group size 16, twice as aggressive as the dense 32B), `head_dim=128`. Same QK-Norm + no-QKV-bias as the rest of Qwen3. Larger groups make sense at this scale because KV cache pressure dominates serving cost. |
 
 ## Related techniques
 

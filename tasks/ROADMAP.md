@@ -8,14 +8,14 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 for context_extension + multi-stage alignment + runtime inference modes; DeepSeek-V3
 migrated).
 
-**Recommended next:** `qwen3-235b-a22b` — Qwen MoE flagship. Second cross-vendor MoE
-data point alongside DeepSeek-V3, exercising the new `alignment.stages` flow with the
-same four-stage pipeline 32B uses, plus Qwen3's no-shared-experts MoE design (128 routed
-experts / 8 active / 0 shared) and global-batch load balancing loss for direct
-comparison against DeepSeek-V3's auxiliary-loss-free routing.
+**Recommended next:** Cross-family dense baseline — pick one of `llama-3.1-70b`,
+`mistral-large-2`, or `glm-4` to break out of the Qwen / DeepSeek duopoly. Llama 3.1
+gives a clean Llama-vs-Qwen GQA contrast and well-documented training infra (which
+both Qwen3 and DeepSeek-V3 keep mostly closed). After that, a closed model
+(`gpt-4o` or `claude-sonnet-4`) to exercise the `inferred_fields` machinery.
 
 > Note on the Qwen3 family: it ships as 6 dense sizes (0.6B–32B) + 2 MoE flagships
-> (30B-A3B, 235B-A22B). We extract two slugs only — the 32B dense and 235B-A22B MoE
+> (30B-A3B, 235B-A22B). We extracted two slugs only — the 32B dense and 235B-A22B MoE
 > flagships — since dense siblings share architecture and training recipe modulo
 > width/depth. If a per-size scaling analysis becomes useful later, schema can grow a
 > `metadata.size_variants` field then.
@@ -23,7 +23,8 @@ comparison against DeepSeek-V3's auxiliary-loss-free routing.
 **Recently completed (2026-05-03):**
 - Schema v3 (`backbone.context_extension`, `alignment.stages`, `alignment.inference_modes`); DeepSeek-V3 migrated
 - Qwen3-32B extraction (Qwen flagship dense, GQA + QK-Norm + ABF/YaRN+DCA + four-stage post-training)
-- 4 new glossary entries: GQA, QK-Norm, Hybrid Thinking, Dual Chunk Attention; YaRN and GRPO entries updated with Qwen3-32B rows
+- Qwen3-235B-A22B extraction (Qwen flagship MoE — 128 experts/8 active, no shared experts, global-batch load balancing; same four-stage pipeline as 32B)
+- 5 new glossary entries: GQA, QK-Norm, Hybrid Thinking, Dual Chunk Attention, Global-batch load balancing; YaRN, GRPO, DeepSeekMoE, and Aux-loss-free entries updated with Qwen3 cross-references
 
 **Recently completed (2026-05-02):**
 - Schema v2 + DeepSeek-V3 migration + glossary scaffold (9 seed entries) + Markdown renderer
@@ -53,7 +54,7 @@ comparison against DeepSeek-V3's auxiliary-loss-free routing.
 | `llama-3.1-405b` | Llama | `backlog` | — | Largest open dense model |
 | `qwen-2.5-72b` | Qwen | `backlog` | — | Strong tech report |
 | `qwen3-32b` | Qwen | `extracted` | [`models/qwen3-32b.md`](./models/qwen3-32b.md) | Dense flagship — GQA, hybrid thinking |
-| `qwen3-235b-a22b` | Qwen | `backlog` | — | MoE flagship — compare routing with DeepSeek-V3 |
+| `qwen3-235b-a22b` | Qwen | `extracted` | [`models/qwen3-235b-a22b.md`](./models/qwen3-235b-a22b.md) | MoE flagship — compare routing with DeepSeek-V3 |
 | `glm-4` | GLM | `backlog` | — | Chinese-language design choices |
 | `kimi-k2` | Kimi | `backlog` | — | Long-context architecture |
 | `minimax-text-01` | MiniMax | `backlog` | — | Linear attention variant |

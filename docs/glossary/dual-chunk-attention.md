@@ -34,6 +34,7 @@ additional training.
 | Model | Variation / details |
 |---|---|
 | Qwen3-32B | DCA + YaRN at deployment lifts the trained 32K context to 128K (4× extension). Applied at inference (vLLM/SGLang configs); not baked into HF `config.json` (`rope_scaling=null`). |
+| Qwen3-235B-A22B | Same DCA + YaRN deployment recipe as the rest of the Qwen3 family above 1.7B. |
 
 ## Related techniques
 

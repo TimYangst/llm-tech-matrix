@@ -30,7 +30,9 @@ is the (normalized) routing affinity — sigmoid in DeepSeek-V3, softmax in earl
 | Model | Variation / details |
 |---|---|
 | DeepSeek-V3 | 256 routed experts + 1 shared expert, top-8 routing, per-expert intermediate size 2048. First 3 layers are dense, remaining 58 are MoE. |
+| Qwen3-235B-A22B | Adopts the **fine-grained expert segmentation** half (128 experts × 1536 width, 8 active) but **excludes shared experts** (paper §2 explicitly contrasts this with Qwen2.5-MoE and DeepSeek-V3). All 94 layers are MoE. Combined with global-batch load balancing instead of aux-loss-free routing. |
 
 ## Related techniques
 
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.md) — DeepSeek-V3's load-balancing strategy on top of DeepSeekMoE
+- [Global-batch load balancing](./global-batch-load-balancing.md) — Qwen3's load-balancing strategy on top of fine-grained MoE

@@ -37,3 +37,4 @@ the bias adjustment.
 ## Related techniques
 
 - [DeepSeekMoE](./deepseekmoe.md)
+- [Global-batch load balancing](./global-batch-load-balancing.md) — Qwen3's alternative balancing approach (gradient-flowing auxiliary loss, but computed over the global batch instead of per-sequence)
