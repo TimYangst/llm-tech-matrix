@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "metadata": {
     "name": "DeepSeek-V3",
     "family": "DeepSeek",
@@ -17,7 +17,15 @@
       "layers": 61,
       "hidden_dim": 7168,
       "context_window": 131072,
-      "context_window_notes": "Paper validates 128K via the Needle-In-A-Haystack test. config.json sets max_position_embeddings=163840 (= YaRN scaling factor 40 x original 4096). 131072 is recorded as the canonical user-facing 128K spec."
+      "context_window_notes": "Paper validates 128K via the Needle-In-A-Haystack test. config.json sets max_position_embeddings=163840 (= YaRN scaling factor 40 x original 4096). 131072 is recorded as the canonical user-facing 128K spec.",
+      "context_extension": {
+        "method": "yarn",
+        "trained_max": "[Unknown/Not Disclosed]",
+        "extended_max": 131072,
+        "factor": 40,
+        "original_max": 4096,
+        "notes": "Pre-train sequence length is 4K per paper; long-context extension uses YaRN. config.json reports max_position_embeddings=163840 (= 4096 x 40); 131072 is the canonical productized 128K spec."
+      }
     },
     "attention": {
       "variant": "MLA",

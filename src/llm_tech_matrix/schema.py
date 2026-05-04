@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v2).
+"""Pydantic models for the extraction schema (v3).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
@@ -78,6 +78,33 @@ class Attention(_Strict):
     )
 
 
+class ContextExtension(_Strict):
+    """Structured record of how a model's productized context was reached.
+
+    For models trained at length T and deployed at length T' > T via a scaling method
+    (YaRN, DCA, LongRoPE, ABF, sliding+global, etc.). For models that ship at exactly
+    their trained length and apply no extension, leave Backbone.context_extension as None.
+    """
+
+    method: str = Field(
+        description='e.g. "yarn", "yarn+dca", "longrope", "abf+yarn", "sliding+global"'
+    )
+    trained_max: int | str = Field(
+        default=UNKNOWN, description="Maximum sequence length seen during pre-training"
+    )
+    extended_max: int | str = Field(
+        description="Productized max context length (= Backbone.context_window)"
+    )
+    factor: float | str = Field(
+        default=UNKNOWN, description="Scaling factor (e.g. YaRN factor) — extended/original"
+    )
+    original_max: int | str = Field(
+        default=UNKNOWN,
+        description='YaRN-style "original_max_position_embeddings" (the pre-extension RoPE base length)',
+    )
+    notes: str = ""
+
+
 class Backbone(_Strict):
     layers: int | str = UNKNOWN
     hidden_dim: int | str = UNKNOWN
@@ -87,6 +114,13 @@ class Backbone(_Strict):
     context_window_notes: str = Field(
         default="",
         description="Free-text for discrepancies (paper vs config), extension method, or caveats",
+    )
+    context_extension: ContextExtension | None = Field(
+        default=None,
+        description=(
+            "Structured extension record. None when the model uses its trained length "
+            "directly without scaling tricks."
+        ),
     )
 
 
@@ -165,6 +199,37 @@ class TrainingObjectives(_Strict):
     )
 
 
+class AlignmentStage(_Strict):
+    """One named stage in a multi-stage post-training pipeline.
+
+    Use the `stages` list when a model runs a structured pipeline (e.g. Qwen3's four-stage
+    Long-CoT Cold Start → Reasoning RL → Thinking Mode Fusion → General RL). For simple
+    SFT+RL pipelines (DeepSeek-V3 style), the flat `sft`/`rl_method` fields are enough
+    and `stages` may be left empty.
+    """
+
+    name: str = Field(description='e.g. "Long-CoT Cold Start", "Reasoning RL"')
+    method: str = Field(
+        description='e.g. "sft", "rl", "distillation", "rejection_sampling+sft"'
+    )
+    description: str = Field(description="Data, signals, key recipe details")
+
+
+class InferenceMode(_Strict):
+    """A runtime-switchable behavior produced by post-training.
+
+    Use this for chat-template-driven modes (Qwen3 thinking/non-thinking), thinking-budget
+    style controls, or other behaviors that the user toggles at inference time without
+    swapping weights.
+    """
+
+    name: str = Field(description='e.g. "thinking", "non-thinking", "thinking-budget"')
+    trigger: str = Field(
+        description='How the user activates this mode, e.g. "/think flag", "system prompt"'
+    )
+    description: str
+
+
 class Alignment(_Strict):
     sft: str
     rl_method: str = Field(description='e.g. "PPO", "DPO", "GRPO", "RLHF", or UNKNOWN')
@@ -173,6 +238,20 @@ class Alignment(_Strict):
         description=(
             "True only if AI generates the preference labels themselves (e.g. Constitutional AI). "
             "A model-based reward model trained on human preferences is RLHF, NOT RLAIF."
+        ),
+    )
+    stages: list[AlignmentStage] = Field(
+        default_factory=list,
+        description=(
+            "Multi-stage post-training pipeline. Empty list when a flat SFT+RL "
+            "description (the sft/rl_method fields above) is sufficient."
+        ),
+    )
+    inference_modes: list[InferenceMode] = Field(
+        default_factory=list,
+        description=(
+            "Runtime-switchable modes the user can toggle at inference. "
+            "Empty list when the model has a single mode of operation."
         ),
     )
 

@@ -1,6 +1,6 @@
 # DeepSeek-V3
 
-*Schema version: 2*
+*Schema version: 3*
 
 ## Overview
 
@@ -28,6 +28,18 @@
 | Context window | 131072 |
 
 **Context notes:** Paper validates 128K via the Needle-In-A-Haystack test. config.json sets max_position_embeddings=163840 (= YaRN scaling factor 40 x original 4096). 131072 is recorded as the canonical user-facing 128K spec.
+
+**Context extension:**
+
+| | |
+|---|---|
+| Method | yarn |
+| Trained max | [Unknown/Not Disclosed] |
+| Extended max | 131072 |
+| Factor | 40.0 |
+| Original max (RoPE) | 4096 |
+
+_Notes:_ Pre-train sequence length is 4K per paper; long-context extension uses YaRN. config.json reports max_position_embeddings=163840 (= 4096 x 40); 131072 is the canonical productized 128K spec.
 
 ### Attention (MLA)
 

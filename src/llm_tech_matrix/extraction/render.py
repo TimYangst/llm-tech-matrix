@@ -89,6 +89,21 @@ def render(model: ExtractedModel) -> str:
     if bb.context_window_notes:
         parts.append("")
         parts.append(f"**Context notes:** {bb.context_window_notes}")
+    if bb.context_extension is not None:
+        ce = bb.context_extension
+        parts.append("")
+        parts.append("**Context extension:**")
+        parts.append("")
+        parts.append(_table([
+            ("Method", ce.method),
+            ("Trained max", ce.trained_max),
+            ("Extended max", ce.extended_max),
+            ("Factor", ce.factor),
+            ("Original max (RoPE)", ce.original_max),
+        ]))
+        if ce.notes:
+            parts.append("")
+            parts.append(f"_Notes:_ {ce.notes}")
     parts.append("")
 
     parts.append(f"### Attention ({arch.attention.variant})")
@@ -228,6 +243,24 @@ def render(model: ExtractedModel) -> str:
     parts.append("")
     parts.append(f"**RLAIF:** `{al.rlaif}`")
     parts.append("")
+
+    if al.stages:
+        parts.append("**Post-training stages:**")
+        parts.append("")
+        parts.append("| # | Name | Method | Description |")
+        parts.append("|---|---|---|---|")
+        for i, s in enumerate(al.stages, start=1):
+            parts.append(f"| {i} | {s.name} | `{s.method}` | {s.description} |")
+        parts.append("")
+
+    if al.inference_modes:
+        parts.append("**Inference modes (runtime-switchable):**")
+        parts.append("")
+        parts.append("| Name | Trigger | Description |")
+        parts.append("|---|---|---|")
+        for m in al.inference_modes:
+            parts.append(f"| `{m.name}` | {m.trigger} | {m.description} |")
+        parts.append("")
 
     parts.append("### Advanced")
     parts.append("")

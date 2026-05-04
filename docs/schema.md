@@ -1,4 +1,4 @@
-# Extraction Schema (v2)
+# Extraction Schema (v3)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -8,7 +8,7 @@ The executable version lives in `src/llm_tech_matrix/schema.py` (Pydantic). This
 document is the human-readable spec; if the two diverge, **the Pydantic version wins**
 and this doc must be updated.
 
-For the schema changelog (what changed v1 → v2), see
+For the schema changelog (what changed across versions), see
 [`conventions.md`](./conventions.md#schema-changelog).
 
 ## Cardinal rule: no hallucination
@@ -44,6 +44,16 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 - `context_window` — int (canonical user-facing max, e.g. 131072 for "128K")
 - `context_window_notes` — string (free-text for paper-vs-config discrepancies, extension
   method, or caveats; empty `""` if none)
+- `context_extension` — object **(null when the model uses its trained length without
+  scaling tricks)**:
+  - `method` — string, e.g. `"yarn"`, `"yarn+dca"`, `"longrope"`, `"abf+yarn"`,
+    `"sliding+global"`
+  - `trained_max` — int (max sequence length seen during pre-training)
+  - `extended_max` — int (productized max — equals `context_window`)
+  - `factor` — float (scaling ratio)
+  - `original_max` — int (YaRN-style `original_max_position_embeddings`)
+  - `notes` — string (e.g. "applied at deployment via vLLM YaRN config; not in static
+    config.json")
 
 #### Attention
 
@@ -107,11 +117,26 @@ directly.
     - `rate` — string (e.g. `"0.1"`)
   - `other` — list of strings (free-form, for novel objectives without a slot yet)
 - `alignment` — object:
-  - `sft` — string description
-  - `rl_method` — enum or string: `"PPO"` / `"DPO"` / `"GRPO"` / `"RLHF"` / etc.
+  - `sft` — string description (flat summary; can stay UNKNOWN if a `stages` list is
+    used instead)
+  - `rl_method` — enum or string: `"PPO"` / `"DPO"` / `"GRPO"` / `"RLHF"` / etc. (flat
+    summary; can stay UNKNOWN if a `stages` list is used instead)
   - `rlaif` — bool. **True only if AI generates the preference labels themselves**
     (e.g. Constitutional AI). A model-based reward model trained on human preferences
     is **RLHF, not RLAIF**.
+  - `stages` — list of `{name, method, description}` for multi-stage post-training
+    pipelines (e.g. Qwen3's four-stage Long-CoT Cold Start → Reasoning RL → Thinking
+    Mode Fusion → General RL). Empty list `[]` for simple SFT+RL pipelines.
+    - `name` — e.g. `"Long-CoT Cold Start"`, `"Reasoning RL"`
+    - `method` — e.g. `"sft"`, `"rl"`, `"distillation"`, `"rejection_sampling+sft"`
+    - `description` — string (data, signals, key recipe details)
+  - `inference_modes` — list of `{name, trigger, description}` for runtime-switchable
+    behaviors produced by post-training (e.g. Qwen3's `/think` vs `/no_think`,
+    thinking-budget). Empty list `[]` for single-mode models.
+    - `name` — e.g. `"thinking"`, `"non-thinking"`, `"thinking-budget"`
+    - `trigger` — string describing how a user activates the mode (chat-template flag,
+      system prompt, special token, etc.)
+    - `description` — string
 - `advanced` — object:
   - `self_distillation` — string description (or `"No"`)
   - `mixed_precision` — e.g. `"FP8 + BF16"`, `"BF16"`
