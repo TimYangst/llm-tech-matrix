@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v4).
+"""Pydantic models for the extraction schema (v5).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
@@ -208,11 +208,63 @@ class BaseComponents(_Strict):
     embedding_notes: str
 
 
+class ResidualConfig(_Strict):
+    """Inter-layer residual-stream topology.
+
+    None / omitted means the model uses standard residual connections (the common case
+    before DeepSeek-V4's Manifold-Constrained Hyper-Connections / Hyper-Connections
+    family of techniques). Populate when a model expands the residual stream beyond
+    R^d into R^(n_hc x d) or otherwise structurally modifies the residual mapping
+    between layers.
+    """
+
+    kind: str = Field(
+        description=(
+            'Topology kind, e.g. "standard", "hyper-connections", "mhc" '
+            '(manifold-constrained hyper-connections), "other"'
+        )
+    )
+    expansion_factor: int | str = Field(
+        default=UNKNOWN,
+        description=(
+            "Width expansion of the residual stream (n_hc in the HC/mHC papers). "
+            "1 for standard residual."
+        ),
+    )
+    constraint: str = Field(
+        default="",
+        description=(
+            "Constraint applied to the residual mapping, e.g. "
+            '"doubly stochastic via Sinkhorn-Knopp", "non-expansive Sigmoid". '
+            "Empty for standard residual."
+        ),
+    )
+    iterations: int | str = Field(
+        default=UNKNOWN,
+        description="Solver iterations (e.g. Sinkhorn-Knopp t_max). UNKNOWN if not applicable.",
+    )
+    dynamic_parameterization: bool | str = Field(
+        default=UNKNOWN,
+        description=(
+            "True when the residual mappings are input-dependent (dynamic), "
+            "False when they are static learnable weights only."
+        ),
+    )
+    notes: str = ""
+
+
 class Architecture(_Strict):
     backbone: Backbone
     attention: Attention
     ffn: FFN
     components: BaseComponents
+    residual_connections: ResidualConfig | None = Field(
+        default=None,
+        description=(
+            "Structured residual-stream topology. None when the model uses standard "
+            "residual connections (the common case)."
+        ),
+    )
     parallelism_notes: str
 
 
@@ -326,6 +378,14 @@ class Training(_Strict):
     objectives: TrainingObjectives = Field(default_factory=TrainingObjectives)
     alignment: Alignment
     advanced: Advanced
+    stability_notes: str = Field(
+        default="",
+        description=(
+            "Training-stability tricks distinct from optimizer / lr_schedule / mixed_precision. "
+            "E.g. DeepSeek-V4's Anticipatory Routing (decoupled routing-net sync) and "
+            "SwiGLU Clamping. Empty when none reported."
+        ),
+    )
 
 
 # ---------- 4. Multimodal ----------

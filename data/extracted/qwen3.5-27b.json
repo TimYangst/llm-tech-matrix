@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "metadata": {
     "name": "Qwen3.5-27B",
     "family": "Qwen",
@@ -38,7 +38,11 @@
         "base": 10000000,
         "scaling": {
           "mrope_interleaved": true,
-          "mrope_section": [11, 11, 10],
+          "mrope_section": [
+            11,
+            11,
+            10
+          ],
           "partial_rotary_factor": 0.25
         }
       },
@@ -117,7 +121,11 @@
     }
   },
   "multimodal": {
-    "modalities": ["text", "image", "video"],
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
     "fusion": "native_early",
     "fusion_notes": "Vendor description: 'Unified Vision-Language Foundation. Early fusion training on multimodal tokens.' Vision tokens are inlined into the same backbone as text via four reserved vocabulary IDs (vision_start, image, video, vision_end). The vision encoder's projected output dim (vision_config.out_hidden_size=5120) equals the LM hidden dim, indicating a direct projection into the shared hidden stream after spatial_merge_size=2 patch merging. README pipeline_tag=image-text-to-text confirms the model is shipped as a single causal LM that natively consumes image and video alongside text; there is no separate text-only checkpoint.",
     "vision_encoder": {

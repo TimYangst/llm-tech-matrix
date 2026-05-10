@@ -49,6 +49,7 @@ LABELS: dict[str, dict[str, str]] = {
         "attention": "Attention",
         "ffn": "FFN",
         "components": "Components",
+        "residual_connections": "Residual connections",
         "parallelism": "Parallelism / infra",
         "training": "Training",
         "training_objectives": "Training objectives (beyond next-token prediction)",
@@ -127,6 +128,13 @@ LABELS: dict[str, dict[str, str]] = {
         # Advanced
         "self_distillation": "Self-distillation",
         "mixed_precision": "Mixed precision",
+        "stability_notes": "Stability tricks",
+        # Residual connections
+        "rc_kind": "Kind",
+        "rc_expansion_factor": "Expansion factor (n_hc)",
+        "rc_constraint": "Constraint",
+        "rc_iterations": "Solver iterations",
+        "rc_dynamic_parameterization": "Dynamic parameterization",
         # Multimodal
         "modalities": "Modalities",
         "fusion": "Fusion",
@@ -169,6 +177,7 @@ LABELS: dict[str, dict[str, str]] = {
         "attention": "注意力",
         "ffn": "FFN",
         "components": "组件",
+        "residual_connections": "残差连接",
         "parallelism": "并行 / 基础设施",
         "training": "训练",
         "training_objectives": "训练目标（next-token prediction 之外）",
@@ -247,6 +256,13 @@ LABELS: dict[str, dict[str, str]] = {
         # Advanced
         "self_distillation": "自蒸馏",
         "mixed_precision": "混合精度",
+        "stability_notes": "稳定性 trick",
+        # Residual connections
+        "rc_kind": "类型",
+        "rc_expansion_factor": "扩展因子（n_hc）",
+        "rc_constraint": "约束",
+        "rc_iterations": "求解迭代数",
+        "rc_dynamic_parameterization": "动态参数化",
         # Multimodal
         "modalities": "模态",
         "fusion": "融合方式",
@@ -552,6 +568,36 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
     )
     parts.append("")
 
+    if arch.residual_connections is not None:
+        rc = arch.residual_connections
+        parts.append(f"### {labels['residual_connections']}")
+        parts.append("")
+        parts.append(
+            _table(
+                [
+                    (labels["rc_kind"], f"`{rc.kind}`"),
+                    (labels["rc_expansion_factor"], rc.expansion_factor),
+                    (labels["rc_iterations"], rc.iterations),
+                    (labels["rc_dynamic_parameterization"], f"`{rc.dynamic_parameterization}`"),
+                ]
+            )
+        )
+        if rc.constraint:
+            parts.append("")
+            parts.append(
+                f"**{labels['rc_constraint']}：** {rc.constraint}"
+                if lang == "zh"
+                else f"**{labels['rc_constraint']}:** {rc.constraint}"
+            )
+        if rc.notes:
+            parts.append("")
+            parts.append(
+                f"_{labels['notes']}：_ {rc.notes}"
+                if lang == "zh"
+                else f"_{labels['notes']}:_ {rc.notes}"
+            )
+        parts.append("")
+
     parts.append(f"### {labels['parallelism']}")
     parts.append("")
     parts.append(arch.parallelism_notes)
@@ -705,6 +751,14 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
         else f"**{labels['mixed_precision']}:** {train.advanced.mixed_precision}"
     )
     parts.append("")
+
+    if train.stability_notes:
+        parts.append(
+            f"**{labels['stability_notes']}：** {train.stability_notes}"
+            if lang == "zh"
+            else f"**{labels['stability_notes']}:** {train.stability_notes}"
+        )
+        parts.append("")
 
     # ---- Multimodal ----
     if model.multimodal is not None:
