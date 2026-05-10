@@ -2,7 +2,7 @@
 
 Slug: `qwen3.5-35b-a3b`
 Family: `qwen`
-Status: `sourcing`
+Status: `extracted`
 
 ## Sources
 
@@ -27,23 +27,29 @@ Considered but excluded:
 
 ## Open questions
 
-Things flagged during sourcing/extraction that need resolution.
-
-- [ ] **Backbone shape doesn't fit the schema's single `architecture.attention` object.**
-  Layout per HF model card: `10 × (3 × (Gated DeltaNet → MoE) → 1 × (Gated Attention → MoE))`.
-  Schema iteration likely needed (per-block-type attention, or a layer-pattern field).
-- [ ] **Vision encoder details.** Schema has only `vision_encoder: str`; HF model
-  card does not currently disclose the encoder architecture / param count. Need
-  to read the blog or check the HF model `architectures` list in config.json.
-- [ ] **Pre-training data composition** — text token count, vision token count,
-  multimodal interleaving strategy. Blog-only at this point.
-- [ ] **Why 1 shared expert again?** Qwen3 dropped shared experts (per their paper);
-  Qwen3.5 brings back exactly one (per HF model card "8 Routed + 1 Shared").
-  Cross-reference with DeepSeek-V3 (also 1 shared) — design rationale unclear.
+(See `data/extracted/qwen3.5-35b-a3b.json` `open_questions` for the authoritative
+list of unresolved items surfaced during extraction — pre-training optimizer/LR/data
+mix, MTP step depth D, post-training pipeline, mixed precision, parallelism, MoE
+routing specifics beyond top-8 + 1 shared, why the shared expert was reintroduced
+and why the LB strategy reverted from global-batch / aux-loss-free to classic
+aux-loss with coef 0.001.)
 
 ## Resolved
 
-- (none yet)
+- ✅ **Hybrid-backbone schema gap** — resolved by schema v4 (`Attention.variants[]`
+  and `layer_pattern`) ahead of extraction. The 10 × (3 GatedDeltaNet, 1
+  GatedAttention) layout is captured cleanly via two `AttentionVariant` entries
+  and a textual `layer_pattern`.
+- ✅ **Vision encoder details** — captured via the structured `Multimodal.vision_encoder`
+  schema-v4 field (HF `vision_config` keys mirrored: depth=27, hidden=1152,
+  intermediate=4304, num_heads=16, patch=16, spatial_merge=2, temporal_patch=2,
+  out_hidden_size=2048). Encoder geometry matches Qwen3.5-27B exactly except for
+  the projected output dim, which tracks LM hidden (2048 here, 5120 for the
+  dense 27B); whether weights are literally shared between the variants remains
+  open.
+- ✅ **Shared expert reintroduction confirmed** — `shared_expert_intermediate_size=512`
+  in config and "8 Routed + 1 Shared" on the HF model card. Design rationale
+  remains undisclosed; carried forward in the extraction's `open_questions`.
 
 ## Inferred fields (closed models only)
 

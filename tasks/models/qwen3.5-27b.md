@@ -2,7 +2,7 @@
 
 Slug: `qwen3.5-27b`
 Family: `qwen`
-Status: `sourcing`
+Status: `extracted`
 
 ## Sources
 
@@ -24,20 +24,27 @@ Considered but excluded:
 
 ## Open questions
 
-- [ ] Same hybrid-backbone schema gap as the MoE sibling (see
-  `qwen3.5-35b-a3b.md`) — `architecture.attention` cannot represent the
-  `(3 × DeltaNet → 1 × Gated Attention)` layer pattern.
-- [ ] **Dense FFN intermediate** is 17408 per HF model card. With dense FFN (no
-  MoE), how does this compare to Qwen3-32B's 25600? Width/depth tradeoff against
-  the new attention budget?
-- [ ] **Cross-version dense compare**: Qwen3-32B is 64 layers / hidden 5120, FFN
-  25600, full GQA. Qwen3.5-27B is also 64 layers / hidden 5120 but with hybrid
-  backbone and FFN 17408. The "saved" FFN budget presumably went into the
-  Gated DeltaNet + Gated Attention machinery.
+(See `data/extracted/qwen3.5-27b.json` `open_questions` for the authoritative list
+of unresolved items surfaced during extraction — pre-training optimizer/LR/data
+mix, MTP step depth D, post-training pipeline structure, mixed-precision recipe,
+parallelism, vision-pathway training. README/blog disclose vendor highlights only;
+no separate Qwen3.5 tech report exists at extraction time.)
 
 ## Resolved
 
-- (none yet)
+- ✅ **Hybrid-backbone schema gap** — resolved by schema v4 (`Attention.variants[]`
+  and `layer_pattern`) ahead of extraction. The 16 × (3 GatedDeltaNet, 1
+  GatedAttention) layout is captured cleanly via two `AttentionVariant` entries
+  and a textual `layer_pattern`. Source: `src/llm_tech_matrix/schema.py` v4 and
+  `docs/conventions.md` schema changelog.
+- ✅ **Dense FFN width vs Qwen3-32B** — confirmed 17408 (per HF README and
+  `config.intermediate_size`); Qwen3-32B is 25600. Captured under
+  `architecture.ffn.layer_partition` with cross-version commentary on the
+  reallocation toward hybrid-backbone machinery.
+- ✅ **Cross-version dense compare structure** — extraction notes the same depth
+  (64L) and hidden (5120) as Qwen3-32B but the attention budget now flows through
+  16 GQA layers (24Q:4KV with output gate + partial RoPE) plus 48 Gated DeltaNet
+  layers, replacing 64 dense GQA layers. Recorded in `architecture.ffn.layer_partition`.
 
 ## Inferred fields (closed models only)
 
