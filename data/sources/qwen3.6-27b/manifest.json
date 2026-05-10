@@ -1,0 +1,60 @@
+{
+  "slug": "qwen3.6-27b",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-27B/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.6-27B HuggingFace config.json (dense, same hybrid arch as 3.5, +MTP multi-steps)",
+      "sha256": "69db4eb7196bc8190813231b3018ca05d8c2e3abc7b1af19d55c157af44a9d9c",
+      "size_bytes": 4308,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-27B/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json — chat_template after /think /nothink soft-switch removal; preserve_thinking kwarg",
+      "sha256": "5186f0defcd7f232382c7f0aebcd2252d073bb921ab240e407b7ae8745d2b29b",
+      "size_bytes": 16718,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-27B/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "HF preprocessor_config.json — vision encoder image preprocessing",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size_bytes": 390,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-27B/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — Token Embedding 248320 padded, MTP multi-steps, agentic coding focus",
+      "sha256": "bb936d6da51014f1edc9aa4cf9abf28d98695b7616ad56adfeeebfa752051d3d",
+      "size_bytes": 62593,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.6-27b",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post for Qwen3.6-27B (April 22, 2026)",
+      "sha256": "a6a646b2e9c6e2e9b23cf314ecb67593af8a554107d7ca5f7550ee4f70a35702",
+      "size_bytes": 87919,
+      "fetched_at": "2026-05-09"
+    }
+  ]
+}

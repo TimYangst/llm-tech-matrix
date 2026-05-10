@@ -15,7 +15,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from llm_tech_matrix.schema import ExtractedModel
+from llm_tech_matrix.schema import SCHEMA_VERSION, ExtractedModel
 
 EXTRACTED_DIR = Path(__file__).resolve().parent.parent / "data" / "extracted"
 
@@ -28,10 +28,29 @@ def main() -> int:
 
     failures: list[str] = []
     for path in files:
+        rel = path.relative_to(EXTRACTED_DIR.parent.parent)
         try:
-            ExtractedModel.model_validate(json.loads(path.read_text()))
-        except (ValidationError, json.JSONDecodeError) as err:
-            failures.append(f"{path.relative_to(EXTRACTED_DIR.parent.parent)}:\n{err}")
+            data = json.loads(path.read_text())
+        except json.JSONDecodeError as err:
+            failures.append(f"{rel}:\n{err}")
+            continue
+
+        # The Pydantic model defaults `schema_version` to the current SCHEMA_VERSION,
+        # so a file missing the field, or with a stale value, would otherwise pass
+        # `model_validate` silently. Enforce equality here so CI catches missed
+        # migrations after a schema bump.
+        declared = data.get("schema_version")
+        if declared != SCHEMA_VERSION:
+            failures.append(
+                f"{rel}:\nschema_version is {declared!r}, expected {SCHEMA_VERSION}. "
+                f"Either migrate the file or pin the schema version explicitly."
+            )
+            continue
+
+        try:
+            ExtractedModel.model_validate(data)
+        except ValidationError as err:
+            failures.append(f"{rel}:\n{err}")
         else:
             print(f"  OK  {path.name}")
 
