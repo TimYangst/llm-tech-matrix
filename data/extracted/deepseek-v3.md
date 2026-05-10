@@ -1,6 +1,6 @@
 # DeepSeek-V3
 
-*Schema version: 3*
+*Schema version: 4*
 
 ## Overview
 

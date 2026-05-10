@@ -1,4 +1,4 @@
-# Extraction Schema (v3)
+# Extraction Schema (v4)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -57,18 +57,32 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 
 #### Attention
 
-- `variant` — string: `"MHA"` / `"GQA"` / `"MLA"` / `"sliding_window"` / other
+- `variant` — string: `"MHA"` / `"GQA"` / `"MLA"` / `"sliding_window"` / `"hybrid"` / other
 - `num_heads` — int (or UNKNOWN for MLA)
 - `num_kv_heads` — int (meaningful for MHA/GQA; UNKNOWN for MLA — use the `mla` subobject)
 - `head_dim` — int (meaningful for MHA/GQA; for MLA the per-head dim is split across
   `mla.qk_nope_head_dim` + `mla.qk_rope_head_dim`)
-- `rope` — object: `{ "type": "standard"|"yarn"|"ntk"|"none", "base": int, "scaling": object|null }`
+- `rope` — object: `{ "type": "standard"|"yarn"|"ntk"|"mrope"|"none", "base": int, "scaling": object|null }`
 - `mla` — object **(required when variant == "MLA", else null)**:
   - `kv_lora_rank` — int (KV compression dim)
   - `q_lora_rank` — int (query compression dim)
   - `qk_nope_head_dim` — int (NoPE part of QK head)
   - `qk_rope_head_dim` — int (RoPE part of QK head)
   - `v_head_dim` — int
+- `variants` — list of `{name, family, num_query_heads, num_kv_heads, head_dim, rope, notes}`
+  **for hybrid stacks** (Qwen3.5/3.6 interleave Gated DeltaNet + Gated Attention 3:1).
+  Empty list `[]` for single-variant stacks. When non-empty, the top-level
+  `num_heads`/`num_kv_heads`/`head_dim` should describe the dominant or full-attention
+  variant for back-compat readers.
+  - `name` — logical name, e.g. `"gated_attention"`, `"gated_deltanet"`
+  - `family` — `"mha"` / `"gqa"` / `"mqa"` / `"mla"` / `"linear_attention"` / `"sliding_window"` / `"other"`
+  - `num_query_heads`, `num_kv_heads`, `head_dim` — per-variant (variants of the same
+    model can disagree on these)
+  - `rope` — string description if RoPE handling differs per variant
+  - `notes` — string for variant-specific knobs (e.g. `"v_heads=32, conv_kernel_dim=4"`)
+- `layer_pattern` — string for hybrid stacks describing layer ordering, e.g.
+  `"(L,L,L,F)×10 with L=gated_deltanet, F=gated_attention"`. Empty `""` for
+  single-variant stacks.
 
 The MLA field names mirror HuggingFace `config.json` keys so extractors can copy them
 directly.
@@ -143,11 +157,44 @@ directly.
 
 ### 4. Multimodal specifics (multimodal models only)
 
-- `vision_encoder` — e.g. `"ViT-L/14 (CLIP-init)"`
-- `audio_encoder` — same shape
-- `fusion` — enum: `"native"` (single transformer over interleaved tokens) / `"projected"`
-  (encoder → MLP → LLM) / `"cross_attention"` / other
-- `fusion_notes` — string with details
+The top-level `multimodal` field is null for text-only LMs. When a model handles non-text
+modalities, populate this section.
+
+- `modalities` — list of strings, e.g. `["text", "image", "video"]`
+- `fusion` — enum:
+  - `"native_early"` — text and vision share the same backbone+vocab from pre-training
+    (Qwen3.5/3.6); image patches map to reserved vocab IDs and flow through the LM stack.
+  - `"projection_mlp"` — vision encoder + MLP projector mapping into the LM hidden_size
+    (Qwen2-VL, LLaVA-style).
+  - `"cross_attention"` — vision tokens attended-to via dedicated cross-attn layers
+    (Flamingo).
+  - `"resampler"` — Q-Former / Perceiver Resampler downsampling to a fixed query count
+    (BLIP-2, MiniCPM-V).
+  - `"other"` / `"[Unknown/Not Disclosed]"`
+- `fusion_notes` — string with specifics (early vs late, projector shape, training-stage
+  timing, etc.)
+- `vision_encoder` — object or null:
+  - `architecture` — e.g. `"ViT"`, `"ViT with window attention"`, `"EVA-CLIP"`
+  - `depth` — int (layers in the vision encoder)
+  - `hidden_size` — int (encoder hidden dim)
+  - `intermediate_size` — int (encoder FFN intermediate)
+  - `num_heads` — int (encoder attention heads)
+  - `patch_size` — int (spatial patch size in pixels)
+  - `in_channels` — int (typically 3 for RGB)
+  - `output_dim` — int (projected dim feeding into the LM hidden stream; for native VL
+    typically equals LM hidden_size after spatial_merge)
+  - `spatial_merge_size` — int
+  - `temporal_patch_size` — int (for video frames)
+  - `notes` — string (window-attention layout, special block indexes, training data, etc.)
+- `vision_token_anchors` — object or null: token IDs in the LM vocab where vision data
+  attaches (relevant for native-VL models; can stay null for projection-fusion models)
+  - `image_token_id` — int
+  - `video_token_id` — int
+  - `vision_start_token_id` — int
+  - `vision_end_token_id` — int
+- `audio_encoder` — string (free-form for now; lift to a structured AudioEncoder when
+  we extract a serious audio model)
+- `audio_notes` — string
 
 ### 5. Top-level: inferred fields and open questions
 

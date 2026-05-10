@@ -1,0 +1,60 @@
+{
+  "slug": "qwen3.5-27b",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.5-27B/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.5-27B HuggingFace config.json (dense, hybrid Gated DeltaNet + Gated Attention, FFN 17408)",
+      "sha256": "f8d190c5b89c1521220f935d2567a587d6e291ed69066a45a106560b05a2174c",
+      "size_bytes": 4134,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.5-27B/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json — contains Jinja2 chat_template",
+      "sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8",
+      "size_bytes": 16710,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.5-27B/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "HF preprocessor_config.json — vision encoder image preprocessing",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size_bytes": 390,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.5-27B/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — 64L hidden 5120 hybrid 16x(3xDeltaNet+1xAttn), dense FFN, native VL",
+      "sha256": "8c6303cd5e89dc378d11fb4b70a0ff9c3cccb55a031133c69d9cbde9481f1a8c",
+      "size_bytes": 92417,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.5",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post 'Qwen3.5: Towards Native Multimodal Agents' (Feb 2026)",
+      "sha256": "d53f9140540199c8f0d743d499c591055ba981b32f4bd3fd5b7d38ded529b4d7",
+      "size_bytes": 87919,
+      "fetched_at": "2026-05-09"
+    }
+  ]
+}

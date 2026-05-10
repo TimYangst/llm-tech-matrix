@@ -1,6 +1,6 @@
 # Qwen3-235B-A22B
 
-*Schema version: 3*
+*Schema version: 4*
 
 ## Overview
 

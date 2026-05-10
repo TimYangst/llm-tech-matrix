@@ -4,21 +4,47 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — open-weight text models. **Schema v3** landed (Qwen3-driven additions
-for context_extension + multi-stage alignment + runtime inference modes; DeepSeek-V3
-migrated).
+**Phase:** M1 — pivoting into native-multimodal territory with Qwen3.5/3.6, the next
+generation after our Qwen3 entries. These ship as **Causal LM + Vision Encoder** by
+default (no text-only checkpoint), so this batch is the project's first real exercise
+of the multimodal schema region — and they introduce a hybrid Gated DeltaNet + Gated
+Attention backbone that doesn't fit cleanly in the current `architecture.attention`
+shape. Expect a schema iteration during/after extraction.
 
-**Recommended next:** Cross-family dense baseline — pick one of `llama-3.1-70b`,
-`mistral-large-2`, or `glm-4` to break out of the Qwen / DeepSeek duopoly. Llama 3.1
-gives a clean Llama-vs-Qwen GQA contrast and well-documented training infra (which
-both Qwen3 and DeepSeek-V3 keep mostly closed). After that, a closed model
-(`gpt-4o` or `claude-sonnet-4`) to exercise the `inferred_fields` machinery.
+**In progress (sourcing):**
+
+- `qwen3.5-35b-a3b` — Qwen3.5 MoE smaller (Feb 2026)
+- `qwen3.5-27b` — Qwen3.5 dense (Feb 2026)
+- `qwen3.6-35b-a3b` — Qwen3.6 MoE smaller (Apr 2026, +MTP, removes /think soft switch)
+- `qwen3.6-27b` — Qwen3.6 dense (Apr 2026, +MTP)
+
+**Anticipated schema gaps (record before extraction starts):**
+
+- `architecture.attention` is a single object; Qwen3.5/3.6 layout is
+  `N × (3 × (Gated DeltaNet → FFN/MoE) → 1 × (Gated Attention → FFN/MoE))` — needs
+  per-block-type variants or a layer-pattern field.
+- `architecture.multimodal` currently is `{vision_encoder, audio_encoder, fusion, fusion_notes}` (4 strings). Native VL with shared backbone needs richer encoder
+  details (params, patch size, native resolution, training data).
+- `training.objectives.multi_token_prediction` exists, but Qwen3.6 trains with
+  multi-step MTP — confirm the field captures step depth.
+- Chat-template details (soft-switch `/think` + API-only `enable_thinking` +
+  `preserve_thinking`) need somewhere structured to live; current
+  `alignment.inference_modes.trigger` is free-form.
+
+**Recommended next (after this batch):** Cross-family dense baseline — `llama-3.1-70b`
+or `mistral-large-2` or `glm-4` to break out of the Qwen / DeepSeek duopoly. Then a
+closed model (`gpt-4o` or `claude-sonnet-4`) to exercise `inferred_fields`.
 
 > Note on the Qwen3 family: it ships as 6 dense sizes (0.6B–32B) + 2 MoE flagships
 > (30B-A3B, 235B-A22B). We extracted two slugs only — the 32B dense and 235B-A22B MoE
 > flagships — since dense siblings share architecture and training recipe modulo
 > width/depth. If a per-size scaling analysis becomes useful later, schema can grow a
 > `metadata.size_variants` field then.
+
+> Note on Qwen3.5/3.6: each generation ships ~7 sizes (0.8B–397B for Qwen3.5; only
+> 27B + 35B-A3B open-weight for Qwen3.6 so far). We're extracting four total: the
+> dense 27B + smaller MoE 35B-A3B from each generation. Same-size cross-version
+> compare is the cleanest signal for the Qwen3.5→3.6 delta.
 
 **Recently completed (2026-05-03):**
 
@@ -63,11 +89,20 @@ both Qwen3 and DeepSeek-V3 keep mostly closed). After that, a closed model
 
 ## M1 — Multimodal extension
 
-| Slug              | Family  | Status    | Notes file | Source priority                       |
-| ----------------- | ------- | --------- | ---------- | ------------------------------------- |
-| `qwen-2.5-vl-72b` | Qwen    | `backlog` | —          | Vision encoder + projection fusion    |
-| `minicpm-v-2.6`   | MiniCPM | `backlog` | —          | Compact multimodal                    |
-| `glm-4v`          | GLM     | `backlog` | —          | Native vs projected fusion comparison |
+Qwen3.5/3.6 are *natively* multimodal (LM + vision encoder ship together), unlike the
+older projection-fusion multimodal models below them. They sit in this table because
+their primary characterization includes vision, not because they're a "VL extension"
+of a text-only LM.
+
+| Slug              | Family  | Status     | Notes file                                                 | Source priority                                                       |
+| ----------------- | ------- | ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| `qwen3.5-35b-a3b` | Qwen    | `sourcing` | [`models/qwen3.5-35b-a3b.md`](./models/qwen3.5-35b-a3b.md) | Qwen3.5 MoE — hybrid Gated DeltaNet + MoE w/ shared expert; native VL |
+| `qwen3.5-27b`     | Qwen    | `sourcing` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)         | Qwen3.5 dense — hybrid backbone, FFN dense; native VL                 |
+| `qwen3.6-35b-a3b` | Qwen    | `sourcing` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md) | Qwen3.6 MoE — same arch as 3.5, +MTP, removes /think soft switch      |
+| `qwen3.6-27b`     | Qwen    | `sourcing` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)         | Qwen3.6 dense — same arch as 3.5, +MTP, agentic-coding RL             |
+| `qwen-2.5-vl-72b` | Qwen    | `backlog`  | —                                                          | Vision encoder + projection fusion                                    |
+| `minicpm-v-2.6`   | MiniCPM | `backlog`  | —                                                          | Compact multimodal                                                    |
+| `glm-4v`          | GLM     | `backlog`  | —                                                          | Native vs projected fusion comparison                                 |
 
 ## M1 — Closed models (inference)
 

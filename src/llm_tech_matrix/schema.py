@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v3).
+"""Pydantic models for the extraction schema (v4).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,13 +13,20 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
-RoPEType = Literal["standard", "yarn", "ntk", "none", "[Unknown/Not Disclosed]"]
+RoPEType = Literal["standard", "yarn", "ntk", "mrope", "none", "[Unknown/Not Disclosed]"]
 FFNType = Literal["dense", "moe", "hybrid"]
-FusionType = Literal["native", "projected", "cross_attention", "other", "[Unknown/Not Disclosed]"]
+FusionType = Literal[
+    "native_early",  # text and vision tokens share the same backbone+vocab from pre-training (Qwen3.5/3.6)
+    "projection_mlp",  # vision encoder + MLP projector mapping into LM hidden_size (Qwen2-VL, LLaVA)
+    "cross_attention",  # vision tokens attended-to via dedicated cross-attn layers (Flamingo)
+    "resampler",  # Q-Former / Perceiver Resampler downsampling to fixed query count (BLIP-2, MiniCPM-V)
+    "other",
+    "[Unknown/Not Disclosed]",
+]
 Confidence = Literal["low", "medium", "high"]
 
 
@@ -65,8 +72,33 @@ class MLAConfig(_Strict):
     v_head_dim: int | str = UNKNOWN
 
 
+class AttentionVariant(_Strict):
+    """One attention variant in a hybrid stack.
+
+    Used when a model interleaves multiple attention types per layer (e.g. Qwen3.5/3.6
+    interleave 3 Gated DeltaNet layers with 1 Gated Attention layer in repeating blocks).
+    For non-hybrid models, leave Attention.variants empty and use the top-level fields.
+    """
+
+    name: str = Field(description='Logical name, e.g. "gated_attention", "gated_deltanet"')
+    family: str = Field(
+        description='Family: "mha"|"gqa"|"mqa"|"mla"|"linear_attention"|"sliding_window"|"other"'
+    )
+    num_query_heads: int | str = UNKNOWN
+    num_kv_heads: int | str = UNKNOWN
+    head_dim: int | str = UNKNOWN
+    rope: str = Field(default="", description="Per-variant RoPE description if it differs")
+    notes: str = Field(
+        default="",
+        description=(
+            "Variant-specific knobs not covered by other fields, e.g. "
+            "'v_heads=32, conv_kernel_dim=4' for Gated DeltaNet"
+        ),
+    )
+
+
 class Attention(_Strict):
-    variant: str = Field(description='e.g. "MHA", "GQA", "MLA", "sliding_window"')
+    variant: str = Field(description='e.g. "MHA", "GQA", "MLA", "sliding_window", "hybrid"')
     num_heads: int | str = UNKNOWN
     num_kv_heads: int | str = Field(
         default=UNKNOWN,
@@ -79,6 +111,22 @@ class Attention(_Strict):
     rope: RoPEConfig
     mla: MLAConfig | None = Field(
         default=None, description="Required when variant == 'MLA', otherwise None"
+    )
+    variants: list[AttentionVariant] = Field(
+        default_factory=list,
+        description=(
+            "Per-variant detail when the stack interleaves multiple attention variants. "
+            "Empty for single-variant models. When non-empty, the top-level "
+            "num_heads/num_kv_heads/head_dim should describe the dominant or "
+            "full-attention variant for back-compat readers."
+        ),
+    )
+    layer_pattern: str = Field(
+        default="",
+        description=(
+            'Layer ordering pattern for hybrid stacks, e.g. "(L,L,L,F)x10 with '
+            'L=gated_deltanet, F=gated_attention". Empty for single-variant stacks.'
+        ),
     )
 
 
@@ -283,11 +331,83 @@ class Training(_Strict):
 # ---------- 4. Multimodal ----------
 
 
+class VisionEncoder(_Strict):
+    """Structured vision-encoder details.
+
+    Field names follow HF `vision_config` conventions where they exist (depth,
+    hidden_size, intermediate_size, num_heads, patch_size, in_channels, spatial_merge_size,
+    temporal_patch_size). Use UNKNOWN for fields not exposed in source material.
+    """
+
+    architecture: str = Field(
+        description='Architecture family, e.g. "ViT", "ViT with window attention", "EVA-CLIP"'
+    )
+    depth: int | str = UNKNOWN
+    hidden_size: int | str = UNKNOWN
+    intermediate_size: int | str = UNKNOWN
+    num_heads: int | str = UNKNOWN
+    patch_size: int | str = UNKNOWN
+    in_channels: int | str = UNKNOWN
+    output_dim: int | str = Field(
+        default=UNKNOWN,
+        description=(
+            "Projected output dim that feeds into the LM hidden stream. For native VL, "
+            "this typically equals LM hidden_size after spatial_merge."
+        ),
+    )
+    spatial_merge_size: int | str = UNKNOWN
+    temporal_patch_size: int | str = Field(
+        default=UNKNOWN, description="Temporal patch size for video frames"
+    )
+    notes: str = Field(
+        default="",
+        description=(
+            "Free-form notes — window-attention layout, special block indexes, "
+            "training data origin, etc."
+        ),
+    )
+
+
+class VisionTokenAnchors(_Strict):
+    """Token IDs in the LM vocab where vision data attaches.
+
+    Native-VL models reuse the LM vocab for vision (specific token IDs are reserved
+    for image patches and surround markers); projection-fusion models may not need
+    these and can leave them UNKNOWN.
+    """
+
+    image_token_id: int | str = UNKNOWN
+    video_token_id: int | str = UNKNOWN
+    vision_start_token_id: int | str = UNKNOWN
+    vision_end_token_id: int | str = UNKNOWN
+
+
 class Multimodal(_Strict):
-    vision_encoder: str
-    audio_encoder: str
+    """Multimodal architecture details.
+
+    Required when the model handles non-text modalities. For text-only LMs, the
+    top-level `multimodal` field stays None.
+    """
+
+    modalities: list[str] = Field(
+        default_factory=list,
+        description='e.g. ["text"], ["text","image"], ["text","image","video"], ["text","image","video","audio"]',
+    )
     fusion: FusionType
-    fusion_notes: str
+    fusion_notes: str = Field(
+        default="",
+        description="Free text describing fusion specifics (early vs late, projector shape, training stage timing)",
+    )
+    vision_encoder: VisionEncoder | None = None
+    vision_token_anchors: VisionTokenAnchors | None = None
+    audio_encoder: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Free-form audio encoder description for now. When we extract a serious "
+            "audio model, lift this to a structured AudioEncoder subobject."
+        ),
+    )
+    audio_notes: str = ""
 
 
 # ---------- 5. Top-level ----------

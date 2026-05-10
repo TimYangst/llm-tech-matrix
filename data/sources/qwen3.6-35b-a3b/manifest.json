@@ -1,0 +1,60 @@
+{
+  "slug": "qwen3.6-35b-a3b",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.6-35B-A3B HuggingFace config.json (same hybrid arch as 3.5, +MTP multi-steps)",
+      "sha256": "93a4693fa9d8392fbfccd4b3c9873f4bfdcb14fdede978b123d07d19675efe99",
+      "size_bytes": 3686,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json — chat_template after /think /nothink soft-switch removal; preserve_thinking kwarg",
+      "sha256": "5186f0defcd7f232382c7f0aebcd2252d073bb921ab240e407b7ae8745d2b29b",
+      "size_bytes": 16718,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "HF preprocessor_config.json — vision encoder image preprocessing",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size_bytes": 390,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — agentic coding + thinking preservation; same arch as Qwen3.5 35B-A3B",
+      "sha256": "c4ddaa065649ff6352648f64747a16eda31726f3e34add94ce04abb461c77b75",
+      "size_bytes": 64550,
+      "fetched_at": "2026-05-09"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.6-35b-a3b",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post for Qwen3.6-35B-A3B (April 16, 2026)",
+      "sha256": "1d55bd0908b3ae61c64e8dcdd516be387e2d2385bc54305f549b464da33af17b",
+      "size_bytes": 87919,
+      "fetched_at": "2026-05-09"
+    }
+  ]
+}

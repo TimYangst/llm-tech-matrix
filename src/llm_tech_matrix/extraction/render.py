@@ -159,6 +159,23 @@ def render(model: ExtractedModel) -> str:
         )
         parts.append("")
 
+    if att.variants:
+        parts.append("**Hybrid attention variants:**")
+        parts.append("")
+        parts.append("| Name | Family | Q heads | KV heads | Head dim | RoPE | Notes |")
+        parts.append("|---|---|---|---|---|---|---|")
+        for v in att.variants:
+            rope_cell = v.rope or "—"
+            notes_cell = v.notes or "—"
+            parts.append(
+                f"| `{v.name}` | `{v.family}` | {v.num_query_heads} | "
+                f"{v.num_kv_heads} | {v.head_dim} | {rope_cell} | {notes_cell} |"
+            )
+        parts.append("")
+    if att.layer_pattern:
+        parts.append(f"**Layer pattern:** {att.layer_pattern}")
+        parts.append("")
+
     parts.append(f"### FFN ({arch.ffn.ffn_type})")
     parts.append("")
     ffn = arch.ffn
@@ -310,12 +327,12 @@ def render(model: ExtractedModel) -> str:
         mm = model.multimodal
         parts.append("## Multimodal")
         parts.append("")
+        modalities_str = ", ".join(mm.modalities) if mm.modalities else "—"
         parts.append(
             _table(
                 [
-                    ("Vision encoder", mm.vision_encoder),
-                    ("Audio encoder", mm.audio_encoder),
-                    ("Fusion", mm.fusion),
+                    ("Modalities", modalities_str),
+                    ("Fusion", f"`{mm.fusion}`"),
                 ]
             )
         )
@@ -323,6 +340,54 @@ def render(model: ExtractedModel) -> str:
             parts.append("")
             parts.append(f"**Fusion notes:** {mm.fusion_notes}")
         parts.append("")
+
+        if mm.vision_encoder is not None:
+            ve = mm.vision_encoder
+            parts.append("### Vision encoder")
+            parts.append("")
+            parts.append(
+                _table(
+                    [
+                        ("Architecture", ve.architecture),
+                        ("Depth (layers)", ve.depth),
+                        ("Hidden size", ve.hidden_size),
+                        ("Intermediate size", ve.intermediate_size),
+                        ("Num heads", ve.num_heads),
+                        ("Patch size", ve.patch_size),
+                        ("Input channels", ve.in_channels),
+                        ("Output dim → LM", ve.output_dim),
+                        ("Spatial merge size", ve.spatial_merge_size),
+                        ("Temporal patch size", ve.temporal_patch_size),
+                    ]
+                )
+            )
+            if ve.notes:
+                parts.append("")
+                parts.append(f"_Notes:_ {ve.notes}")
+            parts.append("")
+
+        if mm.vision_token_anchors is not None:
+            va = mm.vision_token_anchors
+            parts.append("### Vision token anchors (LM vocab IDs)")
+            parts.append("")
+            parts.append(
+                _table(
+                    [
+                        ("image_token_id", va.image_token_id),
+                        ("video_token_id", va.video_token_id),
+                        ("vision_start_token_id", va.vision_start_token_id),
+                        ("vision_end_token_id", va.vision_end_token_id),
+                    ]
+                )
+            )
+            parts.append("")
+
+        if mm.audio_encoder and mm.audio_encoder != "[Unknown/Not Disclosed]":
+            parts.append(f"**Audio encoder:** {mm.audio_encoder}")
+            if mm.audio_notes:
+                parts.append("")
+                parts.append(f"_Audio notes:_ {mm.audio_notes}")
+            parts.append("")
 
     # ---- Inferred fields & open questions ----
     if model.inferred_fields:

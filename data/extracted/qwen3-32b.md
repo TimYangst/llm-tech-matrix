@@ -1,6 +1,6 @@
 # Qwen3-32B
 
-*Schema version: 3*
+*Schema version: 4*
 
 ## Overview
 
