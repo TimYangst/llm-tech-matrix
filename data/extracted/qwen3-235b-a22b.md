@@ -2,7 +2,7 @@
 
 > 中文版：[qwen3-235b-a22b.zh.md](./qwen3-235b-a22b.zh.md)
 
-*Schema version: 4*
+*Schema version: 5*
 
 ## Overview
 

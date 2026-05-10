@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "metadata": {
     "name": "Qwen3-235B-A22B",
     "family": "Qwen",
@@ -125,7 +125,7 @@
     "Vocabulary size discrepancy: paper Section 2 states 151,669 while config.json sets vocab_size=151,936. Likely the config value pads the BBPE vocabulary to a hardware-friendly size with control/special tokens, but the paper does not explicitly reconcile the two numbers.",
     "HF config.json contains intermediate_size=12288 alongside moe_intermediate_size=1536, with mlp_only_layers=[] and decoder_sparse_step=1 (every layer is MoE). The dense intermediate_size has no inference-time consumer in this configuration; likely a vestige (and 12288 = 8 active x 1536 = effective per-token compute width). Worth confirming via a Qwen3-MoE reference implementation.",
     "Does the global-batch load balancing loss (router_aux_loss_coef=0.001) coexist with any sequence-level balancing term, or is it the only routing-balance signal? The paper cites Qiu et al., 2025 for the technique but does not detail the exact loss formulation here.",
-    "Whether the MoE pre-training corpus is exactly the 36T tokens used by the dense models or a subset/superset is not explicitly stated. Paper §3 implies the recipe is shared but does not assert token-for-token equality between dense and MoE flagships.",
+    "Whether the MoE pre-training corpus is exactly the 36T tokens used by the dense models or a subset/superset is not explicitly stated. Paper \u00a73 implies the recipe is shared but does not assert token-for-token equality between dense and MoE flagships.",
     "Pre-training optimizer (AdamW vs other), peak/min learning rates, batch-size schedule, weight decay, and gradient clipping are not disclosed - paper says scaling-law-predicted values are used per-model but no concrete numbers are given.",
     "Mixed-precision policy during pre-training (BF16-only vs FP8 GEMM with BF16 master weights, etc.) is not disclosed.",
     "Parallelism strategy and training infrastructure (TP/PP/EP/DP shapes, GPU type and count, framework) are not disclosed in the paper. Expert parallelism is essentially required at this scale but the topology is undocumented.",

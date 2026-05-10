@@ -30,9 +30,11 @@ operation than "continue from the cursor."
 
 ## Used by
 
-| Model       | Variation / details                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------- |
-| DeepSeek-V3 | PSM format, rate 0.1, applied at document level during pre-packing (no cross-sample attention masking). |
+| Model             | Variation / details                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V3       | PSM format, rate 0.1, applied at document level during pre-packing (no cross-sample attention masking).                                                                                                                   |
+| DeepSeek-V4-Pro   | Inherits PSM format from DeepSeek-V3 (paper Section 4.1: 'we also inherit the token-splitting and Fill-in-Middle (FIM) strategies from DeepSeek-V3'). Rate not restated — assume V3's 0.1 unless V4 ablations land later. |
+| DeepSeek-V4-Flash | Same PSM inheritance as V4-Pro. Rate not restated.                                                                                                                                                                        |
 
 ## Related techniques
 

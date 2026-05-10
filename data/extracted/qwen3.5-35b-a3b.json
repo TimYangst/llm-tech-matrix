@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "metadata": {
     "name": "Qwen3.5-35B-A3B",
     "family": "Qwen",
@@ -38,7 +38,11 @@
         "base": 10000000,
         "scaling": {
           "mrope_interleaved": true,
-          "mrope_section": [11, 11, 10],
+          "mrope_section": [
+            11,
+            11,
+            10
+          ],
           "partial_rotary_factor": 0.25
         }
       },
@@ -60,7 +64,7 @@
           "num_kv_heads": 2,
           "head_dim": 256,
           "rope": "mrope (multimodal RoPE) with rope_theta=10,000,000 and partial_rotary_factor=0.25 - only 64 of 256 head dims are rotated, the remaining 192 are NoPE. mrope_section=[11,11,10] partitions the rotary dims across temporal/height/width axes; mrope_interleaved=true.",
-          "notes": "Softmax attention with output gating (config: attn_output_gate=true). GQA 16Q:2KV (group size 8) — twice as aggressive as Qwen3.5-27B's 24Q:4KV (group size 6). attention_bias=false. Used in 1 out of every 4 layers (10 of 40, 'full_attention' in config.layer_types). Effective Q dim 16*256=4096; KV dim 2*256=512."
+          "notes": "Softmax attention with output gating (config: attn_output_gate=true). GQA 16Q:2KV (group size 8) \u2014 twice as aggressive as Qwen3.5-27B's 24Q:4KV (group size 6). attention_bias=false. Used in 1 out of every 4 layers (10 of 40, 'full_attention' in config.layer_types). Effective Q dim 16*256=4096; KV dim 2*256=512."
         }
       ],
       "layer_pattern": "(D,D,D,F)x10 with D=gated_deltanet, F=gated_attention. config.layer_types is the list ['linear_attention','linear_attention','linear_attention','full_attention'] repeated 10 times (40 layers total). config.full_attention_interval=4 confirms the 1-in-4 cadence. README naming: '10 x (3 x (Gated DeltaNet -> MoE) -> 1 x (Gated Attention -> MoE))'."
@@ -73,7 +77,7 @@
         "num_active_experts": 8,
         "shared_experts": 1,
         "expert_intermediate_size": 512,
-        "routing": "Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts — uniform width. Total MoE width per token = 9 * 512 = 4608 from 9 active experts (8 routed + 1 shared)."
+        "routing": "Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts \u2014 uniform width. Total MoE width per token = 9 * 512 = 4608 from 9 active experts (8 routed + 1 shared)."
       },
       "layer_partition": "Uniform MoE FFN across all 40 layers regardless of attention variant (config.mlp_only_layers=[] - no dense FFN substitution at any depth)."
     },
@@ -123,11 +127,15 @@
     }
   },
   "multimodal": {
-    "modalities": ["text", "image", "video"],
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
     "fusion": "native_early",
-    "fusion_notes": "Vendor description: 'Unified Vision-Language Foundation. Early fusion training on multimodal tokens.' Vision tokens are inlined into the same backbone as text via four reserved vocabulary IDs (vision_start, image, video, vision_end). The vision encoder's projected output dim (vision_config.out_hidden_size=2048) equals the LM hidden dim (note: 2048 here vs 5120 for Qwen3.5-27B — the same vision encoder is reprojected to whatever LM width the backbone uses). README pipeline_tag=image-text-to-text confirms the model is shipped as a single causal LM that natively consumes image and video alongside text; there is no separate text-only checkpoint.",
+    "fusion_notes": "Vendor description: 'Unified Vision-Language Foundation. Early fusion training on multimodal tokens.' Vision tokens are inlined into the same backbone as text via four reserved vocabulary IDs (vision_start, image, video, vision_end). The vision encoder's projected output dim (vision_config.out_hidden_size=2048) equals the LM hidden dim (note: 2048 here vs 5120 for Qwen3.5-27B \u2014 the same vision encoder is reprojected to whatever LM width the backbone uses). README pipeline_tag=image-text-to-text confirms the model is shipped as a single causal LM that natively consumes image and video alongside text; there is no separate text-only checkpoint.",
     "vision_encoder": {
-      "architecture": "ViT (HF model_type=qwen3_5_moe vision config). config.deepstack_visual_indexes=[] - no DeepStack injection layers configured. Same encoder geometry as Qwen3.5-27B (depth/hidden/heads/patch all match) — only the projection out_hidden_size differs to match the LM hidden.",
+      "architecture": "ViT (HF model_type=qwen3_5_moe vision config). config.deepstack_visual_indexes=[] - no DeepStack injection layers configured. Same encoder geometry as Qwen3.5-27B (depth/hidden/heads/patch all match) \u2014 only the projection out_hidden_size differs to match the LM hidden.",
       "depth": 27,
       "hidden_size": 1152,
       "intermediate_size": 4304,
@@ -158,7 +166,7 @@
     "Parallelism strategy and training infrastructure (TP/PP/EP/DP shapes, GPU type and count, framework) are not disclosed. MoE-specific details (expert parallelism, all-to-all dispatch implementation, routing imbalance handling beyond aux_loss_coef=0.001) are also not disclosed.",
     "Why exactly 1 shared expert? Qwen3 dropped shared experts (vs Qwen2.5), citing global-batch load balancing as sufficient. Qwen3.5 reintroduces exactly 1 shared expert (matches DeepSeek-V3's count, but DeepSeek-V3 has 1 shared expert with much wider per-expert intermediate). The design rationale (was global-batch LB insufficient under hybrid attention? did the asymmetric V/K linear-attention budget create capacity gaps the shared expert covers?) is not discussed in vendor sources.",
     "Auxiliary-loss-free routing was a feature of Qwen3-235B-A22B's MoE; Qwen3.5-35B-A3B reverts to a classic auxiliary load-balance loss (router_aux_loss_coef=0.001 in config). No vendor explanation for the reversion.",
-    "Routing algorithm specifics — top-k softmax vs sigmoid gating, expert-choice routing variants, capacity factor at training time, drop-token policy — are not disclosed beyond 'top-8 routed + 1 shared'.",
+    "Routing algorithm specifics \u2014 top-k softmax vs sigmoid gating, expert-choice routing variants, capacity factor at training time, drop-token policy \u2014 are not disclosed beyond 'top-8 routed + 1 shared'.",
     "config.text_config.partial_rotary_factor=0.25 implies only 64 of the 256 attention head dims carry RoPE (remaining 192 are NoPE/non-positional). The README and blog do not explain the motivation for this NoPE/RoPE split.",
     "Vision encoder is the same geometry as Qwen3.5-27B (ViT depth=27, hidden=1152, heads=16, patch=16, spatial_merge=2, temporal_patch=2); only out_hidden_size differs (2048 here vs 5120). Whether the encoder weights are literally shared between the dense 27B and MoE 35B-A3B (same checkpoint, just reprojected) or independently trained is not disclosed.",
     "Cached blog.html at qwen.ai/blog?id=qwen3.5 is a client-side-rendered SPA shell (only 'Qwen' is present in the static HTML). Substantive blog content was therefore unavailable at extraction time; if a static rendering or per-section anchor URL appears later, re-source for a richer training/post-training description."

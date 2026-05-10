@@ -1,4 +1,4 @@
-# Extraction Schema (v4)
+# Extraction Schema (v5)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -105,6 +105,21 @@ directly.
 - `normalization` — e.g. `"RMSNorm"`, `"LayerNorm"`
 - `embedding_notes` — string (tied embeddings? special tokenizer? etc.)
 
+#### Residual connections (optional, v5+)
+
+- `residual_connections` — object **(null when the model uses standard residual
+  connections — the common case before DeepSeek-V4)**:
+  - `kind` — string, e.g. `"standard"`, `"hyper-connections"`, `"mhc"`
+    (manifold-constrained hyper-connections), `"other"`
+  - `expansion_factor` — int (n_hc — width expansion of the residual stream;
+    1 for standard residual)
+  - `constraint` — string (e.g. `"doubly stochastic via Sinkhorn-Knopp"`,
+    `"non-expansive Sigmoid"`); empty for standard residual
+  - `iterations` — int (solver iterations, e.g. Sinkhorn-Knopp t_max)
+  - `dynamic_parameterization` — bool (true when the residual mappings are
+    input-dependent; false for static learnable weights only)
+  - `notes` — string (free-text)
+
 #### Parallelism / infra
 
 - `parallelism_notes` — string describing any architectural hooks for sequence parallelism,
@@ -154,6 +169,10 @@ directly.
 - `advanced` — object:
   - `self_distillation` — string description (or `"No"`)
   - `mixed_precision` — e.g. `"FP8 + BF16"`, `"BF16"`
+- `stability_notes` — string (v5+) — training-stability tricks distinct from
+  optimizer / lr_schedule / mixed_precision. E.g. DeepSeek-V4's Anticipatory Routing
+  (decoupled routing-net synchronization) and SwiGLU Clamping. Empty `""` when none
+  reported.
 
 ### 4. Multimodal specifics (multimodal models only)
 
@@ -207,5 +226,8 @@ modalities, populate this section.
 
 Schema versions are integers tracked in the top-level `schema_version` field. Breaking
 changes bump the version and are documented in [conventions changelog](./conventions.md#schema-changelog).
-Old extractions remain valid against their declared `schema_version` and are migrated
-file-by-file when convenient.
+**On any schema bump, every `data/extracted/*.json` must migrate in the same commit** —
+`scripts/validate_extractions.py` (the CI gate) requires the declared `schema_version`
+to equal the current `SCHEMA_VERSION` constant. For backwards-compatible additions
+(new optional fields with defaults) the migration is a one-line `schema_version` bump.
+For breaking changes, file shapes must be updated too.

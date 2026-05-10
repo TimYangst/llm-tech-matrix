@@ -35,9 +35,11 @@ The reported relative loss error vs. BF16 is consistently below 0.25%.
 
 ## Used by
 
-| Model       | Variation / details                                                                                         |
-| ----------- | ----------------------------------------------------------------------------------------------------------- |
-| DeepSeek-V3 | Recipe described above. Validated on V2-Lite and V2-scale baselines for ~1T tokens before full V3 training. |
+| Model             | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V3       | Recipe described above. Validated on V2-Lite and V2-scale baselines for ~1T tokens before full V3 training.                                                                                                                                                                                                                                                                                                                                  |
+| DeepSeek-V4-Pro   | Pre-training inherits V3's FP8 framework (E4M3, fine-grained 1×128 / 128×128 scaling, FP32 register accumulation every Nc=128 elements). Post-training adds **FP4 QAT** (MXFP4) on top: MoE expert weights (config.expert_dtype='fp4') and the CSA lightning-indexer QK path go to FP4 with lossless dequant to FP8; KV cache stores RoPE dims in BF16 + remaining dims in FP8 (~half size vs pure BF16). Inference uses native FP4 weights. |
+| DeepSeek-V4-Flash | Identical pre-train FP8 + post-train FP4 QAT recipe to V4-Pro (same config.quantization_config).                                                                                                                                                                                                                                                                                                                                             |
 
 ## Related techniques
 

@@ -1,0 +1,71 @@
+{
+  "slug": "deepseek-v4-flash",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V4-Flash HuggingFace config.json",
+      "sha256": "b628e63398a645abc711d92207f8737dd8140f7a4ef1e0a5b3616019e0ddd818",
+      "size_bytes": 1749,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "tech_report",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "DeepSeek-V4 Technical Report (PDF on HF, shared by V4-Pro and V4-Flash)",
+      "sha256": "8a03dadae71894de1515da33e296f0df1dbeed3e7f4bf0badd087f9af77f29e9",
+      "size_bytes": 4480407,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "DeepSeek-V4-Flash HuggingFace model card",
+      "sha256": "75c3a5a94ec93121223740df4f5ffe6a24be488fd654c17602fb0c8ab1a6e698",
+      "size_bytes": 13193,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "DeepSeek-V4-Flash tokenizer config",
+      "sha256": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547",
+      "size_bytes": 801,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "generation_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/raw/main/generation_config.json",
+      "archive_url": null,
+      "filename": "generation_config.json",
+      "description": "DeepSeek-V4-Flash default generation config",
+      "sha256": "5fccff80f55a4d455bbe516bdd552edf3e9623df95e99fbf2a3c3389fdf91af0",
+      "size_bytes": 170,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog_hf",
+      "kind": "blog_html",
+      "url": "https://huggingface.co/blog/deepseekv4",
+      "archive_url": null,
+      "filename": "blog_hf.html",
+      "description": "Hugging Face official blog: DeepSeek-V4 a million-token context that agents can actually use (shared with V4-Pro)",
+      "sha256": "c530605702cdb926f48cc989749b259604ee6b346fbb509c1b3ad346f75f0414",
+      "size_bytes": 136468,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}
