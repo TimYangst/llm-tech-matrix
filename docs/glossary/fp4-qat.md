@@ -1,0 +1,36 @@
+# FP4 Quantization-Aware Training (MXFP4)
+
+> 中文版：[fp4-qat.zh.md](./fp4-qat.zh.md)
+
+**Slug:** `fp4-qat`
+**Category:** quantization
+**One-line:** Post-training MXFP4 quantization-aware training applied to MoE expert weights and the indexer's QK path; FP4-to-FP8 dequantization is lossless when the FP4 sub-block scale ratio fits within FP8's exponent range, letting the existing FP8 training stack drive the QAT step with zero modifications.
+**First introduced in:** [Microscaling Data Formats for Deep Learning (Rouhani et al., 2023)](https://arxiv.org/abs/2310.10537) defines MXFP4; the indexer-QK + MoE-expert co-quantization recipe is DeepSeek-V4's contribution (paper Section 5.2.1).
+
+## Description
+
+FP4 (4-bit floating point in either E2M1 / MXFP4 / NVFP4 form) reduces weight storage by 2× over FP8 and 4× over BF16. Naively post-hoc quantizing weights to FP4 typically harms quality at trillion-parameter scale, so DeepSeek-V4 introduces FP4 in **post-training QAT** (not pre-training) to two specific targets:
+
+1. **MoE expert weights** — FP32 master weights are quantized to FP4 then dequantized losslessly to FP8 for the forward GEMM. The "lossless" part is non-trivial: each FP4 sub-block (1×32 tile) carries its own scale; an FP8 (E4M3) quantization block (128×128 tile) holds 16 such sub-blocks. As long as the ratio max/min of those 16 sub-block scales fits within FP8 E4M3's exponent range, the fine-grained FP4 scale information is fully absorbed by the FP8 representation. V4 verifies empirically that current weights satisfy this. The backward pass propagates with respect to the same FP8 weights (Straight-Through Estimator), so the existing FP8 training framework runs the QAT loop unchanged.
+2. **Lightning-Indexer QK path in CSA** — QK activations are cached, loaded, and multiplied entirely in FP4. Index scores are additionally quantized FP32 → BF16 to give the top-k selector a 2× speedup while preserving 99.7% recall.
+
+During inference and RL rollouts (no backward pass), V4 uses native FP4 quantized weights rather than simulated quantization, ensuring sampling behavior matches deployment exactly. The deployed checkpoint is labeled `FP4 + FP8 Mixed` (MoE expert params in FP4; remaining params in FP8/BF16).
+
+`config.quantization_config`: `fmt="e4m3"`, `scale_fmt="ue8m0"`, `weight_block_size=[128, 128]`, `activation_scheme="dynamic"`.
+
+## Reference materials
+
+- MXFP4 (Microscaling): <https://arxiv.org/abs/2310.10537>
+- DeepSeek-V4 Technical Report Section 5.2.1.
+- README Model Downloads table (FP4 + FP8 Mixed deployment).
+
+## Used by
+
+| Model             | Variation / details                                                                                                                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V4-Pro   | MoE expert weights FP4 (config.expert_dtype="fp4"). CSA indexer QK path FP4. Index scores FP32 → BF16 (2× selector speedup at 99.7% recall). KV cache: BF16 for RoPE dims + FP8 for remaining dims (~half size vs pure BF16). |
+| DeepSeek-V4-Flash | Identical FP4 QAT recipe to V4-Pro (same config.quantization_config, same expert_dtype="fp4", same indexer FP4, same KV cache mixed precision).                                                                               |
+
+## Related techniques
+
+- [FP8 mixed precision (DeepSeek-V3 variant)](./fp8-mixed-precision.md) — the pre-training framework V4 inherits and on top of which FP4 QAT is applied during post-training.

@@ -1,0 +1,209 @@
+# DeepSeek-V4-Pro
+
+> 中文版：[deepseek-v4-pro.zh.md](./deepseek-v4-pro.zh.md)
+
+*Schema version: 5*
+
+## Overview
+
+| | |
+|---|---|
+| Family | DeepSeek |
+| Released | 2026-04 |
+| Openness | Open weights |
+| Total parameters | 1.6T |
+| Active parameters | 49B |
+
+## Sources
+
+- <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/config.json>
+- <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf>
+- <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md>
+- <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/tokenizer_config.json>
+- <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/generation_config.json>
+- <https://huggingface.co/blog/deepseekv4>
+- <https://deepseek4.hk/blog/deepseek-v4-preview-million-context-era/>
+- <https://deepseek4.hk/blog/deepseek-v4-officially-released/>
+
+## Architecture
+
+### Backbone
+
+| | |
+|---|---|
+| Layers | 61 |
+| Hidden dim | 7168 |
+| Context window | 1048576 |
+
+**Context notes:** 1M-token user-facing context (config.max_position_embeddings=1048576; tokenizer_config.model_max_length=1048576). Paper Section 1: 'efficient native support for million-token contexts'. Reached via length-schedule pre-training 4K→16K→64K→1M and YaRN scaling on top of an original 65,536-token RoPE window. README recommends context window ≥384K for 'Think Max' reasoning mode.
+
+**Context extension:**
+
+| | |
+|---|---|
+| Method | yarn |
+| Trained max | 1048576 |
+| Extended max | 1048576 |
+| Factor | 16.0 |
+| Original max (RoPE) | 65536 |
+
+_Notes:_ YaRN scaling configured statically in config.json (rope_scaling.type=yarn, factor=16, original_max_position_embeddings=65536, beta_fast=32, beta_slow=1) with rope_theta=10,000. CSA/HCA compressed-KV branches use a separate compress_rope_theta=160,000 for positions over compressed blocks. Unlike DeepSeek-V3 (4K×40 stretch via YaRN at deployment), V4 trains all the way out to 1M during pre-training; YaRN is configured to align RoPE base length with compressed-KV positional anchors rather than to extend a short pre-trained window.
+
+### Attention (hybrid)
+
+| | |
+|---|---|
+| Variant | hybrid |
+| Heads | 128 |
+| KV heads | 1 |
+| Head dim | 512 |
+
+**RoPE:** type=`yarn`, base=`10000`
+
+RoPE scaling:
+
+```json
+{
+  "type": "yarn",
+  "factor": 16,
+  "original_max_position_embeddings": 65536,
+  "beta_fast": 32,
+  "beta_slow": 1,
+  "compress_rope_theta": 160000,
+  "partial_rotary_factor": "64/512 = 0.125 (paper Section 2.3.3 'Partial Rotary Positional Embedding': RoPE applied to last 64 dims of every Q/K/V vector and to the last 64 dims of core-attention outputs with position -i to preserve relative-position semantics through the KV-compression aggregation)"
+}
+```
+
+**Hybrid attention variants:**
+
+| Name | Family | Q heads | KV heads | Head dim | RoPE | Notes |
+|---|---|---|---|---|---|---|
+| `compressed_sparse_attention` | `other` | 128 | 1 | 512 | Partial RoPE on last 64 dims of Q/K and a -i-position RoPE applied to the last 64 dims of core-attention outputs to preserve relative-position semantics through KV aggregation. | CSA = compress + DeepSeek Sparse Attention. KV cache compressed by m=4 along the sequence dimension via two interleaved softmax-weighted compressors (overlapping windows). A Lightning Indexer with n_I_h=64 indexer query heads of head_dim c_I=128 ranks compressed blocks with ReLU(q·K_indexer) score; top-k=1024 compressed entries are selected for sparse Multi-Query core attention. Query down-projection latent d_c=1536 (shared with the indexer query). After core attention the n_h=128 outputs are split into g=16 groups; each group projected to d_g=1024 then concatenated and projected to hidden_dim=7168. Supplementary sliding-window branch with n_win=128 uncompressed KV entries per query for local fine-grained dependencies. Attention sink (per-head learnable logit) added to softmax denominator. Used at layers 2, 4, 6, ..., 60 (even-indexed layers from 2 onwards) per config.compress_ratios. |
+| `heavily_compressed_attention` | `other` | 128 | 1 | 512 | Same partial RoPE / -i output rotation scheme as CSA. | HCA = heavier compression, no sparse selection. KV cache compressed by m'=128 (non-overlapping) into one entry per 128 tokens. Same Multi-Query core attention shape as CSA: n_h=128 query heads from latent d_c=1536, head_dim c=512, sliding-window branch n_win=128, grouped output projection g=16 groups of d_g=1024. No lightning indexer (HCA does dense attention over all compressed entries). Used at layers 0, 1 (pure HCA prefix) and layers 3, 5, 7, ..., 59 (odd-indexed layers in the interleaved zone) per config.compress_ratios. |
+
+**Layer pattern:** [HCA, HCA, CSA, HCA, CSA, HCA, ..., CSA, HCA, CSA] across 61 layers. config.compress_ratios = [128, 128, 4, 128, 4, 128, 4, ...] (62 entries; final 0 marks the MTP head). Layers 0,1 are pure HCA (paper Section 4.2.1: 'For the first two layers, we use HCA'); from layer 2 onwards CSA(m=4) and HCA(m'=128) interleave 1:1. KV cache layout uses cache blocks of lcm(m,m')=128 original tokens per block, yielding k1=32 CSA compressed entries and k2=1 HCA compressed entry per block.
+
+### FFN (moe)
+
+**MoE:**
+
+| | |
+|---|---|
+| Routed experts | 384 |
+| Active experts per token | 6 |
+| Shared experts | 1 |
+| Per-expert intermediate size | 3072 |
+
+**Routing:** Auxiliary-loss-free routing (config.topk_method='noaux_tc') with SqrtSoftplus(·) affinity score (config.scoring_func='sqrtsoftplus'; changed from V3's Sigmoid). Top-6 routed experts per token (config.num_experts_per_tok=6) plus 1 always-on shared expert (config.n_shared_experts=1). Sequence-wise balance loss preserved with small weight 0.0001 to prevent extreme intra-sequence imbalance. Bias-update speed for the noaux_tc balancing bias = 0.001. Routed-expert score scaling factor = 2.5 (config.routed_scaling_factor). norm_topk_prob=true. Compared with DeepSeek-V3, V4 removes the constraint on the number of routing target nodes (no node-limited routing) and carefully redesigns parallelism to maintain efficiency.
+
+**Layer partition:** All 61 transformer layers use MoE FFN. The first 3 MoE layers (config.num_hash_layers=3) replace SqrtSoftplus aux-loss-free routing with deterministic Hash routing (Roller et al., 2021): the target experts of each token are determined by a fixed hash of the input token ID. The remaining 58 MoE layers use SqrtSoftplus aux-loss-free routing as described above. Routed-expert weights are stored in FP4 (config.expert_dtype='fp4') after post-training FP4 QAT; non-expert parameters use FP8/BF16.
+
+### Components
+
+| | |
+|---|---|
+| Activation | SwiGLU (config.hidden_act='silu'; SwiGLU is the gated form). Trained with SwiGLU clamping for stability: linear component clamped to [-10, 10], gate component capped at 10 (config.swiglu_limit=10.0; paper Section 4.2.3). |
+| Normalization | RMSNorm (config.rms_norm_eps=1e-6) with pre-norm. Additional RMSNorm on each query head and on the single shared KV head before core attention (paper Section 2.3.3: 'avoids exploding attention logits and may improve training stability'). With this query/KV RMSNorm in place V4 does not need the QK-Clip technique used in Muon-trained baselines. |
+
+**Embedding notes:** tie_word_embeddings=false (separate output head). Vocabulary 129,280 (paper says 'remain the vocabulary size to be 128K'; the extra ~1K covers added special tokens for context construction). Inherits the DeepSeek-V3 byte-level BPE tokenizer; tokenizer_config.tokenizer_class=PreTrainedTokenizerFast. Special tokens: <｜begin▁of▁sentence｜> (id=0), <｜end▁of▁sentence｜> (id=1, also pad). Added in V4: (a) Tool-call schema special token '|DSML|' wrapping XML-format tool invocations <|DSML|tool_calls>...<|DSML|invoke name=...>...</|DSML|invoke>... (paper Table 4) - replaces JSON to mitigate string-escape failures; (b) <think> / </think> markers for reasoning trace; (c) Quick Instruction tokens <|action|>, <|title|>, <|query|>, <|authority|>, <|domain|>, <|extracted_url|>, <|read_url|> for parallel auxiliary chatbot tasks reusing the existing KV cache (paper Table 5). The HF release ships no Jinja chat template; encoding is done via a Python module (encoding_dsv4) co-located with the model.
+
+### Residual connections
+
+| | |
+|---|---|
+| Kind | `mhc` |
+| Expansion factor (n_hc) | 4 |
+| Solver iterations | 20 |
+| Dynamic parameterization | `True` |
+
+**Constraint:** Residual mapping B constrained to the manifold of doubly stochastic matrices (Birkhoff polytope) via 20 Sinkhorn-Knopp iterations. Input mapping A and output mapping C constrained non-negative and bounded via Sigmoid (A = σ(Ã), C = 2·σ(C̃)).
+
+_Notes:_ Manifold-Constrained Hyper-Connections (mHC; Xie et al., 2026) replace standard residual connections between adjacent transformer blocks. Residual stream expanded from R^d to R^(n_hc·d) with n_hc=4 (config.hc_mult=4). Three linear mappings A_l ∈ R^(1×n_hc), B_l ∈ R^(n_hc×n_hc), C_l ∈ R^(n_hc×1) update the residual state X_{l+1} = B_l·X_l + C_l·F_l(A_l·X_l) where F_l is the inner layer (CSA/HCA or DeepSeekMoE). Mappings are dynamically parameterized: a static learnable bias plus a dynamic input-dependent component generated from RMSNorm(vec(X_l))·W_l (per-layer weights for pre/res/post). Constraining B to doubly-stochastic guarantees ∥B∥_2 ≤ 1 (non-expansive) and that the set is closed under multiplication (deep-stack stability). config.hc_eps=1e-6 (Sinkhorn convergence tolerance), config.hc_sinkhorn_iters=20. Practical wall-time overhead bounded to ~6.7% of the overlapped 1F1B pipeline stage via fused kernels + recomputation that checkpoints most inter-layer hidden states and all normalized layer inputs while skipping compute-intensive ops.
+
+### Parallelism / infra
+
+Inherits the DualPipe + 64-way Expert Parallelism + ZeRO foundation from DeepSeek-V3 with five V4-specific extensions. (1) Fine-grained EP scheme that fuses Dispatch / Linear-1 / Activation+Combine / Linear-2 into a single pipelined kernel and schedules experts into waves; CUDA implementation open-sourced as MegaMoE in DeepGEMM. 1.50-1.73x speedup vs non-fused baselines, up to 1.96x on RL-rollout latency. (2) Hybrid ZeRO bucketing for the Muon optimizer: dense params use a knapsack bucket assignment with a parallelism cap; MoE params flatten down/up/gate matrices across all experts with no parallelism cap. MoE gradients quantized to BF16 with stochastic rounding for halved sync volume; reduce-scatter replaced by all-to-all + local FP32 sum to avoid low-precision accumulation error. (3) Two-stage Contextual Parallelism for compressed attention: each rank sends its last m (or m') uncompressed KV entries to rank+1, which compresses them with its local entries to a fixed-length s/m+1 (with padding); all-gather across CP ranks then a fused select-and-pad op produces the full compressed KV set with padding entries placed at the tail. Visible compressed-KV ranges per query are precomputed for HCA / CSA-indexer; CSA core attention uses explicit top-k indices. (4) Inference KV cache: heterogeneous layout splits a classical KV cache (CSA / HCA compressed entries, block size lcm(m,m')) and a State Cache (SWA window + uncompressed CSA/HCA tail tokens not yet ready for compression), pre-allocated per request. On-disk KV cache for shared-prefix reuse with three SWA caching strategies (full / periodic checkpoint / zero-cache + recompute). (5) DualPipe 1F1B overlap adjusted to accommodate added pipeline communication from mHC; fused mHC kernels for both training and inference. Beyond parallelism: TileLang DSL with Z3 SMT-assisted formal integer analysis for kernel codegen and Host Codegen reducing per-invocation overhead from ~10s-100s of microseconds to <1us. Bitwise reproducibility via batch-invariant DeepGEMM (replacing cuBLAS) and a deterministic dual-kernel attention strategy. Validated on NVIDIA GPUs and HUAWEI Ascend NPUs.
+
+## Training
+
+| | |
+|---|---|
+| Optimizer | Muon (Jordan et al., 2024 / Liu et al., 2025) for the majority of parameters; AdamW (Loshchilov and Hutter, 2017) for the embedding module, prediction head, all RMSNorm weights, and the static biases + gating factors of mHC modules. AdamW: β1=0.9, β2=0.95, ε=1e-20, weight_decay=0.1. Muon: momentum=0.95, weight_decay=0.1, RMS-of-update rescale to 0.18 (so AdamW LR can be reused). Hybrid Newton-Schulz orthogonalization runs 10 iterations in two stages: 8 steps with (a,b,c)=(3.4445, -4.7750, 2.0315) for rapid convergence, then 2 steps with (2, -1.5, 0.5) to stabilize singular values at 1. Nesterov trick applied. Per-head/per-KV RMSNorm (see components) makes QK-Clip unnecessary. |
+| Total training tokens | 33T |
+
+**LR schedule:** Sequence-length curriculum 4K → 16K → 64K → 1M. Linear warmup over the first 2,000 steps to peak LR 2.0e-4; constant 2.0e-4 for most of training; cosine decay to 2.0e-5 near the end. Batch-size schedule starts small and ramps to a maximum of 94.4M tokens, held constant for most of training. Sparse-attention curriculum: first 1T tokens use dense attention (warmup); sparse attention is introduced at the 64K sequence-length stage with a short Lightning-Indexer warmup pass before turning on full sparse routing for the remainder of training. MTP loss weight 0.3 for most of training, dropped to 0.1 when LR decay starts. Auxiliary-loss-free bias update speed = 0.001, sequence balance loss weight = 0.0001. (All numbers cite paper Section 4.2.2 'DeepSeek-V4-Pro' setups; Flash uses peak LR 2.7e-4 / decay end 2.7e-5 / max BS 75.5M.)
+
+**Data mix notes:** Built on the DeepSeek-V3 corpus and pipeline. Web data filtered to remove batched auto-generated and templated content (model-collapse mitigation, citing Zhu et al. 2024). Math and programming corpora remain core; mid-training phase explicitly incorporates agentic data to lift code-agent capability. Multilingual corpus enlarged for long-tail cross-cultural knowledge. Particular emphasis on long-document curation: scientific papers, technical reports, and other materials with 'unique academic values'. >32T tokens overall (V4-Pro: 33T; V4-Flash: 32T). Inherits the DeepSeek-V3 tokenizer (128K vocab, with new special tokens added for context construction). Inherits token-splitting and Fill-in-Middle (FIM) strategies from DeepSeek-V3. Different from DeepSeek-V3, V4 packs documents from different sources to minimize sample truncation but uses sample-level attention masking during pre-training (V3 packed without cross-sample masking). No quantitative percentage breakdown across categories is disclosed.
+
+### Training objectives (beyond next-token prediction)
+
+**Multi-Token Prediction (MTP):**
+
+| | |
+|---|---|
+| Depth (D) | 1 |
+| Loss weight schedule | MTP loss weight λ=0.3 for most of training, decayed to 0.1 when the main LR decay begins (paper Section 4.2.2). |
+
+_Shared modules:_ MTP configuration is identical to DeepSeek-V3 (paper Section 2.1: 'we adopt the same strategy for DeepSeek-V4 series without modification'). config.num_nextn_predict_layers=1 confirms a single additional prediction head. Embedding and output-head sharing with the main model and DualPipe co-location follow V3.
+
+**Fill-in-Middle (FIM):**
+
+| | |
+|---|---|
+| Format | PSM (Prefix-Suffix-Middle) inherited from DeepSeek-V3 (paper Section 4.1: 'we also inherit the token-splitting and Fill-in-Middle (FIM) strategies from DeepSeek-V3'). |
+| Rate | [Unknown/Not Disclosed] |
+
+### Alignment
+
+**SFT:** [Unknown/Not Disclosed]
+
+**RL method:** GRPO (Group Relative Policy Optimization)
+
+**RLAIF:** `False`
+
+**Post-training stages:**
+
+| # | Name | Method | Description |
+|---|---|---|---|
+| 1 | Specialist Cultivation - per-domain SFT | `sft` | Per target domain (mathematics, coding, agent, instruction following, etc.) the V4-Pro base model is fine-tuned on high-quality domain-specific data to establish foundational capability. One specialist per domain. Hyper-parameters closely aligned with DeepSeek-V3.2 post-training pipeline. |
+| 2 | Specialist Cultivation - per-domain RL (GRPO) | `rl` | Each domain specialist is then optimized with GRPO under domain-specific prompts and reward signals. For easy-to-verify tasks: rule-based verifiers / unit tests. For hard-to-verify tasks: rubric-guided RL data evaluated by a Generative Reward Model (GRM) - rather than training a separate scalar reward model, the actor network itself functions as the GRM and judging proficiency is jointly optimized with generative capability. This produces a diverse set of domain experts (mathematics, coding, agent, ...) each excelling in its field. Per reasoning effort level (Non-think / Think High / Think Max) distinct length penalties and context windows are used during RL training. |
+| 3 | On-Policy Distillation (OPD) into a unified model | `distillation` | Single unified V4-Pro is trained to minimize Σ w_i · D_KL(π_θ ∥ π_E_i) over >10 expert teachers. Reverse KL is computed on trajectories sampled by the student π_θ (on-policy). Full-vocabulary logit distillation is used (rather than the variance-prone token-level KL estimate common in prior work); engineering enables this at scale via centralized teacher-weight storage with on-demand ZeRO-like sharding, last-layer-hidden-state caching (logits reconstructed on the fly through the prediction head), and teacher-index-ordered sample dispatch so at most one teacher head is on device per mini-batch. This stage entirely replaces the mixed-RL stage that was used in DeepSeek-V3.2. |
+
+**Inference modes (runtime-switchable):**
+
+| Name | Trigger | Description |
+|---|---|---|
+| `non-think` | Default response mode. Output begins directly with '</think> summary' (no thinking tokens emitted). Selected by absence of the Think-Max system prompt and by the post-training reasoning-effort axis; per Section 5.3.1, evaluation context window 8K. | Fast, intuitive responses based on habits or simple rules. Targets routine daily tasks, emergency reactions, low-risk decisions. Trained as a separate specialist mode under shorter context window and tighter length penalty during RL. |
+| `think-high` | Output framed as '<think> thinking tokens </think> summary'. Per Section 5.3.1 evaluation context window 128K. | Conscious logical analysis - slower but more accurate. Targets complex problem-solving, planning, medium-risk decisions. Trained under longer context window than Non-think and a length-penalty schedule that allows more reasoning tokens. |
+| `think-max` | Two ingredients: (1) a special instruction prepended to the system prompt ('Reasoning Effort: Absolute maximum with no shortcuts permitted...' - paper Table 3); (2) <think>...</think> output framing. Per Section 5.3.1 evaluation context window 384K (README also recommends ≥384K when using Think Max). | Reasoning pushed to its fullest extent. Targets exploration of the model's reasoning boundary. Trained with the longest context window and the most-relaxed length penalty during RL. DeepSeek-V4-Pro-Max in benchmarks always denotes V4-Pro under this mode. |
+| `interleaved-thinking (cross-turn reasoning preservation)` | Behavior of all three reasoning modes when a tool-calling context is detected (paper Figure 7a). Conventional conversational scenarios still discard prior reasoning at each new user turn (paper Figure 7b - same as DeepSeek-V3.2). Agent frameworks that simulate tool interactions via plain user messages (e.g. Terminus) may not trigger the tool-calling path; non-think modes are recommended for such architectures. | In tool-calling scenarios all reasoning content is preserved across the entire conversation, including across user message boundaries - the model maintains a coherent cumulative chain of thought over long-horizon agent tasks rather than reconstructing state from scratch each turn. Enabled by the 1M context window. |
+
+### Advanced
+
+**Self-distillation:** Yes - multi-teacher On-Policy Distillation (OPD) consolidates >10 domain-specialist V4-Pro variants (each a per-domain SFT+GRPO derivative of the same V4-Pro base) into a single unified V4-Pro via reverse KL on student-sampled trajectories with full-vocabulary logit distillation (paper Section 5.1.2). This is intra-family / self-family distillation rather than cross-model distillation. Distinct from DeepSeek-V3 which distilled R1-series long-CoT capability into V3 via SFT data generation; V4 collapses what would have been a mixed-RL stage entirely into multi-teacher OPD.
+
+**Mixed precision:** Pre-training: FP8 (inherits V3 framework). Post-training adds FP4 Quantization-Aware Training (MXFP4; Rouhani et al., 2023) for two components: (1) MoE expert weights - FP32 master weights are quantized to FP4 then dequantized losslessly to FP8 for compute (FP8 E4M3's exponent range absorbs the 1x32 FP4 sub-block scales within a 128x128 FP8 quant block); backward propagates with respect to the same FP8 weights via Straight-Through Estimator; (2) Query-Key path in CSA's lightning indexer - QK activations cached / loaded / multiplied entirely in FP4. Index scores additionally quantized FP32→BF16 (2x speedup for top-k selector at 99.7% KV recall). Inference and RL rollout use native FP4 weights (not simulated quantization), so sampling matches deployment exactly. KV cache uses BF16 for RoPE dimensions and FP8 for the remaining dimensions (~half the size of pure BF16). All other modules remain in BF16/FP8 per V3 conventions. The shipped checkpoint is labeled 'FP4 + FP8 Mixed' (README Model Downloads). config.quantization_config: fmt=e4m3, scale_fmt=ue8m0, weight_block_size=[128,128], activation_scheme=dynamic.
+
+**Stability tricks:** Two stability tricks specific to V4 (paper Section 4.2.3 'Mitigating Training Instability'). (1) Anticipatory Routing decouples synchronous updates of the backbone and routing networks: at step t, feature computation uses current params θ_t but routing indices are computed and applied using historical params θ_{t-Δt}. Routing indices are pre-computed at step t-Δt and cached for use at step t (overhead bounded to ~20% wall-clock by carefully orchestrating pipeline execution + EP-comm overlap). Activated dynamically only when an automatic detector observes a loss spike, then reverted to standard training after a stabilization period — average overall overhead is negligible. Empirically tied loss spikes to MoE-layer outliers exacerbated by routing; decoupling breaks the vicious cycle. (2) SwiGLU Clamping bounds the linear and gate components of SwiGLU to suppress outliers: linear ∈ [-10, 10], gate capped at 10 (config.swiglu_limit=10.0). Used throughout the training of both V4-Flash and V4-Pro without compromising performance. The paper notes both tricks are effective but their underlying principles 'remain insufficiently understood'.
+
+## Open questions
+
+- Schema gap (deferred to schema iteration): hybrid attention with KV compression. Schema's AttentionVariant.family enum (mha/gqa/mqa/mla/linear_attention/sliding_window/other) does not capture compression rate, indexer dims, or grouped-output-projection shape. CSA/HCA encoded via family='other' with dense free-text in notes (compression rate m / m', indexer n_I_h / c_I, sparse-top-k, query-latent d_c, output-projection groups g / d_g, sliding window n_win, attention sink). A clean future design would add a CompressedAttentionConfig subobject mirroring the way MLA subobject is structured. Deferred until a second model adopts compressed attention (V4-Flash will share the shape; that doesn't yet count as a second family).
+- Schema gap (deferred to schema iteration): FP4 Quantization-Aware Training recipe. Encoded in advanced.mixed_precision free-text. Once a second FP4-QAT model lands (e.g. OpenAI gpt-oss FP4 weights), promote to a structured QuantizationConfig subobject covering target_components (MoE / indexer / KV cache), formats (E4M3 / E2M1 / MXFP4 / NVFP4), block size, scale format, lossless-dequant lineage.
+- Schema gap (lower priority): Generative Reward Model (GRM). Schema's alignment.rl_method is a free-text/enum slot; GRM (actor-as-judge, jointly optimized with generation, replaces scalar RM for hard-to-verify tasks) is captured in the stages[] description but lacks a structured field. Recurring across recent reasoning models.
+- Schema gap (lower priority): tool-call protocol / agent-token schema. The |DSML| token + XML tool-call format (paper Table 4) is captured in components.embedding_notes; Quick Instruction tokens (<|action|>, <|title|>, <|query|>, <|authority|>, <|domain|>, <|extracted_url|>, <|read_url|>) likewise. As more models ship with structured tool protocols, an alignment.tool_protocol slot may be useful for cross-vendor compare.
+- FIM rate is not explicitly restated in the V4 paper - it says 'we also inherit the token-splitting and Fill-in-Middle (FIM) strategies from DeepSeek-V3' without numbers. Recorded as inherited PSM format but rate left as Unknown. (V3 used rate=0.1.)
+- Pre-training data percentage breakdown (code / math / text / multilingual / long-doc shares of the 33T) is not disclosed. Only qualitative descriptions in the paper's data section.
+- SFT data scale is not disclosed for V4. The paper says 'training pipeline largely mirrored that of DeepSeek-V3.2' but does not restate sample counts. (V3 used 1.5M SFT instances; V4 likely similar order but unconfirmed.)
+- Number of OPD teacher models is given as '>10' but not specified exactly. Per-teacher weight w_i (importance weighting in the OPD objective) is described as 'typically determined by the relative importance of the expert' - no concrete schedule disclosed.
+- Hardware platform for V4 pre-training is not specified in the paper. V3 used 2048 H800 GPUs; V4 paper validates fine-grained EP scheme on 'NVIDIA GPUs and HUAWEI Ascend NPUs platforms' but does not state which platform was used for the actual production runs.
+- Pre-training start date and total training-time wall-clock are not disclosed.
+- The DeepSeek-V3.2 model referenced repeatedly throughout the V4 paper as the immediate baseline is not currently in this repo's extracted set (we have V3 only). Future cross-model compare against V3.2 will need a separate sourcing+extraction pass.
+- config.compress_ratios array has length 62 with a trailing 0; mapping the trailing 0 to the MTP head (rather than a 62nd transformer layer) is inferred from num_hidden_layers=61 + num_nextn_predict_layers=1 - the paper does not explicitly describe this layout convention.
+- Per-mode evaluation context windows (Non-think 8K / Think High 128K / Think Max 384K) are stated as evaluation setups in Section 5.3.1; whether these are hard limits trained into each specialist or only the eval-time configuration is not made fully unambiguous in the paper.
+- Released variants V4-Flash-Base, V4-Pro-Base (FP8 Mixed) vs V4-Flash, V4-Pro (FP4 + FP8 Mixed) are listed in the README Model Downloads table. This extraction targets the post-FP4-QAT V4-Pro release; V4-Pro-Base shares architecture but lacks the FP4-quantized expert weights.
+- Two of the three blog sources are from deepseek4.hk, which is not an official DeepSeek domain. Only the HF blog (huggingface.co/blog/deepseekv4) and HF model card / paper / config are authoritative for fact-checking. None of the unique facts in this extraction were sourced from the deepseek4.hk blogs - they were registered for completeness only.
+
+---
+
+_Generated from `data/extracted/deepseek-v4-pro.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._

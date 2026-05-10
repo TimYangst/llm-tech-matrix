@@ -23,6 +23,7 @@
 - [Grouped Query Attention (GQA)](./gqa.zh.md)
 - [QK-Norm](./qk-norm.zh.md)
 - [Gated DeltaNet](./gated-deltanet.zh.md)
+- [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
 
 ### FFN / MoE
 
@@ -39,6 +40,7 @@
 
 - [Group Relative Policy Optimization (GRPO)](./grpo.zh.md)
 - [Hybrid Thinking（chat-template 思考模式融合）](./hybrid-thinking.zh.md)
+- [On-Policy Distillation（多教师 OPD）](./on-policy-distillation.zh.md)
 
 ### 位置编码 / 长上下文
 
@@ -49,7 +51,16 @@
 ### 量化 / 混合精度
 
 - [FP8 mixed precision（DeepSeek-V3 变体）](./fp8-mixed-precision.zh.md)
+- [FP4 量化感知训练 (MXFP4)](./fp4-qat.zh.md)
 
 ### 分布式训练
 
 - [DualPipe pipeline scheduling](./dualpipe.zh.md)
+
+### 优化器
+
+- [Muon（按矩阵 Newton-Schulz 正交化）](./muon.zh.md)
+
+### 残差连接
+
+- [Manifold-Constrained Hyper-Connections (mHC)](./mhc.zh.md)

@@ -30,6 +30,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Grouped Query Attention (GQA)](./gqa.md)
 - [QK-Norm](./qk-norm.md)
 - [Gated DeltaNet](./gated-deltanet.md)
+- [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
 
 ### FFN / MoE
 
@@ -46,6 +47,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 
 - [Group Relative Policy Optimization (GRPO)](./grpo.md)
 - [Hybrid Thinking (chat-template thinking-mode fusion)](./hybrid-thinking.md)
+- [On-Policy Distillation (multi-teacher OPD)](./on-policy-distillation.md)
 
 ### Position embedding / long context
 
@@ -56,7 +58,16 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 ### Quantization / mixed precision
 
 - [FP8 mixed precision (DeepSeek-V3 variant)](./fp8-mixed-precision.md)
+- [FP4 Quantization-Aware Training (MXFP4)](./fp4-qat.md)
 
 ### Distributed training
 
 - [DualPipe pipeline scheduling](./dualpipe.md)
+
+### Optimizers
+
+- [Muon (per-matrix Newton-Schulz orthogonalization)](./muon.md)
+
+### Residual connections
+
+- [Manifold-Constrained Hyper-Connections (mHC)](./mhc.md)

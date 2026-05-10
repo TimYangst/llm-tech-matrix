@@ -32,9 +32,11 @@ the bias adjustment.
 
 ## Used by
 
-| Model       | Variation / details                                                                                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| DeepSeek-V3 | bias update speed γ=0.001 for first 14.3T tokens, 0 for last 500B; complementary sequence-wise balance loss α=0.0001; node-limited routing (M=4 nodes, 8 expert groups). |
+| Model             | Variation / details                                                                                                                                                                                                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V3       | bias update speed γ=0.001 for first 14.3T tokens, 0 for last 500B; complementary sequence-wise balance loss α=0.0001; node-limited routing (M=4 nodes, 8 expert groups).                                                                                                                                                                    |
+| DeepSeek-V4-Pro   | Same noaux_tc strategy as V3 but with SqrtSoftplus(·) replacing Sigmoid(·) for affinity scoring (config.scoring_func="sqrtsoftplus"). Bias update speed 0.001; sequence balance loss weight 0.0001. **Removes V3's node-limited routing constraint**. First 3 MoE layers use deterministic Hash routing (config.num_hash_layers=3) instead. |
+| DeepSeek-V4-Flash | Identical noaux_tc + SqrtSoftplus + first-3-layer Hash routing recipe to V4-Pro. Differs only in scale (256 routed × top-6 + 1 shared, scaling factor 1.5) and routed-scaling factor (1.5 vs Pro's 2.5).                                                                                                                                    |
 
 ## Related techniques
 
