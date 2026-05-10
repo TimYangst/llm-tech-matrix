@@ -51,7 +51,7 @@
           "num_kv_heads": 16,
           "head_dim": 128,
           "rope": "Not applicable - Gated DeltaNet is a linear-attention variant and does not use RoPE; positional information is implicit in its recurrent state update.",
-          "notes": "Linear attention with asymmetric V vs QK head counts (config: linear_num_value_heads=48 with linear_value_head_dim=128 -> 6144-dim V state; linear_num_key_heads=16 with linear_key_head_dim=128 -> 2048-dim K state). 1D causal conv pre-DeltaNet with linear_conv_kernel_dim=4. output_gate_type=swish. mamba_ssm_dtype=float32. Used in 3 out of every 4 layers."
+          "notes": "Linear attention with asymmetric V vs QK head counts (config: linear_num_value_heads=48 with linear_value_head_dim=128 -> 6144-dim V state; linear_num_key_heads=16 with linear_key_head_dim=128 -> 2048-dim K state). 1D causal conv pre-DeltaNet with linear_conv_kernel_dim=4. mamba_ssm_dtype=float32. The Gated DeltaNet's output-gate activation function is not disclosed by this config (only the Qwen3.6-27B config in the same family explicitly sets output_gate_type=swish). Used in 3 out of every 4 layers."
         },
         {
           "name": "gated_attention",

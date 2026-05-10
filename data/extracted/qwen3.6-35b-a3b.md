@@ -98,7 +98,7 @@ RoPE scaling:
 | Activation | SwiGLU (config reports hidden_act=silu; SwiGLU is the gated form used in each expert FFN). |
 | Normalization | RMSNorm with pre-normalization (rms_norm_eps=1e-6). attention_bias=false. |
 
-**Embedding notes:** tie_word_embeddings=false (separate input embedding and output head). Token Embedding 248320 (padded) and LM Output 248320 (padded) per README; config.vocab_size=248320 confirms. Vision-related reserved IDs in the LM vocabulary: image_token_id=248056, video_token_id=248057, vision_start_token_id=248053, vision_end_token_id=248054. eos_token_id=248044. config.text_config explicitly exposes bos_token_id=248044 and pad_token_id=null (Qwen3.5-35B-A3B's config did not expose bos_token_id at the text_config layer; this is metadata-level only with no architectural impact). Output gate type is implicit: the 3.5-35B-A3B config exposed `output_gate_type=swish` for Gated DeltaNet, but the 3.6-35B-A3B config omits this field — same default behavior is presumed.
+**Embedding notes:** tie_word_embeddings=false (separate input embedding and output head). Token Embedding 248320 (padded) and LM Output 248320 (padded) per README; config.vocab_size=248320 confirms. Vision-related reserved IDs in the LM vocabulary: image_token_id=248056, video_token_id=248057, vision_start_token_id=248053, vision_end_token_id=248054. eos_token_id=248044. config.text_config explicitly exposes bos_token_id=248044 and pad_token_id=null (Qwen3.5-35B-A3B's config did not expose bos_token_id at the text_config layer; this is metadata-level only with no architectural impact).
 
 ### Parallelism / infra
 
