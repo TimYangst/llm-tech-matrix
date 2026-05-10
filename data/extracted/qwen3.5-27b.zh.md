@@ -2,7 +2,7 @@
 
 > English: [qwen3.5-27b.md](./qwen3.5-27b.md)
 
-*Schema 版本: 5*
+*Schema 版本: 6*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -15,6 +15,8 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | 开放程度 | 开放权重 |
 | 总参数量 | 27B |
 | 激活参数量 | 27B |
+
+**变体策略（variant policy）：** Unified weights per (size, dense/MoE) — Qwen3.5 ships ~7 open-weight sizes (per the Qwen3.6-27B README comparison table the 3.5 family includes 27B dense and 397B-A17B MoE among others). Each checkpoint handles thinking, non-thinking, vision and tool use through chat-template kwargs (`enable_thinking`) and serving-time parsers; there are NO separate Math / Coder / VL / Thinking siblings (a deliberate departure from Qwen2.5's Math/Coder/VL split). 'Coder' capability is exposed via the `--tool-call-parser qwen3_coder` serving flag (vLLM / SGLang) and post-training emphasis, not a separate weight checkpoint. Native VL is unified into the base weights via the `qwen3_5` ViT shared with the LM vocabulary (image / video / vision_start / vision_end token IDs). README pipeline_tag is `image-text-to-text` for both 27B and 35B-A3B.
 
 ## 数据源
 
@@ -135,6 +137,29 @@ _共享模块：_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_ded
 |---|---|---|
 | `thinking` | Default mode. Qwen3.5 thinks by default and wraps reasoning in <think>...</think> before producing the final response. README explicitly states the Qwen3-style /think and /no_think soft switches are NOT supported in Qwen3.5. | Long Chain-of-Thought reasoning before the final answer. Recommended sampling per README Best Practices: temperature=1.0, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=1.5, repetition_penalty=1.0 (general); temperature=0.6 for precise coding tasks (e.g. WebDev). |
 | `non-thinking` | Set chat_template_kwargs={"enable_thinking": False} via the OpenAI-compatible API extra_body (vLLM/SGLang/Qwen-Agent), or pass enable_thinking=False directly on Alibaba Cloud Model Studio. Soft switches /think and /no_think are NOT supported (README: 'Qwen3.5 does not officially support the soft switch of Qwen3'). | Direct, low-latency response without an explicit reasoning trace. Recommended sampling per README Best Practices: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5 (general); temperature=1.0, top_p=1.0, top_k=40, presence_penalty=2.0 for reasoning tasks in non-thinking mode. |
+
+- **`thinking`**
+    - Kwargs：`enable_thinking=true`
+    - 推荐采样参数：`temperature=1.0`, `top_p=0.95`, `top_k=20`, `min_p=0.0`, `presence_penalty=1.5`, `repetition_penalty=1.0`
+- **`non-thinking`**
+    - Kwargs：`enable_thinking=false`
+    - 推荐采样参数：`temperature=0.7`, `top_p=0.8`, `top_k=20`, `min_p=0.0`, `presence_penalty=1.5`, `repetition_penalty=1.0`
+
+**Tool-call 协议：**
+
+| | |
+|---|---|
+| 格式 | `xml-like` |
+| 起始 token | `<tool_call>` |
+| 结束 token | `</tool_call>` |
+| 参数编码方式 | Per-arg <parameter=name>VALUE</parameter> blocks nested inside a <function=NAME></function> wrapper. Values are stringified — in Qwen3.5 the chat template applies `tojson` only to mappings/sequences and falls back to Python `str()` for scalars (so booleans render as 'True'/'False' rather than 'true'/'false' — fixed in Qwen3.6 to apply `tojson` to anything that is not already a string). |
+
+**服务端解析器参数：**
+
+- `vllm`: `--tool-call-parser qwen3_coder`
+- `sglang`: `--tool-call-parser qwen3_coder`
+
+_说明：_ Verbatim from the chat template (tokenizer_config.json): '<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\n...\n</parameter>\n</function>\n</tool_call>'. README serving snippets pair `--tool-call-parser qwen3_coder` with `--reasoning-parser qwen3` for combined reasoning + tool-use deployments. The natural-language reasoning may appear BEFORE but NOT after the tool call (template comment). Tool-call output is wrapped via `<tool_response>...</tool_response>` blocks emitted as a `tool` role message.
 
 ### 进阶
 

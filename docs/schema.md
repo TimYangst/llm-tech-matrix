@@ -1,4 +1,4 @@
-# Extraction Schema (v5)
+# Extraction Schema (v6)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -25,15 +25,16 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 
 ### 1. Model metadata
 
-| Field           | Type               | Notes                                                    |
-| --------------- | ------------------ | -------------------------------------------------------- |
-| `name`          | string             | Canonical name, e.g. `"DeepSeek-V3"`, `"Llama-3.1-70B"`  |
-| `family`        | string             | Family name, e.g. `"DeepSeek"`, `"Llama"`                |
-| `release_date`  | string (`YYYY-MM`) | Public release/announcement date                         |
-| `openness`      | enum               | `"open_source"` / `"open_weights"` / `"closed"`          |
-| `params_total`  | string             | e.g. `"671B"`, `"70B"` — keep human-readable units       |
-| `params_active` | string             | For MoE; equals total for dense models                   |
-| `sources`       | list of URLs       | Where this extraction was sourced from (paper, HF, blog) |
+| Field            | Type               | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`           | string             | Canonical name, e.g. `"DeepSeek-V3"`, `"Llama-3.1-70B"`                                                                                                                                                                                                                                                                                                                                                                                      |
+| `family`         | string             | Family name, e.g. `"DeepSeek"`, `"Llama"`                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `release_date`   | string (`YYYY-MM`) | Public release/announcement date                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `openness`       | enum               | `"open_source"` / `"open_weights"` / `"closed"`                                                                                                                                                                                                                                                                                                                                                                                              |
+| `params_total`   | string             | e.g. `"671B"`, `"70B"` — keep human-readable units                                                                                                                                                                                                                                                                                                                                                                                           |
+| `params_active`  | string             | For MoE; equals total for dense models                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `sources`        | list of URLs       | Where this extraction was sourced from (paper, HF, blog)                                                                                                                                                                                                                                                                                                                                                                                     |
+| `variant_policy` | string             | Free-text — how the vendor partitions capabilities across weight checkpoints vs. runtime modes (v6+). E.g. Qwen3.5/3.6: "unified weights per (size, dense/MoE); thinking / non-thinking / preserve_thinking via chat-template kwargs; coding via post-training plus serving-time tool-call parser; no Math/Coder/VL siblings." Qwen2.5: "separate Instruct/Math/Coder/VL/Audio/Omni checkpoints per capability." UNKNOWN when not disclosed. |
 
 ### 2. Architecture
 
@@ -159,13 +160,38 @@ directly.
     - `name` — e.g. `"Long-CoT Cold Start"`, `"Reasoning RL"`
     - `method` — e.g. `"sft"`, `"rl"`, `"distillation"`, `"rejection_sampling+sft"`
     - `description` — string (data, signals, key recipe details)
-  - `inference_modes` — list of `{name, trigger, description}` for runtime-switchable
-    behaviors produced by post-training (e.g. Qwen3's `/think` vs `/no_think`,
-    thinking-budget). Empty list `[]` for single-mode models.
-    - `name` — e.g. `"thinking"`, `"non-thinking"`, `"thinking-budget"`
+  - `inference_modes` — list of `{name, trigger, description, kwargs, sampling_recommended}`
+    for runtime-switchable behaviors produced by post-training (e.g. Qwen3's `/think` vs
+    `/no_think`, Qwen3.6's `preserve_thinking`, DeepSeek-V4's reasoning-effort triplet).
+    Empty list `[]` for single-mode models.
+    - `name` — e.g. `"thinking"`, `"non-thinking"`, `"thinking-budget"`, `"preserve-thinking"`
     - `trigger` — string describing how a user activates the mode (chat-template flag,
       system prompt, special token, etc.)
     - `description` — string
+    - `kwargs` — `dict[str, str]` (v6+) — machine-readable chat-template kwargs / API
+      parameters that activate this mode. Values stringified for portability across JSON
+      booleans / Python booleans (e.g. `{"enable_thinking": "false"}`,
+      `{"preserve_thinking": "true"}`). Empty when the mode is the default, is triggered
+      by prompt content (e.g. soft-switch tokens in user message), or has no toggle.
+    - `sampling_recommended` — `dict[str, str]` (v6+) — vendor-recommended sampling
+      parameters when this mode is active (`temperature`, `top_p`, `top_k`, `min_p`,
+      `presence_penalty`, `repetition_penalty`, etc.). Values stringified. Empty when
+      vendor does not disclose per-mode recommendations.
+  - `tool_call_protocol` — object or null (v6+) — wire format the model emits for tool
+    calls, plus serving-stack parsers that decode it. None when the model has no
+    documented tool-calling protocol or it is undisclosed.
+    - `format` — string family of the wire format. Suggested values: `"xml-like"`
+      (Qwen3-Coder: `<tool_call><function=NAME><parameter=ARG>VALUE</parameter></function></tool_call>`);
+      `"json-only"` (a single JSON object inside a special-token pair);
+      `"json-in-text"` (JSON inline in normal text, no special tokens);
+      `"function-call-token"` (single special token followed by JSON args); `"other"`.
+    - `start_token` — string (e.g. `"<tool_call>"`); empty if no delimiters
+    - `end_token` — string (e.g. `"</tool_call>"`); empty if N/A
+    - `arguments_schema` — string describing how arguments are encoded inside one call
+      (e.g. `"per-arg <parameter=name>VALUE</parameter> blocks"`, `"JSON object"`)
+    - `parser_flags` — `dict[str, str]` keyed by serving stack, e.g.
+      `{"vllm": "--tool-call-parser qwen3_coder", "sglang": "--tool-call-parser qwen3_coder"}`
+    - `notes` — string — multi-tool-per-turn handling, version differences, known issues
 - `advanced` — object:
   - `self_distillation` — string description (or `"No"`)
   - `mixed_precision` — e.g. `"FP8 + BF16"`, `"BF16"`

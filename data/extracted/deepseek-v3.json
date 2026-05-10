@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "metadata": {
     "name": "DeepSeek-V3",
     "family": "DeepSeek",
@@ -10,7 +10,8 @@
     "sources": [
       "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/config.json",
       "https://arxiv.org/pdf/2412.19437"
-    ]
+    ],
+    "variant_policy": "Single base + Chat checkpoint per release; no Math / Coder / VL siblings. Reasoning capability lives in a separate sibling model (DeepSeek-R1) rather than as a runtime mode — V3 is a non-thinking instruction-following model end-to-end. The V3 → V4 generation collapses this V3+R1 split into a 3-mode runtime axis on one model."
   },
   "architecture": {
     "backbone": {

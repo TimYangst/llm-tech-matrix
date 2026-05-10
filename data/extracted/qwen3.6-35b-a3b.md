@@ -2,7 +2,7 @@
 
 > 中文版：[qwen3.6-35b-a3b.zh.md](./qwen3.6-35b-a3b.zh.md)
 
-*Schema version: 5*
+*Schema version: 6*
 
 ## Overview
 
@@ -13,6 +13,8 @@
 | Openness | Open weights |
 | Total parameters | 35B |
 | Active parameters | 3B |
+
+**Variant policy:** Same unified-weights philosophy as Qwen3.5: one checkpoint per (size, dense/MoE), modes via chat-template kwargs. Qwen3.6 adds a third runtime mode `preserve_thinking` (multi-turn reasoning carryover) via a chat-template kwarg — composable with `enable_thinking`. As of release the open-weight surface is narrower than 3.5 — only 27B dense + 35B-A3B MoE shipped open-weight (README: 'first open-weight variant of Qwen3.6'). Same NO-separate-Math/Coder/VL-siblings policy; Coder capability is post-training emphasis ('Agentic Coding' highlight) plus the `qwen3_coder` serving parser, not a sibling checkpoint.
 
 ## Sources
 
@@ -143,6 +145,31 @@ _Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_ded
 | `thinking` | Default mode. Qwen3.6 thinks by default and wraps reasoning in <think>...</think> before producing the final response. README repeats the Qwen3.5 statement that the Qwen3-style /think and /no_think soft switches are NOT officially supported. | Long Chain-of-Thought reasoning before the final answer. Recommended sampling per README Best Practices (same as Qwen3.5): temperature=1.0, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=1.5, repetition_penalty=1.0 (general); temperature=0.6 for precise coding tasks (e.g. WebDev). |
 | `non-thinking` | Set chat_template_kwargs={"enable_thinking": False} via the OpenAI-compatible API extra_body (vLLM/SGLang/Qwen-Agent), or pass enable_thinking=False directly on Alibaba Cloud Model Studio. Soft switches /think and /no_think are documented as NOT officially supported. | Direct, low-latency response without an explicit reasoning trace. Same recommended sampling as Qwen3.5-35B-A3B. |
 | `preserve-thinking` | Set chat_template_kwargs={"preserve_thinking": True} via the API (Alibaba Cloud Model Studio shortens to top-level preserve_thinking=True). Composable with enable_thinking — the user can run thinking + preserve_thinking, or non-thinking + preserve_thinking. | **New in Qwen3.6.** README: 'By default, only the thinking blocks generated in handling the latest user message is retained, resulting in a pattern commonly as interleaved thinking. Qwen3.6 has been additionally trained to preserve and leverage thinking traces from historical messages.' Vendor argues it benefits multi-turn agent scenarios by improving decision consistency, can reduce total tokens by avoiding re-derivation, and improves KV-cache utilization. Default is False (interleaved-thinking pattern, matching Qwen3.5 behavior). The Qwen3.6 chat template references `preserve_thinking` 2x and still references `/think` 5x (same as Qwen3.5 templates) — soft-switch deprecation remains a docs/policy posture rather than a template-level removal. |
+
+- **`thinking`**
+    - Kwargs: `enable_thinking=true`
+    - Recommended sampling: `temperature=1.0`, `top_p=0.95`, `top_k=20`, `min_p=0.0`, `presence_penalty=0.0`, `repetition_penalty=1.0`
+- **`non-thinking`**
+    - Kwargs: `enable_thinking=false`
+    - Recommended sampling: `temperature=0.7`, `top_p=0.80`, `top_k=20`, `min_p=0.0`, `presence_penalty=1.5`, `repetition_penalty=1.0`
+- **`preserve-thinking`**
+    - Kwargs: `preserve_thinking=true`
+
+**Tool-call protocol:**
+
+| | |
+|---|---|
+| Format | `xml-like` |
+| Start token | `<tool_call>` |
+| End token | `</tool_call>` |
+| Arguments schema | Per-arg <parameter=name>VALUE</parameter> blocks nested inside a <function=NAME></function> wrapper. Qwen3.6 fixes a Qwen3.5 JSON-encoding bug — the chat template now applies `tojson` to anything that is not already a string (non-string scalars like booleans and numbers serialize as JSON 'true'/'false'/'5' rather than Python 'True'/'False'/'5'). Strings pass through unchanged. |
+
+**Serving parser flags:**
+
+- `vllm`: `--tool-call-parser qwen3_coder`
+- `sglang`: `--tool-call-parser qwen3_coder`
+
+_Notes:_ Same Qwen3-Coder XML-like wire format as Qwen3.5; only difference is the tool-arg scalar encoding fix above. README serving snippets pair `--tool-call-parser qwen3_coder` with `--reasoning-parser qwen3`. Compatible with `preserve_thinking` kwarg — README highlights agent scenarios as the primary motivation for the new preserve_thinking mode (full reasoning context across multi-turn tool-calling improves decision consistency and KV-cache utilization).
 
 ### Advanced
 
