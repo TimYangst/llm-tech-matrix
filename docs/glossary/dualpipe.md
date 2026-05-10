@@ -1,5 +1,7 @@
 # DualPipe pipeline scheduling
 
+> 中文版：[dualpipe.zh.md](./dualpipe.zh.md)
+
 **Slug:** `dualpipe`
 **Category:** infra
 **One-line:** A bidirectional pipeline-parallel schedule that overlaps forward/backward computation with all-to-all expert-parallel communication, eliminating most communication-stall bubbles in large MoE training.

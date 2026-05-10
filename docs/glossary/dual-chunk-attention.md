@@ -1,5 +1,7 @@
 # Dual Chunk Attention (DCA)
 
+> 中文版：[dual-chunk-attention.zh.md](./dual-chunk-attention.zh.md)
+
 **Slug:** `dual-chunk-attention`
 **Category:** position-embedding
 **One-line:** A training-free long-context extension method that re-indexes positions inside and across fixed-size chunks so a model trained at length T can attend over sequences of length kT without retraining, typically combined with a frequency-scaling method like YaRN.

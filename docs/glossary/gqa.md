@@ -1,5 +1,7 @@
 # Grouped Query Attention (GQA)
 
+> 中文版：[gqa.zh.md](./gqa.zh.md)
+
 **Slug:** `gqa`
 **Category:** attention
 **One-line:** Multi-head attention variant where multiple query heads share a single key/value head, shrinking the KV cache by the grouping factor while preserving most of the modeling quality of full multi-head attention.

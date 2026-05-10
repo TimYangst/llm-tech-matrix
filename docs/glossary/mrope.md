@@ -1,5 +1,7 @@
 # Multimodal RoPE (mRoPE)
 
+> 中文版：[mrope.zh.md](./mrope.zh.md)
+
 **Slug:** `mrope`
 **Category:** position-embedding
 **One-line:** A RoPE variant that partitions the rotary head dimensions into bands assigned to different positional axes (temporal, height, width) so a single attention layer can encode 2D image and 3D video positions alongside 1D text positions in the same RoPE space.

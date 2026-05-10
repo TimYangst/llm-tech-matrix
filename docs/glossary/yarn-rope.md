@@ -1,5 +1,7 @@
 # YaRN RoPE scaling
 
+> 中文版：[yarn-rope.zh.md](./yarn-rope.zh.md)
+
 **Slug:** `yarn-rope`
 **Category:** position-embedding
 **One-line:** A RoPE position-encoding extension method that interpolates frequencies non-uniformly across head dimensions, enabling much longer context windows than the model was originally trained on with minimal fine-tuning.

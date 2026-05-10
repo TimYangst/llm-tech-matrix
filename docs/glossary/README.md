@@ -1,5 +1,7 @@
 # Glossary
 
+> 中文版：[README.zh.md](./README.zh.md)
+
 Short reference entries for the techniques that appear across extracted models. Each
 entry explains what the technique is, where it came from, and which models in this
 repo use it.

@@ -1,130 +1,132 @@
 # Qwen3-235B-A22B
 
-> 中文版：[qwen3-235b-a22b.zh.md](./qwen3-235b-a22b.zh.md)
+> English: [qwen3-235b-a22b.md](./qwen3-235b-a22b.md)
 
-*Schema version: 4*
+*Schema 版本: 4*
 
-## Overview
+_章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
+
+## 概览
 
 | | |
 |---|---|
-| Family | Qwen |
-| Released | 2025-05 |
-| Openness | Open weights |
-| Total parameters | 235B |
-| Active parameters | 22B |
+| 模型家族 | Qwen |
+| 发布时间 | 2025-05 |
+| 开放程度 | 开放权重 |
+| 总参数量 | 235B |
+| 激活参数量 | 22B |
 
-## Sources
+## 数据源
 
 - <https://huggingface.co/Qwen/Qwen3-235B-A22B/raw/main/config.json>
 - <https://arxiv.org/pdf/2505.09388>
 
-## Architecture
+## 架构
 
-### Backbone
-
-| | |
-|---|---|
-| Layers | 94 |
-| Hidden dim | 4096 |
-| Context window | 131072 |
-
-**Context notes:** Productized 128K. HF config.json reports max_position_embeddings=40960 with rope_scaling=null because YaRN+DCA extension is applied at deployment time (vLLM/SGLang configs), not baked into the static config.
-
-**Context extension:**
+### 骨干网络
 
 | | |
 |---|---|
-| Method | yarn+dca |
-| Trained max | 32768 |
-| Extended max | 131072 |
-| Factor | 4.0 |
-| Original max (RoPE) | 32768 |
+| 层数 | 94 |
+| 隐藏维度 | 4096 |
+| 上下文窗口 | 131072 |
 
-_Notes:_ Two-step path identical to the dense Qwen3 32B/14B/8B/4B family. (1) During the Long Context Stage of pre-training, RoPE base frequency is raised from 10,000 to 1,000,000 via the ABF technique (Xiong et al., 2023) while training at sequence length 32,768 on hundreds of billions of tokens (75% of 16K-32K text, 25% of 4K-16K text). (2) At inference, YaRN (Peng et al., 2023) and Dual Chunk Attention (An et al., 2024) achieve a 4x sequence-length extension, lifting deployable context from 32K to 128K.
+**上下文说明：** Productized 128K. HF config.json reports max_position_embeddings=40960 with rope_scaling=null because YaRN+DCA extension is applied at deployment time (vLLM/SGLang configs), not baked into the static config.
 
-### Attention (GQA)
+**上下文扩展：**
 
 | | |
 |---|---|
-| Variant | GQA |
-| Heads | 64 |
-| KV heads | 4 |
-| Head dim | 128 |
+| 方法 | yarn+dca |
+| 训练最大长度 | 32768 |
+| 扩展最大长度 | 131072 |
+| 倍率 | 4.0 |
+| RoPE 原始最大长度 | 32768 |
 
-**RoPE:** type=`standard`, base=`1000000`
+_说明：_ Two-step path identical to the dense Qwen3 32B/14B/8B/4B family. (1) During the Long Context Stage of pre-training, RoPE base frequency is raised from 10,000 to 1,000,000 via the ABF technique (Xiong et al., 2023) while training at sequence length 32,768 on hundreds of billions of tokens (75% of 16K-32K text, 25% of 4K-16K text). (2) At inference, YaRN (Peng et al., 2023) and Dual Chunk Attention (An et al., 2024) achieve a 4x sequence-length extension, lifting deployable context from 32K to 128K.
 
-### FFN (moe)
-
-**MoE:**
-
-| | |
-|---|---|
-| Routed experts | 128 |
-| Active experts per token | 8 |
-| Shared experts | 0 |
-| Per-expert intermediate size | 1536 |
-
-**Routing:** Fine-grained expert segmentation (Dai et al., 2024 - DeepSeekMoE) over 128 experts with top-8 routing per token (norm_topk_prob=true). No shared experts (shared_experts=0). Load balancing uses the global-batch load balancing loss (Qiu et al., 2025) with router_aux_loss_coef=0.001 - balancing is computed across the entire global batch rather than per-sequence to encourage richer expert specialization.
-
-**Layer partition:** All 94 layers are MoE (config: decoder_sparse_step=1, mlp_only_layers=[]). The HF config also reports intermediate_size=12288 = 8 active x 1536 expert width (effective per-token compute), but this dense field has no inference-time consumer when every layer is MoE.
-
-### Components
+### 注意力（GQA）
 
 | | |
 |---|---|
-| Activation | SwiGLU (config reports hidden_act=silu; SwiGLU is the gated form used in each expert FFN) |
-| Normalization | RMSNorm with pre-normalization (rms_norm_eps=1e-6). Adds QK-Norm (Dehghani et al., 2023) inside the attention block to stabilize training; replaces the QKV-bias used in Qwen2 (config sets attention_bias=false). |
+| 变体 | GQA |
+| 头数 | 64 |
+| KV 头数 | 4 |
+| 头维度 | 128 |
 
-**Embedding notes:** tie_word_embeddings=false (separate output head). Byte-level BPE tokenizer with vocabulary 151,669 (paper Section 2); config vocab_size=151,936 (padded for special tokens). Special tokens for hybrid thinking: <think> and </think> delimit the reasoning block; chat-template directives /think (default) and /no_think in the user or system message switch between thinking and non-thinking modes. Tokenizer is shared across the entire Qwen3 family.
+**RoPE：** type=`standard`, base=`1000000`
 
-### Parallelism / infra
+### FFN（moe）
+
+**MoE：**
+
+| | |
+|---|---|
+| 可路由专家数 | 128 |
+| 每 token 激活专家数 | 8 |
+| 共享专家数 | 0 |
+| 单专家中间维度 | 1536 |
+
+**路由：** Fine-grained expert segmentation (Dai et al., 2024 - DeepSeekMoE) over 128 experts with top-8 routing per token (norm_topk_prob=true). No shared experts (shared_experts=0). Load balancing uses the global-batch load balancing loss (Qiu et al., 2025) with router_aux_loss_coef=0.001 - balancing is computed across the entire global batch rather than per-sequence to encourage richer expert specialization.
+
+**层划分：** All 94 layers are MoE (config: decoder_sparse_step=1, mlp_only_layers=[]). The HF config also reports intermediate_size=12288 = 8 active x 1536 expert width (effective per-token compute), but this dense field has no inference-time consumer when every layer is MoE.
+
+### 组件
+
+| | |
+|---|---|
+| 激活函数 | SwiGLU (config reports hidden_act=silu; SwiGLU is the gated form used in each expert FFN) |
+| 归一化 | RMSNorm with pre-normalization (rms_norm_eps=1e-6). Adds QK-Norm (Dehghani et al., 2023) inside the attention block to stabilize training; replaces the QKV-bias used in Qwen2 (config sets attention_bias=false). |
+
+**Embedding 说明：** tie_word_embeddings=false (separate output head). Byte-level BPE tokenizer with vocabulary 151,669 (paper Section 2); config vocab_size=151,936 (padded for special tokens). Special tokens for hybrid thinking: <think> and </think> delimit the reasoning block; chat-template directives /think (default) and /no_think in the user or system message switch between thinking and non-thinking modes. Tokenizer is shared across the entire Qwen3 family.
+
+### 并行 / 基础设施
 
 [Unknown/Not Disclosed]
 
-## Training
+## 训练
 
 | | |
 |---|---|
-| Optimizer | [Unknown/Not Disclosed] |
-| Total training tokens | 36T |
+| 优化器 | [Unknown/Not Disclosed] |
+| 训练总 token 数 | 36T |
 
-**LR schedule:** Three-stage pre-training shared with Qwen3 dense models. (S1, General Stage) over 30T tokens at sequence length 4,096 covering 119 languages and broad domain knowledge. (S2, Reasoning Stage) about 5T higher-quality tokens at sequence length 4,096 with an enriched STEM/coding/reasoning/synthetic mix; LR decay is accelerated relative to S1. (S3, Long Context Stage) hundreds of billions of tokens at sequence length 32,768 over a long-context corpus, with RoPE base frequency raised 10K -> 1M via ABF. Optimal LR scheduler and batch size predicted by per-stage scaling laws on small proxy models; concrete values not disclosed.
+**学习率调度：** Three-stage pre-training shared with Qwen3 dense models. (S1, General Stage) over 30T tokens at sequence length 4,096 covering 119 languages and broad domain knowledge. (S2, Reasoning Stage) about 5T higher-quality tokens at sequence length 4,096 with an enriched STEM/coding/reasoning/synthetic mix; LR decay is accelerated relative to S1. (S3, Long Context Stage) hundreds of billions of tokens at sequence length 32,768 over a long-context corpus, with RoPE base frequency raised 10K -> 1M via ABF. Optimal LR scheduler and batch size predicted by per-stage scaling laws on small proxy models; concrete values not disclosed.
 
-**Data mix notes:** Coverage of 119 languages and dialects. High-quality content across coding, STEM, reasoning, books, multilingual texts, and synthetic data. Synthetic tokens generated by Qwen2.5, Qwen2.5-Math, and Qwen2.5-Coder (used as data-generation tools). PDF-derived tokens recovered via Qwen2.5-VL OCR + Qwen2.5 refinement. A multilingual data annotation system tags >30T tokens by educational value, fields, domains, and safety; data mixture is optimized at the instance level via ablations on small proxy models. No quantitative percentage breakdown disclosed.
+**数据配比说明：** Coverage of 119 languages and dialects. High-quality content across coding, STEM, reasoning, books, multilingual texts, and synthetic data. Synthetic tokens generated by Qwen2.5, Qwen2.5-Math, and Qwen2.5-Coder (used as data-generation tools). PDF-derived tokens recovered via Qwen2.5-VL OCR + Qwen2.5 refinement. A multilingual data annotation system tags >30T tokens by educational value, fields, domains, and safety; data mixture is optimized at the instance level via ablations on small proxy models. No quantitative percentage breakdown disclosed.
 
-### Alignment
+### 对齐
 
-**SFT:** Flagship four-stage post-training pipeline (see alignment.stages). The Long-CoT Cold Start (Stage 1) and Thinking Mode Fusion (Stage 3) are the SFT-flavored phases; Stage 1 instills cold-start reasoning patterns from a curated math/code/logic/STEM dataset (queries filtered via Qwen2.5-72B-Instruct, responses generated and filtered using QwQ-32B), Stage 3 conducts continual SFT on the Reasoning-RL model with a thinking + non-thinking SFT mix to fuse both modes under one chat-template.
+**SFT：** Flagship four-stage post-training pipeline (see alignment.stages). The Long-CoT Cold Start (Stage 1) and Thinking Mode Fusion (Stage 3) are the SFT-flavored phases; Stage 1 instills cold-start reasoning patterns from a curated math/code/logic/STEM dataset (queries filtered via Qwen2.5-72B-Instruct, responses generated and filtered using QwQ-32B), Stage 3 conducts continual SFT on the Reasoning-RL model with a thinking + non-thinking SFT mix to fuse both modes under one chat-template.
 
-**RL method:** GRPO during Reasoning RL (Stage 2), then a multi-reward General RL stage (Stage 4) combining (a) rule-based rewards, (b) model-based rewards with reference answers (Qwen2.5-72B-Instruct as judge), and (c) a learned reward model trained on human preferences. See alignment.stages for breakdown.
+**RL 方法：** GRPO during Reasoning RL (Stage 2), then a multi-reward General RL stage (Stage 4) combining (a) rule-based rewards, (b) model-based rewards with reference answers (Qwen2.5-72B-Instruct as judge), and (c) a learned reward model trained on human preferences. See alignment.stages for breakdown.
 
-**RLAIF:** `False`
+**RLAIF：** `False`
 
-**Post-training stages:**
+**后训练阶段：**
 
-| # | Name | Method | Description |
+| # | 名称 | 方法 | 描述 |
 |---|---|---|---|
 | 1 | Long-CoT Cold Start | `sft` | Curate a math/code/logic/STEM dataset whose problems all have verified reference answers or code-based test cases. Two-phase filtering: (a) query filtering with Qwen2.5-72B-Instruct removes ambiguous queries, multi-question items, generic generation prompts, and items already solvable without CoT; remaining queries are domain-tagged for balance. (b) response filtering: candidate responses are generated by QwQ-32B; for queries where QwQ-32B fails, human annotators assess responses; surviving responses are filtered to remove wrong final answers, repetition, guesswork, thinking/summary inconsistency, language-mixing, and validation-set leakage. A small subset is used for cold-start SFT to instill reasoning patterns without saturating performance, deliberately minimizing samples and steps to leave headroom for the subsequent RL stage. |
 | 2 | Reasoning RL | `rl` | GRPO (Shao et al., 2024) on 3,995 carefully filtered query-verifier pairs that are (1) unused in cold-start, (2) learnable for the cold-start checkpoint, (3) as challenging as possible, (4) sub-domain diverse. Uses large batch size + many rollouts per query with off-policy training for sample efficiency; entropy is steered to grow steadily or stay stable to balance exploration vs exploitation. Reported on this model: AIME'24 score rises 70.1 -> 85.1 over 170 RL training steps without any manual hyperparameter intervention. |
 | 3 | Thinking Mode Fusion | `sft` | Continual SFT on the Reasoning-RL checkpoint that integrates non-thinking ability back into the model. SFT data combines (a) thinking samples generated by rejection-sampling Stage-1 queries with the Stage-2 model (preserves reasoning quality), and (b) curated non-thinking samples spanning code, math, instruction-following, multilingual, creative writing, QA, role-play, with auto-generated checklists scoring response quality and increased translation share to improve low-resource languages. The chat-template introduces /think and /no_think directives in user/system messages and an empty <think></think> block convention for non-thinking responses; multi-turn dialogs randomly mix the directives. Thinking-budget control emerges naturally: when thinking output reaches a user-defined threshold, a fixed stop-thinking instruction is inserted to terminate reasoning and produce a final answer (not separately trained). |
 | 4 | General RL | `rl` | Broadens capability and stability across 20+ tasks via three reward types: (1) rule-based rewards for instruction- and format-adherence; (2) model-based reward with reference answer using Qwen2.5-72B-Instruct as the judge against a provided reference; (3) model-based reward without reference, a learned reward model trained on human preference data. Targets instruction following, format following (including correct /think and /no_think behavior and <think></think> usage), preference alignment, agent ability (multi-turn tool calls with real environment feedback during rollout), and specialized scenarios such as RAG (rewards anti-hallucination). |
 
-**Inference modes (runtime-switchable):**
+**推理模式（runtime 可切换）：**
 
-| Name | Trigger | Description |
+| 名称 | 触发方式 | 描述 |
 |---|---|---|
 | `thinking` | Default mode (or explicit /think directive in user/system message). The chat-template wraps reasoning in <think>...</think> before producing the final response. | Long Chain-of-Thought reasoning before answering. Recommended sampling: temperature=0.6, top-p=0.95, top-k=20. |
 | `non-thinking` | /no_think directive in user or system message (also exposed as enable_thinking=False in the HuggingFace tokenizer chat template). The model emits an empty <think></think> block then the response. | Direct, low-latency response without explicit reasoning trace. Recommended sampling: temperature=0.7, top-p=0.8, top-k=20, presence_penalty=1.5. |
 | `thinking-budget` | Manual: when the model's thinking length reaches a user-defined token threshold, the fixed instruction 'Considering the limited time by the user, I have to give the solution based on the thinking directly now. </think>' is inserted to halt the thinking block and produce a final response from accumulated reasoning. | User-controlled latency/quality knob over the thinking phase. Capability emerges naturally from Thinking Mode Fusion and is not separately trained. |
 
-### Advanced
+### 进阶
 
-**Self-distillation:** No - Qwen3-235B-A22B is itself produced via the four-stage flagship pipeline (see alignment.stages). It serves as a teacher (alongside Qwen3-32B) in the Strong-to-Weak Distillation pipeline that yields smaller Qwen3 models (0.6B/1.7B/4B/8B/14B dense and 30B-A3B MoE) via two-phase distillation: (a) off-policy distillation that combines teacher outputs from both /think and /no_think modes for response distillation, then (b) on-policy distillation where students sample completions and align logits to the teacher via KL minimization. The distillation pipeline yields better Pass@1 and Pass@64 than running the full four-stage process per small model and uses ~1/10 the GPU hours.
+**自蒸馏：** No - Qwen3-235B-A22B is itself produced via the four-stage flagship pipeline (see alignment.stages). It serves as a teacher (alongside Qwen3-32B) in the Strong-to-Weak Distillation pipeline that yields smaller Qwen3 models (0.6B/1.7B/4B/8B/14B dense and 30B-A3B MoE) via two-phase distillation: (a) off-policy distillation that combines teacher outputs from both /think and /no_think modes for response distillation, then (b) on-policy distillation where students sample completions and align logits to the teacher via KL minimization. The distillation pipeline yields better Pass@1 and Pass@64 than running the full four-stage process per small model and uses ~1/10 the GPU hours.
 
-**Mixed precision:** [Unknown/Not Disclosed]
+**混合精度：** [Unknown/Not Disclosed]
 
-## Open questions
+## 待解问题（open_questions）
 
 - Why does HF config.json report max_position_embeddings=40960 rather than 32,768 (S3 trained length) or 131,072 (productized 128K)? The paper does not address this specific value; deployment uses YaRN+DCA to reach 128K and rope_scaling is null in the static config.
 - Vocabulary size discrepancy: paper Section 2 states 151,669 while config.json sets vocab_size=151,936. Likely the config value pads the BBPE vocabulary to a hardware-friendly size with control/special tokens, but the paper does not explicitly reconcile the two numbers.
@@ -138,4 +140,4 @@ _Notes:_ Two-step path identical to the dense Qwen3 32B/14B/8B/4B family. (1) Du
 
 ---
 
-_Generated from `data/extracted/qwen3-235b-a22b.json` by `python -m llm_tech_matrix.extraction.render`. Edit the JSON, not this file._
+_由 `data/extracted/qwen3-235b-a22b.json` 通过 `python -m llm_tech_matrix.extraction.render` 自动生成。请勿直接编辑此文件——修改 JSON 或渲染器。_

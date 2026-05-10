@@ -1,5 +1,7 @@
 # Qwen3.5-27B
 
+> 中文版：[qwen3.5-27b.zh.md](./qwen3.5-27b.zh.md)
+
 *Schema version: 4*
 
 ## Overview

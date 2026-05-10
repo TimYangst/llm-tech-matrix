@@ -1,5 +1,7 @@
 # Multi-head Latent Attention (MLA)
 
+> 中文版：[mla.zh.md](./mla.zh.md)
+
 **Slug:** `mla`
 **Category:** attention
 **One-line:** A low-rank joint compression of attention keys and values into a small latent vector, dramatically shrinking the KV cache while keeping MHA-like quality.
