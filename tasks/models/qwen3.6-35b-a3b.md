@@ -2,7 +2,7 @@
 
 Slug: `qwen3.6-35b-a3b`
 Family: `qwen`
-Status: `sourcing`
+Status: `extracted`
 
 ## Sources
 
@@ -25,28 +25,30 @@ Considered but excluded:
 
 ## Open questions
 
-- [ ] Same hybrid-backbone schema gap as Qwen3.5 (see `qwen3.5-35b-a3b.md`).
-- [ ] **MTP step depth.** Qwen3.5 already has `mtp_num_hidden_layers: 1` in
-  config — i.e., 1 MTP head, like DeepSeek-V3. The 27B Qwen3.6 model card says
-  "MTP: trained with multi-steps". Need to confirm whether the 35B-A3B 3.6
-  config exposes a higher `mtp_num_hidden_layers` or the multi-step is inside
-  a single head.
-- [ ] **Soft-switch "removal" — actually a docs-only change.** The HF card says
-  Qwen3.6 "does not officially support the soft switch of Qwen3, i.e., `/think`
-  and `/nothink`", but a quick grep shows `/think` still appears 5× in the
-  Qwen3.6 chat template (identical count to Qwen3.5). So the deprecation is
-  policy/docs, not template-level. Confirm at extraction time whether the
-  template still routes `/think` end-of-message to enable thinking, or whether
-  it now no-ops.
-- [ ] **`preserve_thinking` mechanism** — what determines which prior turns'
-  thinking get retained? Sliding-window? All? Tagged-by-user?
-- [ ] **Agentic-coding RL recipe** — execution-feedback RL (Docker-sandboxed
-  test-running) was mentioned in third-party coverage but not in the HF model
-  card we read. Confirm via the official blog.
+(See `data/extracted/qwen3.6-35b-a3b.json` `open_questions` for the
+authoritative list — pre-training continuation vs fresh pretrain, MTP step
+depth D, agentic-coding RL recipe, preserve_thinking retention rule, mixed
+precision, parallelism, soft-switch behavior at template level, why no
+revisit of MoE load-balancing.)
 
 ## Resolved
 
-- (none yet)
+- ✅ **Hybrid-backbone schema gap** — covered by schema v4; validated again
+  here via the same `Attention.variants[]` + `layer_pattern` shape used for
+  the 3.5 sibling.
+- ✅ **MTP head topology confirmed identical to 3.5** — `mtp_num_hidden_layers=1`
+  in config, same as 3.5-35B-A3B and as the 3.6-27B sibling. Multi-step
+  training depth D remains undisclosed and is flagged in the extracted JSON's
+  `open_questions`.
+- ✅ **Soft-switch behavior is template-level still present** — confirmed at
+  extraction: `/think` still appears 5× in the chat template; "not officially
+  supported" is a docs/policy posture, not a template removal. Captured under
+  `training.alignment.inference_modes` and flagged in `open_questions` for
+  the lingering "what does the template actually do on `/think`" question.
+- ✅ **`preserve_thinking` is template-level** — the chat template references
+  `preserve_thinking` 2× and the README documents the API kwarg; captured as
+  the third inference mode. The retention rule (sliding-window vs full-history
+  vs tagged) is not specified and remains in `open_questions`.
 
 ## Inferred fields (closed models only)
 

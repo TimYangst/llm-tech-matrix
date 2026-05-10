@@ -6,30 +6,30 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 **Phase:** M1 — pivoting into native-multimodal territory with Qwen3.5/3.6, the next
 generation after our Qwen3 entries. These ship as **Causal LM + Vision Encoder** by
-default (no text-only checkpoint), so this batch is the project's first real exercise
-of the multimodal schema region — and they introduce a hybrid Gated DeltaNet + Gated
-Attention backbone that doesn't fit cleanly in the current `architecture.attention`
-shape. Expect a schema iteration during/after extraction.
+default (no text-only checkpoint), introducing a hybrid Gated DeltaNet + Gated
+Attention backbone (`16 × (3×DeltaNet + 1×GatedAttn)`). Schema v4 was landed up
+front to cover the new shapes (hybrid attention variants, native-VL encoder/anchors,
+mRoPE); extraction can proceed without further schema changes.
 
-**In progress (sourcing):**
+**In progress (sourcing → extracting):**
 
-- `qwen3.5-35b-a3b` — Qwen3.5 MoE smaller (Feb 2026)
-- `qwen3.5-27b` — Qwen3.5 dense (Feb 2026)
-- `qwen3.6-35b-a3b` — Qwen3.6 MoE smaller (Apr 2026, +MTP, removes /think soft switch)
-- `qwen3.6-27b` — Qwen3.6 dense (Apr 2026, +MTP)
+- ✅ `qwen3.5-27b` — Qwen3.5 dense (Feb 2026) — **extracted** (first hybrid-backbone validation; schema v4 holds)
+- ✅ `qwen3.5-35b-a3b` — Qwen3.5 MoE smaller (Feb 2026) — **extracted** (hybrid attention + MoE-FFN combo; shared-expert reintroduction; reverts to classic aux-loss)
+- ✅ `qwen3.6-27b` — Qwen3.6 dense (Apr 2026) — **extracted** (post-training-only refresh of 3.5-27B; adds `preserve_thinking` 3rd inference mode + agentic-coding focus)
+- ✅ `qwen3.6-35b-a3b` — Qwen3.6 MoE smaller (Apr 2026) — **extracted** (post-training-only refresh of 3.5-35B-A3B; same `preserve_thinking` + agentic-coding deltas as 3.6-27B)
 
-**Anticipated schema gaps (record before extraction starts):**
+**Schema gaps — resolved by v4 (2026-05):**
 
-- `architecture.attention` is a single object; Qwen3.5/3.6 layout is
-  `N × (3 × (Gated DeltaNet → FFN/MoE) → 1 × (Gated Attention → FFN/MoE))` — needs
-  per-block-type variants or a layer-pattern field.
-- `architecture.multimodal` currently is `{vision_encoder, audio_encoder, fusion, fusion_notes}` (4 strings). Native VL with shared backbone needs richer encoder
-  details (params, patch size, native resolution, training data).
-- `training.objectives.multi_token_prediction` exists, but Qwen3.6 trains with
-  multi-step MTP — confirm the field captures step depth.
-- Chat-template details (soft-switch `/think` + API-only `enable_thinking` +
-  `preserve_thinking`) need somewhere structured to live; current
-  `alignment.inference_modes.trigger` is free-form.
+- ✅ Hybrid attention layout — `Attention.variants[]` + `layer_pattern` (see [conventions changelog v4](../docs/conventions.md#schema-changelog)).
+- ✅ Native-VL encoder details — structured `Multimodal.vision_encoder` (HF `vision_config` keys) + `vision_token_anchors`.
+- ✅ mRoPE — `RoPEType` includes `"mrope"`; `mrope_section` / `partial_rotary_factor` go in `rope.scaling` dict.
+- ✅ Chat-template `enable_thinking` / `preserve_thinking` — `alignment.inference_modes[].trigger` (free-form is the right shape; mechanisms vary too much across vendors to structure).
+- ✅ Multi-step MTP — `MTPConfig.depth` (semantic match: "D additional tokens"); `mtp_num_hidden_layers` (head depth) goes in `shared_modules`.
+
+**Vendor-fact corrections (against initial roadmap notes):**
+
+- Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
+- Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
 **Recommended next (after this batch):** Cross-family dense baseline — `llama-3.1-70b`
 or `mistral-large-2` or `glm-4` to break out of the Qwen / DeepSeek duopoly. Then a
@@ -45,6 +45,20 @@ closed model (`gpt-4o` or `claude-sonnet-4`) to exercise `inferred_fields`.
 > 27B + 35B-A3B open-weight for Qwen3.6 so far). We're extracting four total: the
 > dense 27B + smaller MoE 35B-A3B from each generation. Same-size cross-version
 > compare is the cleanest signal for the Qwen3.5→3.6 delta.
+
+**Recently completed (2026-05-09):**
+
+- Schema v4 — Qwen3.5/3.6-driven: `Attention.variants[]` + `layer_pattern` for hybrid stacks; structured `Multimodal` (vision_encoder, vision_token_anchors); `RoPEType` adds `"mrope"`. All three v3 extractions (DeepSeek-V3, Qwen3-32B, Qwen3-235B-A22B) re-validated as v4 (multimodal: null → no migration needed).
+- Sourced 4 Qwen3.5/3.6 slugs (config + HF README + blog).
+- Qwen3.5-27B extraction (Qwen3.5 dense; hybrid 16×(3 GatedDeltaNet + 1 GatedAttention) backbone, partial RoPE 0.25, mRoPE, native VL with shared 248320 vocab; opt-in YaRN 262K→1010K; first stress-test of v4 hybrid-attention shape — schema held without modification).
+- Qwen3.5-35B-A3B extraction (Qwen3.5 MoE; same hybrid backbone at 40 layers / hidden 2048, 256 routed × 512 width with 1 shared expert at 512 width, classic aux-loss `router_aux_loss_coef=0.001` reverting from Qwen3's global-batch LB and DeepSeek-V3's aux-loss-free; first hybrid-attention + MoE-FFN combo — schema held).
+- Qwen3.6-27B extraction (post-training-only refresh of Qwen3.5-27B; same architecture, MTP, vision encoder, YaRN; deltas: a third runtime mode `preserve_thinking` for multi-turn reasoning carry-over, plus agentic-coding-focused post-training).
+- Qwen3.6-35B-A3B extraction (post-training-only refresh of Qwen3.5-35B-A3B; HF model class is still `Qwen3_5MoeForConditionalGeneration`; same MoE topology + same classic aux-loss; same `preserve_thinking` + agentic-coding deltas as 3.6-27B).
+- 2 new glossary entries: Gated DeltaNet, mRoPE; "Used by" rows added across GQA, MTP, YaRN, Hybrid Thinking, DeepSeekMoE for the full Qwen3.5/3.6 family.
+
+**Phase complete:** all 4 native-VL Qwen3.5/3.6 slugs extracted (7 extractions total in repo). Schema v4 held throughout — designed up front, no in-flight changes needed. The 3.6 → 3.5 deltas turned out to be post-training-only (same backbone weights presumed; only HF class names differ at the metadata-level).
+
+**Recommended next:** Cross-family dense baseline to break the Qwen monoculture in extracted set. Per the M1 backlog: `llama-3.1-70b` (reference dense GQA + RoPE), `mistral-large-2` (European reference), or `glm-4` (Chinese-language design choices). Then a closed model (`gpt-4o` or `claude-sonnet-4`) to exercise `inferred_fields`.
 
 **Recently completed (2026-05-03):**
 
@@ -94,15 +108,15 @@ older projection-fusion multimodal models below them. They sit in this table bec
 their primary characterization includes vision, not because they're a "VL extension"
 of a text-only LM.
 
-| Slug              | Family  | Status     | Notes file                                                 | Source priority                                                       |
-| ----------------- | ------- | ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
-| `qwen3.5-35b-a3b` | Qwen    | `sourcing` | [`models/qwen3.5-35b-a3b.md`](./models/qwen3.5-35b-a3b.md) | Qwen3.5 MoE — hybrid Gated DeltaNet + MoE w/ shared expert; native VL |
-| `qwen3.5-27b`     | Qwen    | `sourcing` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)         | Qwen3.5 dense — hybrid backbone, FFN dense; native VL                 |
-| `qwen3.6-35b-a3b` | Qwen    | `sourcing` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md) | Qwen3.6 MoE — same arch as 3.5, +MTP, removes /think soft switch      |
-| `qwen3.6-27b`     | Qwen    | `sourcing` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)         | Qwen3.6 dense — same arch as 3.5, +MTP, agentic-coding RL             |
-| `qwen-2.5-vl-72b` | Qwen    | `backlog`  | —                                                          | Vision encoder + projection fusion                                    |
-| `minicpm-v-2.6`   | MiniCPM | `backlog`  | —                                                          | Compact multimodal                                                    |
-| `glm-4v`          | GLM     | `backlog`  | —                                                          | Native vs projected fusion comparison                                 |
+| Slug              | Family  | Status      | Notes file                                                 | Source priority                                                                                                                                                              |
+| ----------------- | ------- | ----------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `qwen3.5-35b-a3b` | Qwen    | `extracted` | [`models/qwen3.5-35b-a3b.md`](./models/qwen3.5-35b-a3b.md) | Qwen3.5 MoE — hybrid (10×(3 DeltaNet + 1 GatedAttn)) + 256-expert MoE (top-8 + 1 shared, w 512); native VL                                                                   |
+| `qwen3.5-27b`     | Qwen    | `extracted` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)         | Qwen3.5 dense — hybrid backbone (16×(3 DeltaNet + 1 GatedAttn)), FFN dense 17408, native VL                                                                                  |
+| `qwen3.6-35b-a3b` | Qwen    | `extracted` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md) | Qwen3.6 MoE — architecturally identical to Qwen3.5-35B-A3B (same `Qwen3_5MoeForConditionalGeneration` HF class); deltas: `preserve_thinking` 3rd mode + agentic-coding focus |
+| `qwen3.6-27b`     | Qwen    | `extracted` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)         | Qwen3.6 dense — architecturally identical to Qwen3.5-27B; deltas: `preserve_thinking` 3rd inference mode + agentic-coding post-training focus                                |
+| `qwen-2.5-vl-72b` | Qwen    | `backlog`   | —                                                          | Vision encoder + projection fusion                                                                                                                                           |
+| `minicpm-v-2.6`   | MiniCPM | `backlog`   | —                                                          | Compact multimodal                                                                                                                                                           |
+| `glm-4v`          | GLM     | `backlog`   | —                                                          | Native vs projected fusion comparison                                                                                                                                        |
 
 ## M1 — Closed models (inference)
 

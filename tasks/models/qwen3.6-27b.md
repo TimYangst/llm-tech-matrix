@@ -2,7 +2,7 @@
 
 Slug: `qwen3.6-27b`
 Family: `qwen`
-Status: `sourcing`
+Status: `extracted`
 
 ## Sources
 
@@ -23,23 +23,28 @@ Considered but excluded:
 
 ## Open questions
 
-- [ ] Same hybrid-backbone schema gap as Qwen3.5 (see `qwen3.5-35b-a3b.md`).
-- [ ] **MTP details**. HF model card explicitly says "MTP: trained with
-  multi-steps". Schema's `training.objectives.multi_token_prediction` is a
-  single boolean/object — confirm we capture the step depth/count.
-- [ ] **Token embedding 248320 (Padded)** — explicitly listed for both Qwen3.6
-  variants. What's the unpadded vocab size, and what's the padding intent
-  (alignment for tensor-parallel? new vision tokens?). Compare against Qwen3
-  vocab.
-- [ ] **"Soft-switch removal" is docs-only.** Quick template grep confirms
-  `/think` still appears 5× in the Qwen3.6-27B chat template (same count as
-  Qwen3.5 templates). The "not officially supported" claim from the HF model
-  card is a policy/docs change, not a template change. Verify behavior at
-  extraction.
+(See `data/extracted/qwen3.6-27b.json` `open_questions` for the authoritative
+list — pre-training continuation vs fresh pretrain, MTP step depth D, agentic
+coding RL signal, preserve_thinking training recipe, mixed precision,
+parallelism, and the lingering "/think soft switch in template but docs say
+not supported" behavior question.)
 
 ## Resolved
 
-- (none yet)
+- ✅ **Hybrid-backbone schema gap** — covered by schema v4 (validated via
+  Qwen3.5-27B and -35B-A3B; identical layout reused here).
+- ✅ **MTP semantic capture** — `training.objectives.multi_token_prediction.depth`
+  fits the multi-step claim; exact D still UNKNOWN per vendor disclosure, but
+  the schema field captures it (would be filled if the depth were stated).
+- ✅ **Token embedding padded** — captured in `architecture.components.embedding_notes`
+  with a cross-version note (Qwen3.5-27B is identical at 248320 padded; the
+  unpadded count and padding rationale remain undisclosed and are flagged in
+  the extracted JSON's `open_questions`).
+- ✅ **Soft-switch policy vs template behavior** — captured under
+  `training.alignment.inference_modes` triggers and flagged as an open question
+  in the extracted JSON (template still references `/think` 5×; vendor doc
+  says "not officially supported" — exact behavior on the soft tokens is not
+  characterized, surface for downstream tooling).
 
 ## Inferred fields (closed models only)
 

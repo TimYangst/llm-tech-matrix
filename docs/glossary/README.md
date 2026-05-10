@@ -27,6 +27,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Multi-head Latent Attention (MLA)](./mla.md)
 - [Grouped Query Attention (GQA)](./gqa.md)
 - [QK-Norm](./qk-norm.md)
+- [Gated DeltaNet](./gated-deltanet.md)
 
 ### FFN / MoE
 
@@ -48,6 +49,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 
 - [YaRN RoPE scaling](./yarn-rope.md)
 - [Dual Chunk Attention (DCA)](./dual-chunk-attention.md)
+- [Multimodal RoPE (mRoPE)](./mrope.md)
 
 ### Quantization / mixed precision
 
