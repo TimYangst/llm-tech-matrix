@@ -1,5 +1,7 @@
 # Fill-in-Middle (FIM)
 
+> 中文版：[fim.zh.md](./fim.zh.md)
+
 **Slug:** `fim`
 **Category:** training-objective
 **One-line:** A pre-training data augmentation that randomly rewrites documents into "given prefix and suffix, predict the middle" form, giving autoregressive LMs a fill-in-the-blank capability without architectural changes.

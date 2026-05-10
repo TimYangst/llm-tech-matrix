@@ -1,5 +1,7 @@
 # Multi-Token Prediction (MTP)
 
+> 中文版：[mtp.zh.md](./mtp.zh.md)
+
 **Slug:** `mtp`
 **Category:** training-objective
 **One-line:** A pre-training objective that predicts not just the next token but the next D tokens via shallow extra modules, densifying the training signal and (optionally) supplying speculative-decoding heads at inference.

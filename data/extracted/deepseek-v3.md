@@ -1,5 +1,7 @@
 # DeepSeek-V3
 
+> 中文版：[deepseek-v3.zh.md](./deepseek-v3.zh.md)
+
 *Schema version: 4*
 
 ## Overview

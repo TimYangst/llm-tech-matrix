@@ -1,5 +1,7 @@
 # FP8 mixed precision (DeepSeek-V3 variant)
 
+> 中文版：[fp8-mixed-precision.zh.md](./fp8-mixed-precision.zh.md)
+
 **Slug:** `fp8-mixed-precision`
 **Category:** quantization
 **One-line:** A training-precision recipe that runs compute-density GEMMs in FP8 (E4M3) with fine-grained tile/block scaling, while keeping precision-sensitive ops (embedding, attention, normalization, optimizer state) in BF16/FP32.

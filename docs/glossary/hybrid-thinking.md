@@ -1,5 +1,7 @@
 # Hybrid Thinking (chat-template-driven thinking-mode fusion)
 
+> 中文版：[hybrid-thinking.zh.md](./hybrid-thinking.zh.md)
+
 **Slug:** `hybrid-thinking`
 **Category:** alignment
 **One-line:** A post-training recipe that fuses long-CoT reasoning ("thinking") and direct response ("non-thinking") behaviors into a single set of weights, switched at inference via chat-template directives rather than serving two separate models.

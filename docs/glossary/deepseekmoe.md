@@ -1,5 +1,7 @@
 # DeepSeekMoE (fine-grained + shared experts)
 
+> 中文版：[deepseekmoe.zh.md](./deepseekmoe.zh.md)
+
 **Slug:** `deepseekmoe`
 **Category:** ffn / moe
 **One-line:** A Mixture-of-Experts variant that uses many fine-grained experts plus a small number of always-active "shared" experts, improving expert specialization without sacrificing common-knowledge coverage.

@@ -1,6 +1,6 @@
 ---
 name: extract-model
-description: Run a schema-strict extraction for one AI model. Reads sources from data/sources/<slug>/, produces data/extracted/<slug>.json validated against src/llm_tech_matrix/schema.py plus a rendered <slug>.md, and updates tasks/ROADMAP.md. Use when the user asks to "extract <model>", "do the deepseek-v3 extraction", "run the pilot extraction", or similar per-model extraction work.
+description: Run a schema-strict extraction for one AI model. Reads sources from data/sources/<slug>/, produces data/extracted/<slug>.json validated against src/llm_tech_matrix/schema.py plus rendered <slug>.md (English) and <slug>.zh.md (Chinese), and updates tasks/ROADMAP.md. Use when the user asks to "extract <model>", "do the deepseek-v3 extraction", "run the pilot extraction", or similar per-model extraction work.
 ---
 
 # extract-model
@@ -77,20 +77,30 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 
    If validation fails, fix the JSON. **Do not loosen the schema to accommodate extraction shortcuts** — if the schema genuinely needs a new field, that's a separate change (bump `schema_version`, update `docs/schema.md`, document in `docs/conventions.md` schema changelog).
 
-6. **Render the human-readable Markdown:**
+6. **Render the human-readable Markdown (bilingual):**
 
    ```bash
    uv run python -m llm_tech_matrix.extraction.render <slug>
    ```
 
-   This produces `data/extracted/<slug>.md` deterministically from the JSON. Both files are committed.
+   This produces **two** files deterministically from the JSON, both committed:
+
+   - `data/extracted/<slug>.md` — English (section headers, table labels, chrome).
+   - `data/extracted/<slug>.zh.md` — Chinese chrome (headers + labels translated). Field
+     *values* stay in source-language English to keep the .md a faithful view of the
+     JSON; the glossary is the place to look up term definitions in Chinese.
+
+   Both files cross-link to each other in their header. If you want to change the
+   Chinese label wording, edit `LABELS["zh"]` in `src/llm_tech_matrix/extraction/render.py`
+   and re-render — never edit the rendered files.
 
 7. **Touch the glossary** (`docs/glossary/`):
 
    - For every distinctive technique referenced in your extraction (a new attention variant, MoE routing trick, training objective, optimizer, quantization recipe, etc.):
-     - If an entry already exists, **add a row to its "Used by" table** for this model with the model-specific variant/details.
-     - If no entry exists and the technique is meaningfully novel (not just a one-off naming difference), **create a new glossary entry** from `_template.md` and add it to `README.md`'s index.
+     - If an entry already exists, **add a row to its "Used by" table** for this model with the model-specific variant/details. Update **both** `<slug>.md` and `<slug>.zh.md` so the two stay in sync (same row, English content in `.md`, Chinese translation in `.zh.md`).
+     - If no entry exists and the technique is meaningfully novel (not just a one-off naming difference), **create both** `<slug>.md` (from `_template.md`) and `<slug>.zh.md` (from `_template.zh.md`), and add an entry to **both** `README.md` and `README.zh.md` indexes.
    - Skip techniques that are universal commodities (e.g. "transformer block", "softmax") — the glossary is for things worth comparing across vendors.
+   - Each glossary file should have a top cross-link to its sibling (`> 中文版：...` in the English file, `> English: ...` in the Chinese file) — see existing entries for the format.
 
 8. **Update tasks**:
 
@@ -99,9 +109,9 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 
 9. **Report back** to the user with:
 
-   - Path to the extracted JSON and rendered Markdown.
+   - Path to the extracted JSON and the two rendered Markdown files (`<slug>.md` and `<slug>.zh.md`).
    - Count of `[Unknown/Not Disclosed]` fields (signals disclosure quality).
-   - New glossary entries created (if any).
+   - New glossary entries created (if any) — list both the `.md` and `.zh.md` paths.
    - Any new open questions worth their attention.
    - For closed models: the `inferred_fields` summary so they can sanity-check the inferences.
 
@@ -121,4 +131,4 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 - If they ask you to fill an unknown field with a "reasonable guess" — refuse. Cite this skill's cardinal rule.
 - If they ask you to skip validation — refuse. Schema-strict is the contract.
 - If they ask you to extract a model with no source files — ask them to run the sourcing step first or provide URLs.
-- If they ask you to commit `data/extracted/<slug>.md` without regenerating from the JSON — refuse. The .md is deterministic; if they want different content, change the JSON or the renderer.
+- If they ask you to commit `data/extracted/<slug>.md` or `<slug>.zh.md` without regenerating from the JSON — refuse. Both are deterministic; if they want different content, change the JSON or the renderer (English wording in `LABELS["en"]`, Chinese wording in `LABELS["zh"]`).

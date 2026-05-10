@@ -1,5 +1,7 @@
 # Auxiliary-loss-free routing
 
+> 中文版：[aux-loss-free-routing.zh.md](./aux-loss-free-routing.zh.md)
+
 **Slug:** `aux-loss-free-routing`
 **Category:** ffn / moe
 **One-line:** Balances MoE expert load via per-expert learnable bias terms (adjusted online based on observed expert utilization) instead of an auxiliary load-balancing loss, avoiding the gradient signal that auxiliary losses inject into the main objective.

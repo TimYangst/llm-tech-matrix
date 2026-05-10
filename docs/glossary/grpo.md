@@ -1,5 +1,7 @@
 # Group Relative Policy Optimization (GRPO)
 
+> 中文版：[grpo.zh.md](./grpo.zh.md)
+
 **Slug:** `grpo`
 **Category:** alignment
 **One-line:** A PPO-family RL algorithm that drops the separate value/critic network and estimates the advantage baseline by sampling a group of completions per prompt and using their group-relative reward as the baseline.

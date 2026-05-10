@@ -1,5 +1,7 @@
 # \<Technique Name>
 
+> 中文版：[\_template.zh.md](./_template.zh.md)
+
 **Slug:** `<kebab-case-slug>`
 **Category:** attention | ffn / moe | optimizer | training-objective | alignment | infra | quantization | other
 **One-line:** \<what it does, in one sentence>

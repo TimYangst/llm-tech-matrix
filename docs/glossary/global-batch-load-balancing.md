@@ -1,5 +1,7 @@
 # Global-batch load balancing loss
 
+> 中文版：[global-batch-load-balancing.zh.md](./global-batch-load-balancing.zh.md)
+
 **Slug:** `global-batch-load-balancing`
 **Category:** ffn / moe
 **One-line:** A MoE load-balancing auxiliary loss computed across the entire global batch (all sequences across all DP ranks) rather than per-sequence or per-micro-batch, encouraging richer expert specialization without forcing every short sequence to use all experts.

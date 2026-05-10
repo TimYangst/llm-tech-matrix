@@ -1,5 +1,7 @@
 # Gated DeltaNet
 
+> 中文版：[gated-deltanet.zh.md](./gated-deltanet.zh.md)
+
 **Slug:** `gated-deltanet`
 **Category:** attention
 **One-line:** A linear-attention variant that maintains a recurrent key-value state updated by a delta rule and produces output via a learned multiplicative gate, giving softmax-quality recall at constant per-token cost.

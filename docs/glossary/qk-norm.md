@@ -1,5 +1,7 @@
 # QK-Norm
 
+> 中文版：[qk-norm.zh.md](./qk-norm.zh.md)
+
 **Slug:** `qk-norm`
 **Category:** attention
 **One-line:** Apply normalization (typically RMSNorm or LayerNorm) to the query and key projections inside attention before the dot product, to stabilize training by preventing attention-logit scale blow-ups.
