@@ -80,7 +80,7 @@ RoPE scaling:
 
 **Dense intermediate size:** `17408`
 
-**Layer partition:** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant (config.mlp_only_layers=[] - no MoE substitution). Note: this is narrower than Qwen3-32B's 25600 despite the same hidden=5120/layers=64; the FFN budget appears reallocated to the hybrid Gated DeltaNet + Gated Attention machinery.
+**Layer partition:** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant (config.mlp_only_layers=[] - no MoE substitution).
 
 ### Components
 
@@ -115,7 +115,7 @@ RoPE scaling:
 | Depth (D) | [Unknown/Not Disclosed] |
 | Loss weight schedule | [Unknown/Not Disclosed] |
 
-_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states only 'MTP: trained with multi-steps' - the exact step depth D is not disclosed. The serving recipe uses MTP for speculative decoding (sglang: speculative-num-steps=3 / speculative-num-draft-tokens=4; vLLM: qwen3_next_mtp with num_speculative_tokens=2), suggesting at least D=2-4 useful prediction depth at inference, but training-time D is not stated.
+_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states 'MTP: trained with multi-steps' - the exact step depth D is not disclosed.
 
 ### Alignment
 

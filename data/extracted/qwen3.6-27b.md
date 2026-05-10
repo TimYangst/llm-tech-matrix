@@ -80,7 +80,7 @@ RoPE scaling:
 
 **Dense intermediate size:** `17408`
 
-**Layer partition:** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant (config.mlp_only_layers=[]). Same FFN width 17408 as Qwen3.5-27B.
+**Layer partition:** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant (config.mlp_only_layers=[]).
 
 ### Components
 
@@ -115,7 +115,7 @@ RoPE scaling:
 | Depth (D) | [Unknown/Not Disclosed] |
 | Loss weight schedule | [Unknown/Not Disclosed] |
 
-_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states only 'MTP: trained with multi-steps' - exact step depth D is not disclosed. Same serving recipes as Qwen3.5-27B (vLLM qwen3_next_mtp num_speculative_tokens=2; sglang NEXTN speculative-num-steps=3 / num-draft-tokens=4). Identical MTP topology to Qwen3.5-27B.
+_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states 'MTP: trained with multi-steps' - exact step depth D is not disclosed.
 
 ### Alignment
 

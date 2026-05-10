@@ -73,9 +73,9 @@
         "num_active_experts": 8,
         "shared_experts": 1,
         "expert_intermediate_size": 512,
-        "routing": "Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts. Identical routing topology and LB strategy to Qwen3.5-35B-A3B - the 3.6 release does not revisit the load-balancing design (despite Qwen3 having shipped global-batch LB and DeepSeek-V3 having shipped aux-loss-free routing)."
+        "routing": "Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts."
       },
-      "layer_partition": "Uniform MoE FFN across all 40 layers regardless of attention variant (config.mlp_only_layers=[]). Same as Qwen3.5-35B-A3B."
+      "layer_partition": "Uniform MoE FFN across all 40 layers regardless of attention variant (config.mlp_only_layers=[])."
     },
     "components": {
       "activation": "SwiGLU (config reports hidden_act=silu; SwiGLU is the gated form used in each expert FFN).",
@@ -94,7 +94,7 @@
       "multi_token_prediction": {
         "depth": "[Unknown/Not Disclosed]",
         "loss_weight_schedule": "[Unknown/Not Disclosed]",
-        "shared_modules": "MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states 'MTP: trained with multi-steps' - exact step depth D not disclosed. Same serving recipes as Qwen3.5-35B-A3B (vLLM qwen3_next_mtp num_speculative_tokens=2; sglang NEXTN speculative-num-steps=3 / num-draft-tokens=4). Identical MTP topology to Qwen3.5-35B-A3B."
+        "shared_modules": "MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states 'MTP: trained with multi-steps' - exact step depth D is not disclosed."
       },
       "fill_in_middle": null,
       "other": []

@@ -87,7 +87,7 @@ RoPE scaling:
 | Shared experts | 1 |
 | Per-expert intermediate size | 512 |
 
-**Routing:** Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts — uniform width. Total MoE width per token = 9 * 512 = 4608 from 9 active experts (8 routed + 1 shared). Note: Qwen3 dropped shared experts vs Qwen2.5; Qwen3.5 reintroduces exactly one — an open question why.
+**Routing:** Top-8 routing over 256 routed experts plus 1 always-on shared expert per token (README: '8 Routed + 1 Shared'). Auxiliary load-balance loss with coefficient router_aux_loss_coef=0.001. Per-expert FFN intermediate dim is 512 for both routed (moe_intermediate_size) and shared (shared_expert_intermediate_size) experts — uniform width. Total MoE width per token = 9 * 512 = 4608 from 9 active experts (8 routed + 1 shared).
 
 **Layer partition:** Uniform MoE FFN across all 40 layers regardless of attention variant (config.mlp_only_layers=[] - no dense FFN substitution at any depth).
 
@@ -124,7 +124,7 @@ RoPE scaling:
 | Depth (D) | [Unknown/Not Disclosed] |
 | Loss weight schedule | [Unknown/Not Disclosed] |
 
-_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states only 'MTP: trained with multi-steps' - the exact step depth D is not disclosed. The serving recipe uses MTP for speculative decoding (sglang: speculative-num-steps=3 / speculative-num-draft-tokens=4; vLLM: qwen3_next_mtp with num_speculative_tokens=2), suggesting at least D=2-4 useful prediction depth at inference, but training-time D is not stated.
+_Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_dedicated_embeddings=false (shares input embeddings with the main model). README states 'MTP: trained with multi-steps' - the exact step depth D is not disclosed.
 
 ### Alignment
 
