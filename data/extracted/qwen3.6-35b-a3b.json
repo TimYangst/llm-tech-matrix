@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "metadata": {
     "name": "Qwen3.6-35B-A3B",
     "family": "Qwen",
@@ -11,7 +11,8 @@
       "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/config.json",
       "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/raw/main/README.md",
       "https://qwen.ai/blog?id=qwen3.6-35b-a3b"
-    ]
+    ],
+    "variant_policy": "Same unified-weights philosophy as Qwen3.5: one checkpoint per (size, dense/MoE), modes via chat-template kwargs. Qwen3.6 adds a third runtime mode `preserve_thinking` (multi-turn reasoning carryover) via a chat-template kwarg — composable with `enable_thinking`. As of release the open-weight surface is narrower than 3.5 — only 27B dense + 35B-A3B MoE shipped open-weight (README: 'first open-weight variant of Qwen3.6'). Same NO-separate-Math/Coder/VL-siblings policy; Coder capability is post-training emphasis ('Agentic Coding' highlight) plus the `qwen3_coder` serving parser, not a sibling checkpoint."
   },
   "architecture": {
     "backbone": {
@@ -25,7 +26,7 @@
         "extended_max": 1010000,
         "factor": 4.0,
         "original_max": 262144,
-        "notes": "Identical to Qwen3.5-35B-A3B \u2014 opt-in deployment-time scaling, factor=4.0 with original_max_position_embeddings=262144. mRoPE configuration (mrope_section=[11,11,10], mrope_interleaved=true, partial_rotary_factor=0.25, rope_theta=10,000,000) preserved across the extension."
+        "notes": "Identical to Qwen3.5-35B-A3B — opt-in deployment-time scaling, factor=4.0 with original_max_position_embeddings=262144. mRoPE configuration (mrope_section=[11,11,10], mrope_interleaved=true, partial_rotary_factor=0.25, rope_theta=10,000,000) preserved across the extension."
       }
     },
     "attention": {
@@ -93,7 +94,7 @@
     "lr_schedule": "[Unknown/Not Disclosed]",
     "data_total_tokens": "[Unknown/Not Disclosed]",
     "data_mix": {},
-    "data_mix_notes": "Qwen3.6 is a post-training-focused refresh of Qwen3.5 \u2014 the README opens with 'Following the February release of the Qwen3.5 series, we're pleased to share the first open-weight variant of Qwen3.6. Built on direct feedback from the community, Qwen3.6 prioritizes stability and real-world utility, offering developers a more intuitive, responsive, and genuinely productive coding experience.' The Qwen3.5 family-level pre-training highlights (early-fusion multimodal training, 201-language coverage, asynchronous RL infra) are not restated in the Qwen3.6 README. Two Qwen3.6 highlights: (1) **Agentic Coding** - frontend workflows and repository-level reasoning with greater fluency; (2) **Thinking Preservation** - retain reasoning context from historical messages across multi-turn dialogs. No quantitative breakdown is disclosed for either pre-training or post-training data.",
+    "data_mix_notes": "Qwen3.6 is a post-training-focused refresh of Qwen3.5 — the README opens with 'Following the February release of the Qwen3.5 series, we're pleased to share the first open-weight variant of Qwen3.6. Built on direct feedback from the community, Qwen3.6 prioritizes stability and real-world utility, offering developers a more intuitive, responsive, and genuinely productive coding experience.' The Qwen3.5 family-level pre-training highlights (early-fusion multimodal training, 201-language coverage, asynchronous RL infra) are not restated in the Qwen3.6 README. Two Qwen3.6 highlights: (1) **Agentic Coding** - frontend workflows and repository-level reasoning with greater fluency; (2) **Thinking Preservation** - retain reasoning context from historical messages across multi-turn dialogs. No quantitative breakdown is disclosed for either pre-training or post-training data.",
     "objectives": {
       "multi_token_prediction": {
         "depth": "[Unknown/Not Disclosed]",
@@ -112,19 +113,56 @@
         {
           "name": "thinking",
           "trigger": "Default mode. Qwen3.6 thinks by default and wraps reasoning in <think>...</think> before producing the final response. README repeats the Qwen3.5 statement that the Qwen3-style /think and /no_think soft switches are NOT officially supported.",
-          "description": "Long Chain-of-Thought reasoning before the final answer. Recommended sampling per README Best Practices (same as Qwen3.5): temperature=1.0, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=1.5, repetition_penalty=1.0 (general); temperature=0.6 for precise coding tasks (e.g. WebDev)."
+          "description": "Long Chain-of-Thought reasoning before the final answer. Recommended sampling per README Best Practices (same as Qwen3.5): temperature=1.0, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=1.5, repetition_penalty=1.0 (general); temperature=0.6 for precise coding tasks (e.g. WebDev).",
+          "kwargs": {
+            "enable_thinking": "true"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95",
+            "top_k": "20",
+            "min_p": "0.0",
+            "presence_penalty": "0.0",
+            "repetition_penalty": "1.0"
+          }
         },
         {
           "name": "non-thinking",
           "trigger": "Set chat_template_kwargs={\"enable_thinking\": False} via the OpenAI-compatible API extra_body (vLLM/SGLang/Qwen-Agent), or pass enable_thinking=False directly on Alibaba Cloud Model Studio. Soft switches /think and /no_think are documented as NOT officially supported.",
-          "description": "Direct, low-latency response without an explicit reasoning trace. Same recommended sampling as Qwen3.5-35B-A3B."
+          "description": "Direct, low-latency response without an explicit reasoning trace. Same recommended sampling as Qwen3.5-35B-A3B.",
+          "kwargs": {
+            "enable_thinking": "false"
+          },
+          "sampling_recommended": {
+            "temperature": "0.7",
+            "top_p": "0.80",
+            "top_k": "20",
+            "min_p": "0.0",
+            "presence_penalty": "1.5",
+            "repetition_penalty": "1.0"
+          }
         },
         {
           "name": "preserve-thinking",
-          "trigger": "Set chat_template_kwargs={\"preserve_thinking\": True} via the API (Alibaba Cloud Model Studio shortens to top-level preserve_thinking=True). Composable with enable_thinking \u2014 the user can run thinking + preserve_thinking, or non-thinking + preserve_thinking.",
-          "description": "**New in Qwen3.6.** README: 'By default, only the thinking blocks generated in handling the latest user message is retained, resulting in a pattern commonly as interleaved thinking. Qwen3.6 has been additionally trained to preserve and leverage thinking traces from historical messages.' Vendor argues it benefits multi-turn agent scenarios by improving decision consistency, can reduce total tokens by avoiding re-derivation, and improves KV-cache utilization. Default is False (interleaved-thinking pattern, matching Qwen3.5 behavior). The Qwen3.6 chat template references `preserve_thinking` 2x and still references `/think` 5x (same as Qwen3.5 templates) \u2014 soft-switch deprecation remains a docs/policy posture rather than a template-level removal."
+          "trigger": "Set chat_template_kwargs={\"preserve_thinking\": True} via the API (Alibaba Cloud Model Studio shortens to top-level preserve_thinking=True). Composable with enable_thinking — the user can run thinking + preserve_thinking, or non-thinking + preserve_thinking.",
+          "description": "**New in Qwen3.6.** README: 'By default, only the thinking blocks generated in handling the latest user message is retained, resulting in a pattern commonly as interleaved thinking. Qwen3.6 has been additionally trained to preserve and leverage thinking traces from historical messages.' Vendor argues it benefits multi-turn agent scenarios by improving decision consistency, can reduce total tokens by avoiding re-derivation, and improves KV-cache utilization. Default is False (interleaved-thinking pattern, matching Qwen3.5 behavior). The Qwen3.6 chat template references `preserve_thinking` 2x and still references `/think` 5x (same as Qwen3.5 templates) — soft-switch deprecation remains a docs/policy posture rather than a template-level removal.",
+          "kwargs": {
+            "preserve_thinking": "true"
+          },
+          "sampling_recommended": {}
         }
-      ]
+      ],
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<tool_call>",
+        "end_token": "</tool_call>",
+        "arguments_schema": "Per-arg <parameter=name>VALUE</parameter> blocks nested inside a <function=NAME></function> wrapper. Qwen3.6 fixes a Qwen3.5 JSON-encoding bug — the chat template now applies `tojson` to anything that is not already a string (non-string scalars like booleans and numbers serialize as JSON 'true'/'false'/'5' rather than Python 'True'/'False'/'5'). Strings pass through unchanged.",
+        "parser_flags": {
+          "vllm": "--tool-call-parser qwen3_coder",
+          "sglang": "--tool-call-parser qwen3_coder"
+        },
+        "notes": "Same Qwen3-Coder XML-like wire format as Qwen3.5; only difference is the tool-arg scalar encoding fix above. README serving snippets pair `--tool-call-parser qwen3_coder` with `--reasoning-parser qwen3`. Compatible with `preserve_thinking` kwarg — README highlights agent scenarios as the primary motivation for the new preserve_thinking mode (full reasoning context across multi-turn tool-calling improves decision consistency and KV-cache utilization)."
+      }
     },
     "advanced": {
       "self_distillation": "[Unknown/Not Disclosed]",
@@ -166,10 +204,10 @@
     "Pre-training optimizer, learning-rate schedule, batch size, LR, weight decay, gradient clipping are not disclosed for Qwen3.6-35B-A3B. Whether 3.6 reuses the 3.5 base checkpoint (continued post-training only), continues pre-training from it, or repeats pre-training from scratch on similar data is not stated.",
     "Total pre-training tokens and data mix are not disclosed numerically.",
     "Multi-Token Prediction step depth D is not stated quantitatively. Same gap as 3.5 - mtp_num_hidden_layers=1 (head depth) is exposed but training-time multi-step D is undisclosed.",
-    "Post-training pipeline structure is undisclosed for Qwen3.6: no explicit stage count, no SFT data scale, no RL algorithm name. The two highlighted capabilities \u2014 Agentic Coding (frontend + repo-level reasoning) and Thinking Preservation (preserve_thinking API kwarg) \u2014 have no documented training recipe (execution-feedback RL? unit-test-grounded rewards? continued SFT? data scale?).",
+    "Post-training pipeline structure is undisclosed for Qwen3.6: no explicit stage count, no SFT data scale, no RL algorithm name. The two highlighted capabilities — Agentic Coding (frontend + repo-level reasoning) and Thinking Preservation (preserve_thinking API kwarg) — have no documented training recipe (execution-feedback RL? unit-test-grounded rewards? continued SFT? data scale?).",
     "Mixed-precision training recipe is not disclosed (config.text_config.dtype=bfloat16 reflects the released checkpoint dtype only).",
     "Parallelism strategy and training infrastructure are not disclosed. MoE-specific details (expert parallelism, all-to-all dispatch implementation, capacity factor, drop-token policy) remain undisclosed.",
-    "Soft switches `/think` and `/no_think` are described as 'not officially supported' in the README, but the chat template (Jinja2) still references `/think` 5 times \u2014 same count as Qwen3.5 templates. Behavior on the soft tokens (silent ignore? graceful degrade? still routes to thinking/non-thinking?) is not characterized.",
+    "Soft switches `/think` and `/no_think` are described as 'not officially supported' in the README, but the chat template (Jinja2) still references `/think` 5 times — same count as Qwen3.5 templates. Behavior on the soft tokens (silent ignore? graceful degrade? still routes to thinking/non-thinking?) is not characterized.",
     "preserve_thinking mechanism details: is the entire history of <think> blocks retained, only the most-recent N, or some tagged-by-user subset? The README/template do not explicitly bound the retention; the chat template references preserve_thinking 2x but the exact retention rule is not described in plain English.",
     "Why no revisit of MoE load-balancing in the 3.6 refresh? Qwen3.6 inherits the classic aux-loss recipe (router_aux_loss_coef=0.001) introduced by 3.5, despite Qwen3 having shipped global-batch LB and DeepSeek-V3 aux-loss-free routing. No vendor explanation.",
     "Cross-version compare: Qwen3.6-35B-A3B is architecturally identical to Qwen3.5-35B-A3B (same layers, hidden, attention shape, MoE topology, vocab, vision encoder, MTP topology, context window, RoPE config, even the same architectures='Qwen3_5MoeForConditionalGeneration' HF class name). The release is a post-training-only refresh as far as disclosed signals indicate. Confirm against any future tech report.",

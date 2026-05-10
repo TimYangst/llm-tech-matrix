@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v5).
+"""Pydantic models for the extraction schema (v6).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
@@ -47,6 +47,17 @@ class ModelMetadata(_Strict):
     params_total: str
     params_active: str
     sources: list[str] = Field(description="URLs the extraction was sourced from")
+    variant_policy: str = Field(
+        default=UNKNOWN,
+        description=(
+            "How the vendor partitions capabilities across weight checkpoints vs. runtime modes. "
+            'E.g. Qwen3.5/3.6: "unified weights per (size, dense/MoE); thinking/non-thinking and '
+            "preserve_thinking exposed via chat-template kwargs; coding emphasis via post-training "
+            'plus a serving-time tool-call parser; no separate Math/Coder/VL siblings." '
+            'vs Qwen2.5: "separate Instruct/Math/Coder/VL/Audio/Omni checkpoints per capability." '
+            "Free-text — vendor strategies vary too much to enum. UNKNOWN when not disclosed."
+        ),
+    )
 
 
 # ---------- 2. Architecture ----------
@@ -331,6 +342,76 @@ class InferenceMode(_Strict):
         description='How the user activates this mode, e.g. "/think flag", "system prompt"'
     )
     description: str
+    kwargs: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Machine-readable chat-template kwargs / API parameters that activate this mode. "
+            "Values are stringified for portability across JSON booleans / Python booleans "
+            '(e.g. {"enable_thinking": "false"}, {"preserve_thinking": "true"}). Empty when '
+            "the mode is the default, is triggered by prompt content (e.g. soft-switch tokens "
+            "in user message), or has no toggle. Do NOT invent kwargs — only fill from sources."
+        ),
+    )
+    sampling_recommended: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Vendor-recommended sampling parameters when this mode is active "
+            "(temperature, top_p, top_k, min_p, presence_penalty, repetition_penalty, etc.). "
+            "Values stringified. Empty when the vendor does not disclose per-mode recommendations."
+        ),
+    )
+
+
+class ToolCallProtocol(_Strict):
+    """Wire format the model emits for tool calls, plus the serving-stack parsers that decode it.
+
+    Captures the *syntactic* protocol (delimiter tokens, argument encoding) — distinct from
+    "the model can call tools" (yes/no). Lets synthesis compare e.g. Qwen3-Coder XML-like vs
+    JSON-only protocols across vendors. None at the Alignment level when the model has no
+    documented tool-calling protocol or when the protocol is undisclosed in source material.
+    """
+
+    format: str = Field(
+        description=(
+            "Family of the wire format. Suggested values: "
+            '"xml-like" (Qwen3-Coder: <tool_call><function=NAME><parameter=ARG>VALUE</parameter></function></tool_call>); '
+            '"json-only" (a single JSON object inside a special-token pair); '
+            '"json-in-text" (JSON object inline in normal text, no special tokens); '
+            '"function-call-token" (single special token followed by JSON args); '
+            '"other".'
+        )
+    )
+    start_token: str = Field(
+        default="",
+        description='Special token / delimiter starting a tool call (e.g. "<tool_call>"). Empty if no delimiters.',
+    )
+    end_token: str = Field(
+        default="",
+        description='End-of-tool-call delimiter (e.g. "</tool_call>"). Empty if N/A.',
+    )
+    arguments_schema: str = Field(
+        default="",
+        description=(
+            'How arguments are encoded inside one call. Examples: "JSON object as the function body"; '
+            '"per-arg <parameter=name>VALUE</parameter> blocks (string-typed values; non-string '
+            'scalars are JSON-encoded in Qwen3.6, str()-stringified in Qwen3.5)"; "key=value lines".'
+        ),
+    )
+    parser_flags: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Serving-stack parser flag(s) that decode this protocol, keyed by serving stack. "
+            'E.g. {"vllm": "--tool-call-parser qwen3_coder", '
+            '"sglang": "--tool-call-parser qwen3_coder"}. Empty when no published parser flag.'
+        ),
+    )
+    notes: str = Field(
+        default="",
+        description=(
+            "Free-text — multi-tool-per-turn handling, version differences, known issues, "
+            "tool-result protocol if it differs from the call protocol, etc."
+        ),
+    )
 
 
 class Alignment(_Strict):
@@ -355,6 +436,15 @@ class Alignment(_Strict):
         description=(
             "Runtime-switchable modes the user can toggle at inference. "
             "Empty list when the model has a single mode of operation."
+        ),
+    )
+    tool_call_protocol: ToolCallProtocol | None = Field(
+        default=None,
+        description=(
+            "Structured wire format the model uses for tool calls. None when the model has "
+            "no documented tool-calling protocol (or it is undisclosed in source material). "
+            "The model can still support tool calling without this being populated — populate "
+            "only when the *wire format* is documented."
         ),
     )
 

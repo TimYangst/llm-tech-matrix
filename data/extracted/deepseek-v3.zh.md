@@ -2,7 +2,7 @@
 
 > English: [deepseek-v3.md](./deepseek-v3.md)
 
-*Schema 版本: 5*
+*Schema 版本: 6*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -15,6 +15,8 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | 开放程度 | 开放权重 |
 | 总参数量 | 671B |
 | 激活参数量 | 37B |
+
+**变体策略（variant policy）：** Single base + Chat checkpoint per release; no Math / Coder / VL siblings. Reasoning capability lives in a separate sibling model (DeepSeek-R1) rather than as a runtime mode — V3 is a non-thinking instruction-following model end-to-end. The V3 → V4 generation collapses this V3+R1 split into a 3-mode runtime axis on one model.
 
 ## 数据源
 
@@ -135,7 +137,7 @@ _共享模块：_ Embedding layer and output head are shared with the main model
 
 | | |
 |---|---|
-| 格式 | PSM (Prefix-Suffix-Middle): <|fim_begin|>f_pre<|fim_hole|>f_suf<|fim_end|>f_middle<|eos_token|>, applied at document level during pre-packing |
+| 格式 | PSM (Prefix-Suffix-Middle): <\|fim_begin\|>f_pre<\|fim_hole\|>f_suf<\|fim_end\|>f_middle<\|eos_token\|>, applied at document level during pre-packing |
 | 比例 | 0.1 |
 
 ### 对齐

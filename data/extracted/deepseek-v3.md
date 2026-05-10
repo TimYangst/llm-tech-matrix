@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v3.zh.md](./deepseek-v3.zh.md)
 
-*Schema version: 5*
+*Schema version: 6*
 
 ## Overview
 
@@ -13,6 +13,8 @@
 | Openness | Open weights |
 | Total parameters | 671B |
 | Active parameters | 37B |
+
+**Variant policy:** Single base + Chat checkpoint per release; no Math / Coder / VL siblings. Reasoning capability lives in a separate sibling model (DeepSeek-R1) rather than as a runtime mode — V3 is a non-thinking instruction-following model end-to-end. The V3 → V4 generation collapses this V3+R1 split into a 3-mode runtime axis on one model.
 
 ## Sources
 
@@ -133,7 +135,7 @@ _Shared modules:_ Embedding layer and output head are shared with the main model
 
 | | |
 |---|---|
-| Format | PSM (Prefix-Suffix-Middle): <|fim_begin|>f_pre<|fim_hole|>f_suf<|fim_end|>f_middle<|eos_token|>, applied at document level during pre-packing |
+| Format | PSM (Prefix-Suffix-Middle): <\|fim_begin\|>f_pre<\|fim_hole\|>f_suf<\|fim_end\|>f_middle<\|eos_token\|>, applied at document level during pre-packing |
 | Rate | 0.1 |
 
 ### Alignment

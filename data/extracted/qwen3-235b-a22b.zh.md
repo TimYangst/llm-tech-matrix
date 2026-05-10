@@ -2,7 +2,7 @@
 
 > English: [qwen3-235b-a22b.md](./qwen3-235b-a22b.md)
 
-*Schema 版本: 5*
+*Schema 版本: 6*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -15,6 +15,8 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | 开放程度 | 开放权重 |
 | 总参数量 | 235B |
 | 激活参数量 | 22B |
+
+**变体策略（variant policy）：** Per-size open-weight checkpoints — 6 dense sizes (0.6B-32B) + 2 MoE flagships (30B-A3B, 235B-A22B). All siblings share the unified four-stage post-training pipeline (Long-CoT Cold Start → Reasoning RL → Thinking Mode Fusion → General RL); Stage 3 deliberately FUSES thinking and non-thinking into one model rather than shipping separate Thinking/Instruct checkpoints. No Math/Coder/VL siblings in the Qwen3 generation — coder/VL/omni capabilities live in Qwen2.5 and Qwen3.5+ respectively. Modes are toggled via `/think` and `/no_think` soft-switch tokens in the user/system message (also exposed as `enable_thinking` chat-template kwarg).
 
 ## 数据源
 
@@ -119,6 +121,13 @@ _说明：_ Two-step path identical to the dense Qwen3 32B/14B/8B/4B family. (1)
 | `thinking` | Default mode (or explicit /think directive in user/system message). The chat-template wraps reasoning in <think>...</think> before producing the final response. | Long Chain-of-Thought reasoning before answering. Recommended sampling: temperature=0.6, top-p=0.95, top-k=20. |
 | `non-thinking` | /no_think directive in user or system message (also exposed as enable_thinking=False in the HuggingFace tokenizer chat template). The model emits an empty <think></think> block then the response. | Direct, low-latency response without explicit reasoning trace. Recommended sampling: temperature=0.7, top-p=0.8, top-k=20, presence_penalty=1.5. |
 | `thinking-budget` | Manual: when the model's thinking length reaches a user-defined token threshold, the fixed instruction 'Considering the limited time by the user, I have to give the solution based on the thinking directly now. </think>' is inserted to halt the thinking block and produce a final response from accumulated reasoning. | User-controlled latency/quality knob over the thinking phase. Capability emerges naturally from Thinking Mode Fusion and is not separately trained. |
+
+- **`thinking`**
+    - Kwargs：`enable_thinking=true`
+    - 推荐采样参数：`temperature=0.6`, `top_p=0.95`, `top_k=20`
+- **`non-thinking`**
+    - Kwargs：`enable_thinking=false`
+    - 推荐采样参数：`temperature=0.7`, `top_p=0.8`, `top_k=20`, `presence_penalty=1.5`
 
 ### 进阶
 

@@ -66,6 +66,7 @@ LABELS: dict[str, dict[str, str]] = {
         "openness": "Openness",
         "params_total": "Total parameters",
         "params_active": "Active parameters",
+        "variant_policy": "Variant policy",
         # Backbone rows
         "layers": "Layers",
         "hidden_dim": "Hidden dim",
@@ -125,6 +126,14 @@ LABELS: dict[str, dict[str, str]] = {
         "stages_table_header": "| # | Name | Method | Description |",
         "inference_modes": "Inference modes (runtime-switchable)",
         "modes_table_header": "| Name | Trigger | Description |",
+        "im_kwargs": "Kwargs",
+        "im_sampling": "Recommended sampling",
+        "tool_call_protocol": "Tool-call protocol",
+        "tcp_format": "Format",
+        "tcp_start_token": "Start token",
+        "tcp_end_token": "End token",
+        "tcp_arguments_schema": "Arguments schema",
+        "tcp_parser_flags": "Serving parser flags",
         # Advanced
         "self_distillation": "Self-distillation",
         "mixed_precision": "Mixed precision",
@@ -194,6 +203,7 @@ LABELS: dict[str, dict[str, str]] = {
         "openness": "开放程度",
         "params_total": "总参数量",
         "params_active": "激活参数量",
+        "variant_policy": "变体策略（variant policy）",
         # Backbone rows
         "layers": "层数",
         "hidden_dim": "隐藏维度",
@@ -253,6 +263,14 @@ LABELS: dict[str, dict[str, str]] = {
         "stages_table_header": "| # | 名称 | 方法 | 描述 |",
         "inference_modes": "推理模式（runtime 可切换）",
         "modes_table_header": "| 名称 | 触发方式 | 描述 |",
+        "im_kwargs": "Kwargs",
+        "im_sampling": "推荐采样参数",
+        "tool_call_protocol": "Tool-call 协议",
+        "tcp_format": "格式",
+        "tcp_start_token": "起始 token",
+        "tcp_end_token": "结束 token",
+        "tcp_arguments_schema": "参数编码方式",
+        "tcp_parser_flags": "服务端解析器参数",
         # Advanced
         "self_distillation": "自蒸馏",
         "mixed_precision": "混合精度",
@@ -302,9 +320,27 @@ LABELS: dict[str, dict[str, str]] = {
 }
 
 
+def _escape_table_pipes(s: str) -> str:
+    r"""Escape ``|`` as ``\|`` outside inline-code spans for safe table-cell rendering.
+
+    GFM's table extension says cells can contain ``|`` either escaped as ``\|`` or wrapped
+    inside an inline-code span (CommonMark `` `…` ``). Escaping inside a code span would
+    leak literal backslashes into the rendered output, so we only escape pipes that are
+    outside backticks. Splitting on `` ` `` gives alternating outside/inside segments —
+    even-indexed parts are outside code and need escaping, odd-indexed parts are inside
+    code and pass through unchanged.
+    """
+    parts = s.split("`")
+    for i in range(0, len(parts), 2):
+        parts[i] = parts[i].replace("|", "\\|")
+    return "`".join(parts)
+
+
 def _row(label: str, value: Any) -> str:
     if value is None or value == "":
         value = "—"
+    if isinstance(value, str):
+        value = _escape_table_pipes(value)
     return f"| {label} | {value} |"
 
 
@@ -373,6 +409,14 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
         )
     )
     parts.append("")
+
+    if md.variant_policy and md.variant_policy != "[Unknown/Not Disclosed]":
+        parts.append(
+            f"**{labels['variant_policy']}：** {md.variant_policy}"
+            if lang == "zh"
+            else f"**{labels['variant_policy']}:** {md.variant_policy}"
+        )
+        parts.append("")
 
     # ---- Sources ----
     parts.append(f"## {labels['sources']}")
@@ -735,6 +779,61 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
         parts.append("|---|---|---|")
         for m in al.inference_modes:
             parts.append(f"| `{m.name}` | {m.trigger} | {m.description} |")
+        parts.append("")
+        # Per-mode structured kwargs + sampling, when populated.
+        modes_with_struct = [m for m in al.inference_modes if m.kwargs or m.sampling_recommended]
+        for m in modes_with_struct:
+            parts.append(f"- **`{m.name}`**")
+            if m.kwargs:
+                kv = ", ".join(f"`{k}={v}`" for k, v in m.kwargs.items())
+                parts.append(
+                    f"    - {labels['im_kwargs']}：{kv}"
+                    if lang == "zh"
+                    else f"    - {labels['im_kwargs']}: {kv}"
+                )
+            if m.sampling_recommended:
+                kv = ", ".join(f"`{k}={v}`" for k, v in m.sampling_recommended.items())
+                parts.append(
+                    f"    - {labels['im_sampling']}：{kv}"
+                    if lang == "zh"
+                    else f"    - {labels['im_sampling']}: {kv}"
+                )
+        if modes_with_struct:
+            parts.append("")
+
+    if al.tool_call_protocol is not None:
+        tcp = al.tool_call_protocol
+        parts.append(
+            f"**{labels['tool_call_protocol']}：**"
+            if lang == "zh"
+            else f"**{labels['tool_call_protocol']}:**"
+        )
+        parts.append("")
+        tcp_rows: list[tuple[str, Any]] = [(labels["tcp_format"], f"`{tcp.format}`")]
+        if tcp.start_token:
+            tcp_rows.append((labels["tcp_start_token"], f"`{tcp.start_token}`"))
+        if tcp.end_token:
+            tcp_rows.append((labels["tcp_end_token"], f"`{tcp.end_token}`"))
+        if tcp.arguments_schema:
+            tcp_rows.append((labels["tcp_arguments_schema"], tcp.arguments_schema))
+        parts.append(_table(tcp_rows))
+        if tcp.parser_flags:
+            parts.append("")
+            parts.append(
+                f"**{labels['tcp_parser_flags']}：**"
+                if lang == "zh"
+                else f"**{labels['tcp_parser_flags']}:**"
+            )
+            parts.append("")
+            for stack, flag in tcp.parser_flags.items():
+                parts.append(f"- `{stack}`: `{flag}`")
+        if tcp.notes:
+            parts.append("")
+            parts.append(
+                f"_{labels['notes']}：_ {tcp.notes}"
+                if lang == "zh"
+                else f"_{labels['notes']}:_ {tcp.notes}"
+            )
         parts.append("")
 
     parts.append(f"### {labels['advanced']}")

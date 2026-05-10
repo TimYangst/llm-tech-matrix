@@ -2,7 +2,7 @@
 
 > English: [deepseek-v4-pro.md](./deepseek-v4-pro.md)
 
-*Schema 版本: 5*
+*Schema 版本: 6*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -15,6 +15,8 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | 开放程度 | 开放权重 |
 | 总参数量 | 1.6T |
 | 激活参数量 | 49B |
+
+**变体策略（variant policy）：** Two open-weight sizes (V4-Pro 1.6T/49B and V4-Flash 284B/13B) with the same V4 architecture family modulo size-specific differences (Flash uses pure SWA in layers 0-1 instead of pure HCA). Reasoning effort is a runtime axis with three modes (Non-think / Think High / Think Max) selected via system prompt — collapses what in the V3 generation was a separate Reasoner sibling (DeepSeek-R1) into modes on a single checkpoint. A fourth runtime behavior (interleaved-thinking) auto-engages in tool-calling contexts. No separate Math / Coder / VL siblings.
 
 ## 数据源
 
@@ -179,6 +181,17 @@ _共享模块：_ MTP configuration is identical to DeepSeek-V3 (paper Section 2
 | `think-high` | Output framed as '<think> thinking tokens </think> summary'. Per Section 5.3.1 evaluation context window 128K. | Conscious logical analysis - slower but more accurate. Targets complex problem-solving, planning, medium-risk decisions. Trained under longer context window than Non-think and a length-penalty schedule that allows more reasoning tokens. |
 | `think-max` | Two ingredients: (1) a special instruction prepended to the system prompt ('Reasoning Effort: Absolute maximum with no shortcuts permitted...' - paper Table 3); (2) <think>...</think> output framing. Per Section 5.3.1 evaluation context window 384K (README also recommends ≥384K when using Think Max). | Reasoning pushed to its fullest extent. Targets exploration of the model's reasoning boundary. Trained with the longest context window and the most-relaxed length penalty during RL. DeepSeek-V4-Pro-Max in benchmarks always denotes V4-Pro under this mode. |
 | `interleaved-thinking (cross-turn reasoning preservation)` | Behavior of all three reasoning modes when a tool-calling context is detected (paper Figure 7a). Conventional conversational scenarios still discard prior reasoning at each new user turn (paper Figure 7b - same as DeepSeek-V3.2). Agent frameworks that simulate tool interactions via plain user messages (e.g. Terminus) may not trigger the tool-calling path; non-think modes are recommended for such architectures. | In tool-calling scenarios all reasoning content is preserved across the entire conversation, including across user message boundaries - the model maintains a coherent cumulative chain of thought over long-horizon agent tasks rather than reconstructing state from scratch each turn. Enabled by the 1M context window. |
+
+**Tool-call 协议：**
+
+| | |
+|---|---|
+| 格式 | `xml-like` |
+| 起始 token | `<|DSML|tool_calls>` |
+| 结束 token | `[Unknown/Not Disclosed]` |
+| 参数编码方式 | Per-call <\|DSML\|invoke name=NAME>...</\|DSML\|invoke> blocks nested inside the tool_calls wrapper. XML format — paper Table 4 explicitly states it replaces JSON to mitigate string-escape failures (a known weakness of JSON-only tool protocols). Argument-encoding details inside an invoke block are not restated in the README; refer to paper Table 4 for full grammar. |
+
+_说明：_ Distinguishes V4 from V3 (no documented tool-call protocol in V3). The HF release ships no Jinja chat template — encoding is done via a Python module (encoding_dsv4) co-located with the model, so serving stacks need either that encoder module or a custom integration. Same |DSML| namespace also hosts the V4 'Quick Instruction' tokens (<|action|>, <|title|>, <|query|>, <|authority|>, <|domain|>, <|extracted_url|>, <|read_url|>) that enable parallel auxiliary tasks reusing the existing KV cache (paper Table 5). Auto-engages interleaved-thinking mode (one of the four runtime inference_modes).
 
 ### 进阶
 
