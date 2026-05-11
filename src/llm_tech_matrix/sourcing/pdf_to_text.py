@@ -28,7 +28,9 @@ def pdf_to_text(pdf_path: Path) -> str:
     for i, page in enumerate(reader.pages, start=1):
         parts.append(f"\n\n===== Page {i} =====\n\n")
         parts.append(page.extract_text() or "")
-    return "".join(parts)
+    # Strip NUL bytes — pypdf occasionally emits `\x00`, and a single one flips
+    # grep into binary mode (silent zero matches), breaking grep-based fact-checking.
+    return "".join(parts).replace("\x00", "")
 
 
 def derive_for_slug(slug: str, *, force: bool = False) -> int:
