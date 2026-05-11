@@ -11,7 +11,7 @@
 | Family | Kimi K2 |
 | Released | 2026-01 |
 | Openness | Open weights |
-| Total parameters | 1.04T |
+| Total parameters | 1T |
 | Active parameters | 32B |
 
 **Variant policy:** Within the K2 generation Moonshot ships sibling-per-mode text-only checkpoints (K2-Base, K2-Instruct, K2-Instruct-0905, K2-Thinking). The K2.5 generation collapses that sibling layout into a single unified-weights multimodal checkpoint with two runtime modes (Instant vs Thinking) selected via the chat-template `thinking` kwarg, plus a third K2.6-only `preserve_thinking` kwarg. K2.5 is built by continual pretraining on top of K2-Base; no separate Math / Coder / VL checkpoints exist for the K2.5/K2.6 generations.
@@ -120,7 +120,7 @@ K2.5 inherits the K2 training infrastructure with one multimodal addition: Decou
 | | |
 |---|---|
 | Optimizer | MuonClip — Muon optimizer with QK-Clip for stability (per paper §4.1: 'Kimi K2 employs the token-efficient MuonClip optimizer with QK-Clip for training stability'). The same MuonClip optimizer is used during the joint pre-training and the RL post-training stage (paper §4.4.2: 'We employ the MuonClip optimizer to minimize this objective'). |
-| Total training tokens | ~30T cumulative (15T K2-base text-only + 15T K2.5 joint mixed vision-text) + ~700B mid-training (500B at 32K then 200B at 256K) |
+| Total training tokens | K2.5 paper §4.1 reports the K2-base pre-training corpus as '15 trillion high-quality text tokens'; §2.1 / §4.2 reports K2.5 joint pre-training on '~15 trillion mixed visual and text tokens' on top of K2-base at a constant low text:vision ratio; §4.3 / Table 3 reports mid-training adding 500B tokens at 32K context length then 200B tokens at 256K context length via the YaRN curriculum. Whether the joint-stage 15T is additive to or partially replaces the K2-base 15T is not stated explicitly (see open_questions). |
 
 **LR schedule:** [Unknown/Not Disclosed] — the K2.5 report defers the K2-base lr schedule to the unpublished K2 tech report and does not restate it. Joint pre-training and mid-training schedules are not disclosed numerically.
 

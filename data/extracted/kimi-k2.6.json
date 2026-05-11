@@ -5,7 +5,7 @@
     "family": "Kimi K2",
     "release_date": "[Unknown/Not Disclosed]",
     "openness": "open_weights",
-    "params_total": "1.04T",
+    "params_total": "1T",
     "params_active": "32B",
     "sources": [
       "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/config.json",

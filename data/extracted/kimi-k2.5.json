@@ -5,7 +5,7 @@
     "family": "Kimi K2",
     "release_date": "2026-01",
     "openness": "open_weights",
-    "params_total": "1.04T",
+    "params_total": "1T",
     "params_active": "32B",
     "sources": [
       "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/config.json",
@@ -81,7 +81,7 @@
   "training": {
     "optimizer": "MuonClip — Muon optimizer with QK-Clip for stability (per paper §4.1: 'Kimi K2 employs the token-efficient MuonClip optimizer with QK-Clip for training stability'). The same MuonClip optimizer is used during the joint pre-training and the RL post-training stage (paper §4.4.2: 'We employ the MuonClip optimizer to minimize this objective').",
     "lr_schedule": "[Unknown/Not Disclosed] — the K2.5 report defers the K2-base lr schedule to the unpublished K2 tech report and does not restate it. Joint pre-training and mid-training schedules are not disclosed numerically.",
-    "data_total_tokens": "~30T cumulative (15T K2-base text-only + 15T K2.5 joint mixed vision-text) + ~700B mid-training (500B at 32K then 200B at 256K)",
+    "data_total_tokens": "K2.5 paper §4.1 reports the K2-base pre-training corpus as '15 trillion high-quality text tokens'; §2.1 / §4.2 reports K2.5 joint pre-training on '~15 trillion mixed visual and text tokens' on top of K2-base at a constant low text:vision ratio; §4.3 / Table 3 reports mid-training adding 500B tokens at 32K context length then 200B tokens at 256K context length via the YaRN curriculum. Whether the joint-stage 15T is additive to or partially replaces the K2-base 15T is not stated explicitly (see open_questions).",
     "data_mix": {},
     "data_mix_notes": "K2 base was trained on '15 trillion high-quality text tokens' (paper §4.1, exact distribution not disclosed in the K2.5 report). K2.5 joint pre-training adds ~15T mixed vision+text tokens at a constant text:vision ratio across the entire run (paper §2.1 finds early fusion with low vision ratio outperforms late high-ratio fusion). Joint data extends K2's distribution by introducing unique tokens, increasing weight on coding-related content, and capping max-epochs per source. Mid-training data includes long text, long video, reasoning data, and Long-CoT (paper Table 3). ViT-stage data: alt text, synthetic captions for images and videos, grounding bboxes, OCR.",
     "objectives": {

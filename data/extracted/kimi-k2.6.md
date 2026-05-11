@@ -11,7 +11,7 @@
 | Family | Kimi K2 |
 | Released | [Unknown/Not Disclosed] |
 | Openness | Open weights |
-| Total parameters | 1.04T |
+| Total parameters | 1T |
 | Active parameters | 32B |
 
 **Variant policy:** Same generation-level policy as K2.5 (unified-weights checkpoint with chat-template-kwarg modes), and the only post-K2.5 weight family in the K2 line. K2.6 is a post-training-only refresh of K2.5 — README §5: 'Kimi-K2.6 has the same architecture as Kimi-K2.5, and the deployment method can be directly reused.' Adds a third `preserve_thinking` chat-template kwarg that retains the prior turn's `<think>` block in multi-turn conversations (vs K2.5's strict-suffix-only rendering); no new sibling checkpoints.
