@@ -86,7 +86,7 @@
 
 ### Parallelism / infra
 
-GLM-5.1 release notes do not separately document training infrastructure; post-training-only refresh inherits GLM-5's slime-based asynchronous RL framework (paper §3.6). Inference deployment matches GLM-5 (vLLM v0.19.0+, SGLang v0.5.10+, KTransformers v0.5.3+, Transformers v0.5.3+, xLLM v0.8.0+) — README §Serve adds a 'see [transformers docs](.../glm_moe_dsa.md)' pointer not present on the GLM-5 README, indicating the `glm_moe_dsa` model class is now upstreamed in mainline Transformers.
+GLM-5.1 release notes do not separately document training infrastructure; post-training-only refresh inherits GLM-5's slime-based asynchronous RL framework (paper §3.6). Inference deployment matches GLM-5 (vLLM v0.19.0+, SGLang v0.5.10+, KTransformers v0.5.3+, Transformers v0.5.3+, xLLM v0.8.0+) — README §Serve adds a 'see [transformers docs](https://github.com/huggingface/transformers/blob/main/docs/source/en/model_doc/glm_moe_dsa.md)' pointer not present on the GLM-5 README, indicating the `glm_moe_dsa` model class is now upstreamed in mainline Transformers.
 
 ## Training
 
