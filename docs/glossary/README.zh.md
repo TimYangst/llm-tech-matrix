@@ -23,6 +23,7 @@
 - [Grouped Query Attention (GQA)](./gqa.zh.md)
 - [QK-Norm](./qk-norm.zh.md)
 - [Gated DeltaNet](./gated-deltanet.zh.md)
+- [DeepSeek Sparse Attention (DSA)](./dsa.zh.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
 
 ### FFN / MoE

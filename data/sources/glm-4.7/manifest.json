@@ -1,0 +1,71 @@
+{
+  "slug": "glm-4.7",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/zai-org/GLM-4.7/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "GLM-4.7 HuggingFace config.json (358B MoE, glm4_moe class — incremental refresh of GLM-4.5 architecture)",
+      "sha256": "f713924a536ac1965d8af2a3144d3a0ce0acae94f0fbfd7407240cbafcb08c53",
+      "size_bytes": 1007,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-4.7/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "GLM-4.7 tokenizer_config.json",
+      "sha256": "27d01309c0ae7b5edb6511daabfcbf772b60e21c65cbb74d059acc76796f7897",
+      "size_bytes": 7307,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/zai-org/GLM-4.7/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "GLM-4.7 HF model card — 358B MoE incremental refresh of GLM-4.5 architecture; reasoning_parser=glm45, tool_call_parser=glm47",
+      "sha256": "ad072cbe81374f18149a107f2e1cbed93f27a6b220409a6bb34ba97a4d36757e",
+      "size_bytes": 13605,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2508.06471",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "GLM-4.5 tech report 'GLM-4.5: Agentic, Reasoning, and Coding (ARC) Foundation Models' (arXiv:2508.06471, Aug 2025) — covers GLM-4.5 architecture which GLM-4.6/4.7 inherit",
+      "sha256": "b5eec92371521f580779dc450261728091cc4a004cc5862a0204efab478d5b07",
+      "size_bytes": 4067812,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://z.ai/blog/glm-4.7",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Z.AI blog — GLM-4.7 launch",
+      "sha256": "de951038a3f25e0327451682902afeee87a7422150bd4a08b2efbdfad4f418a5",
+      "size_bytes": 677,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-4.7/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "GLM-4.7 chat template (Jinja2)",
+      "sha256": "d63ad536c3c81880043e22ec7fd08db42b4d8fb7c89c7138bc562bfa25281375",
+      "size_bytes": 3120,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}

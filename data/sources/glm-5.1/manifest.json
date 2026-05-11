@@ -1,0 +1,71 @@
+{
+  "slug": "glm-5.1",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/zai-org/GLM-5.1/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "GLM-5.1 HuggingFace config.json (754B MoE, post-training-only refresh of GLM-5)",
+      "sha256": "726e45e28d1be1636a5834048a4101a2cfe384819ad2ebe08d41f6fe04656526",
+      "size_bytes": 1379,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.1/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "GLM-5.1 tokenizer_config.json",
+      "sha256": "8b6c9684842d57fb45907d1670835fa6929a4686e4229d4c4684d56a9abf3eb1",
+      "size_bytes": 760,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/zai-org/GLM-5.1/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "GLM-5.1 HF model card — post-training-only refresh of GLM-5; long-horizon agentic optimization (SWE-Bench Pro 55.1 → 58.4)",
+      "sha256": "2cb148b732f596716f8c9366edf072e35746de6d06fe69c92301ddb492557077",
+      "size_bytes": 10751,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.15763",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Same GLM-5 paper covers GLM-5.1 (arXiv:2602.15763, Feb 17 2026) — both models released together",
+      "sha256": "e20742ff36e08dc361de6973f7f72ad38e107edf8fd92d2a777a8428fc9b8f0e",
+      "size_bytes": 6177650,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.1/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "GLM-5.1 chat template (Jinja2)",
+      "sha256": "03b1bbff20331e54647c68167e8ac7f0b5b7ceb40ead372f44826624a9ad79cd",
+      "size_bytes": 4672,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://z.ai/blog/glm-5.1",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Z.AI blog — GLM-5.1 launch",
+      "sha256": "4c05dc08a5de72c8e93f28dc36036bf6a542df7fafb0b2ccf341b996c4eafaf9",
+      "size_bytes": 598,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}
