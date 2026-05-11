@@ -1,0 +1,71 @@
+{
+  "slug": "kimi-k2-thinking",
+  "assets": [
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "K2-Thinking chat_template (text-only, thinking mode)",
+      "sha256": "d0a17617078b53af4ff77546d8ef190d28efad6ef2ed0ee69e4b3c97a6f829fd",
+      "size_bytes": 4046,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Kimi K2-Thinking HuggingFace config.json (1T MoE / 32B active, 61L, MLA, 384 experts top-8 + 1 shared, native INT4 QAT)",
+      "sha256": "666ee58fc3871ecc369a22bc8c100075c2ad24ccbe8b3e336fa5f726e6111c15",
+      "size_bytes": 3830,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Kimi K2-Thinking HF model card — text-only thinking agent, native INT4 QAT, 200-300 sequential tool calls, HLE/BrowseComp SOTA",
+      "sha256": "8343341da86d2a74ee576768ea2f8c0be2d3e9cf1cb51838a794581e7a1466cd",
+      "size_bytes": 16176,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://moonshotai.github.io/Kimi-K2/thinking.html",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Moonshot AI blog — K2-Thinking launch",
+      "sha256": "3227f6c64bc710780e22456453b9ab45a4a23c0db1657bf1fa1a63a60cee9257",
+      "size_bytes": 1135,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "K2-Thinking chat template (Jinja2) — defines K2 family tool-call wire format",
+      "sha256": "07a791b8563c5159054394745049c8e487986ecb34aaab77727e1b158bbe6a5c",
+      "size_bytes": 3450,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tool_call_guidance",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/docs/tool_call_guidance.md",
+      "archive_url": null,
+      "filename": "tool_call_guidance.md",
+      "description": "K2-Thinking tool-call wire-format documentation (canonical for K2/K2.5/K2.6 since K2.5/K2.6 share K2-Thinking's tool-call settings)",
+      "sha256": "deb490fcecd4c74a65b1cc7ed328532b421fe2dda237e5dc44208c7e05e1aaf1",
+      "size_bytes": 11338,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}

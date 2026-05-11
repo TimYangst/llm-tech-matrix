@@ -1,0 +1,93 @@
+{
+  "slug": "kimi-k2.5",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Kimi K2.5 HuggingFace config.json (1T MoE / 32B active, 61L, MLA, 384 experts top-8 + 1 shared, MoonViT vision encoder)",
+      "sha256": "acd5bb01a16f64b309599cd6ed196be056f613c99d6bc9300692b82cd10882f6",
+      "size_bytes": 5416,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "K2.5 chat_template — instant + thinking modes",
+      "sha256": "12fcab43d2b6068f46769f5ff373960bf7c17a94d7abbc50e2491306b2f6cf58",
+      "size_bytes": 4862,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "K2.5 vision encoder image preprocessing (MoonViT)",
+      "sha256": "0c43520fbcc076dacbffcf0273f0dfa0ee318ff9aa55537cf7f2788d906de7b2",
+      "size_bytes": 742,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Kimi K2.5 HF model card — native multimodal continual pretrain on ~15T mixed tokens, instant + thinking modes, agent swarm, MoonViT 400M",
+      "sha256": "1b04bed9c6c25894171c0ab5e0b4c4d57667698a654dbfd5a6c1649b922810a5",
+      "size_bytes": 40082,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.02276",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Kimi K2.5 tech report 'Visual Agentic Intelligence' (arXiv:2602.02276, Feb 2 2026) — joint text-vision pretraining/SFT/RL + Agent Swarm",
+      "sha256": "06811e2d0e7a68cfc4e6b081963f4efcc84f5c05a376ed62b05440978db264e9",
+      "size_bytes": 9084004,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://www.kimi.com/blog/kimi-k2-5.html",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Kimi Team blog — K2.5 launch (Jan 29 2026)",
+      "sha256": "7c413a7f20725693e30170eeff95c78d7890b5737ed87480bb6950ccc0a769b4",
+      "size_bytes": 265416,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.5/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "K2.5 chat template (Jinja2) — defines tool-call wire format and instant/thinking/preserve_thinking kwargs",
+      "sha256": "7c91e4b3578b518bfb388d2e3dc645daf0fbf843656e887db75d12891e0030ff",
+      "size_bytes": 3759,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tool_call_guidance",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/docs/tool_call_guidance.md",
+      "archive_url": null,
+      "filename": "tool_call_guidance.md",
+      "description": "K2-family tool-call wire-format docs (canonical for K2/K2.5/K2.6 — K2.5 README §6 says K2.5 shares K2-Thinking's tool-call design)",
+      "sha256": "deb490fcecd4c74a65b1cc7ed328532b421fe2dda237e5dc44208c7e05e1aaf1",
+      "size_bytes": 11338,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "slug": "kimi-k2.6",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Kimi K2.6 HuggingFace config.json (same arch as K2.5: 1T/32B/61L/MLA/384 experts/MoonViT)",
+      "sha256": "85825ca6e18cbe539eb83ee09eedfb3f4222265929f06e9f535a6d9364f55899",
+      "size_bytes": 5416,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://www.kimi.com/blog/kimi-k2-6.html",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Kimi Team blog — K2.6 launch",
+      "sha256": "fe939c18da3d6d89676aabee2934f92a5abfe3c4f31ff106328d270c4734cffa",
+      "size_bytes": 113816,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "K2.6 chat_template (byte-identical to K2.5)",
+      "sha256": "12fcab43d2b6068f46769f5ff373960bf7c17a94d7abbc50e2491306b2f6cf58",
+      "size_bytes": 4862,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "K2.6 vision encoder image preprocessing (MoonViT)",
+      "sha256": "0c43520fbcc076dacbffcf0273f0dfa0ee318ff9aa55537cf7f2788d906de7b2",
+      "size_bytes": 742,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Kimi K2.6 HF model card — same arch as K2.5, post-training delta on long-horizon coding + 300-agent swarm + 4000 coordinated steps",
+      "sha256": "95db3be1d0473e482c7aa901f237ad7af8bb7929625a777b27428081bb8ea9f7",
+      "size_bytes": 29325,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.02276",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Kimi K2 paper (shared with K2.5; K2.6 cites same arXiv ID, post-training delta only)",
+      "sha256": "06811e2d0e7a68cfc4e6b081963f4efcc84f5c05a376ed62b05440978db264e9",
+      "size_bytes": 9084004,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "K2.6 chat template (Jinja2) — same family as K2.5; same tool-call wire format",
+      "sha256": "8bf859698fd4781c0e1e1c63ce74422aab27e53ccc5f47116317c64cda06132f",
+      "size_bytes": 4022,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tool_call_guidance",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking/raw/main/docs/tool_call_guidance.md",
+      "archive_url": null,
+      "filename": "tool_call_guidance.md",
+      "description": "K2-family tool-call wire-format docs (canonical for K2/K2.5/K2.6 — K2.6 README §6 says K2.6 shares K2-Thinking's tool-call design)",
+      "sha256": "deb490fcecd4c74a65b1cc7ed328532b421fe2dda237e5dc44208c7e05e1aaf1",
+      "size_bytes": 11338,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}
