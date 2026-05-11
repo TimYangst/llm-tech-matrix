@@ -30,6 +30,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Grouped Query Attention (GQA)](./gqa.md)
 - [QK-Norm](./qk-norm.md)
 - [Gated DeltaNet](./gated-deltanet.md)
+- [DeepSeek Sparse Attention (DSA)](./dsa.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
 
 ### FFN / MoE

@@ -31,7 +31,7 @@
 ## 参考资料
 
 - DeepSeek-V4 技术报告第 2.3 节 + 图 3、图 4。
-- DeepSeek Sparse Attention (DSA) 见 DeepSeek-V3.2。
+- [DeepSeek Sparse Attention (DSA)](./dsa.zh.md) — V3.2-Exp 的前驱稀疏注意力方案，V4 把它泛化。CSA 在自己的"先压缩再稀疏"管线里复用 DSA 的 Lightning Indexer 机制。
 - 开源实现：<https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/tree/main/inference>
 
 ## 使用此技术的模型

@@ -1,0 +1,71 @@
+{
+  "slug": "glm-5",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/zai-org/GLM-5/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "GLM-5 HuggingFace config.json (754B MoE / 40B active, MoE + DeepSeek Sparse Attention DSA, glm_moe_dsa class)",
+      "sha256": "308d3ceebe7bd9c2246d20550d5b793098dd03838d1e504f8236063ae152bcae",
+      "size_bytes": 1384,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "GLM-5 tokenizer_config.json — chat template + special tokens",
+      "sha256": "8b6c9684842d57fb45907d1670835fa6929a4686e4229d4c4684d56a9abf3eb1",
+      "size_bytes": 760,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/zai-org/GLM-5/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "GLM-5 HF model card — 754B MoE / 40B active, DSA, 28.5T pre-training tokens, slime async RL infra",
+      "sha256": "4f8859aa1e0585e25f4fc61b5c17b2c488c767f37f41231818bc065a865ceae7",
+      "size_bytes": 12732,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.15763",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "GLM-5 tech report 'GLM-5: from Vibe Coding to Agentic Engineering' (arXiv:2602.15763, Feb 17 2026) — covers GLM-5 + GLM-5.1",
+      "sha256": "e20742ff36e08dc361de6973f7f72ad38e107edf8fd92d2a777a8428fc9b8f0e",
+      "size_bytes": 6177650,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://z.ai/blog/glm-5",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Z.AI blog — GLM-5 launch (Feb 17 2026)",
+      "sha256": "b5adb06aba74b9b83700bf13401cdb5c2d41f348d1faf1c02411a97321b75f66",
+      "size_bytes": 596,
+      "fetched_at": "2026-05-10"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "GLM-5 chat template (Jinja2) — defines tool-call wire format",
+      "sha256": "45a1d5635afd3d8e08a28866e72fc8395d2a7ec30989fd0bdaec6dd45a99eff0",
+      "size_bytes": 3123,
+      "fetched_at": "2026-05-10"
+    }
+  ]
+}

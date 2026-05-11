@@ -4,23 +4,35 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — Kimi K2 family batch landed against schema v6 (no schema bump
-required — v6 fields hold cleanly across a third vendor). Three K2 slugs added
-(K2.5, K2.6, K2-Thinking), all 1T total / 32B active / 61L / MLA / 384 routed × 1
-shared experts top-8, all reusing `DeepseekV3ForCausalLM` as the text backbone.
-**The Kimi extraction is the first non-Qwen / non-DeepSeek vendor in the repo
-and the cleanest cross-vendor stress test for v6 yet** — its `variant_policy` is
-*both* sibling-per-mode (within K2: Base / Instruct / Instruct-0905 / Thinking)
-*and* unified-weights-with-modes (within K2.5/K2.6: thinking / instant /
-preserve-thinking via chat-template kwargs), demonstrating that the schema's
-free-text `variant_policy` can carry vendor-specific multi-axis stories that an
-enum couldn't. Tool-call protocol slot now has 4 records to validate against
-(K2-Thinking + K2.5 + K2.6 + DeepSeek-V4), spanning function-call-token (Kimi)
-and `|DSML|`-namespaced XML (DeepSeek) wire formats. Three new glossary entries
-land alongside the extractions: MoonViT (native-resolution + 3D temporal vision
-encoder, NaViT packing), Native INT4 QAT (post-training MoE-expert-only INT4 —
-distinct from V4's FP4 QAT), and Agent Swarm / PARL (parallel-agent RL with
-frozen sub-agents).
+**Phase:** M1 — GLM family batch landed against schema v6 (no schema bump
+required — v6 fields hold cleanly across a fourth vendor). Three GLM slugs added
+(GLM-4.7, GLM-5, GLM-5.1), all spanning the GLM-4.5 → GLM-5 cross-generation
+architecture rewrite. **The GLM batch is the first non-DeepSeek vendor to ship
+DeepSeek Sparse Attention (DSA) — confirmed cross-vendor adoption of a
+DeepSeek-V3.2 architectural innovation.** GLM-5 / GLM-5.1 (`GlmMoeDsaForCausalLM`
+class) combines MLA + DSA + 256-expert MoE + parameter-shared 3-step MTP, all
+trained under Muon (with Z.AI's "Muon Split" per-head adaptation that closes the
+MLA-vs-GQA-8 quality gap and obviates QK-Clip). GLM-4.7 (`Glm4MoeForCausalLM`,
+inherited from the GLM-4.5 ARC paper) is the cross-generation reference: GQA
+12:1 + QK-Norm + partial RoPE 0.5 + 160-expert MoE — a *full architecture
+rewrite* across the 4.7→5 boundary, not an incremental refresh. GLM-5 / GLM-5.1
+config.json is byte-identical except `transformers_version`, the cleanest
+post-training-only refresh signal in the repo. New glossary entry: DSA
+(DeepSeek Sparse Attention). Tool-call protocol slot now has 7 records:
+xml-like (GLM-4.7 / GLM-5 / GLM-5.1 with `glm47` / `glm45` parsers) +
+`|DSML|`-namespaced XML (DeepSeek-V4 Pro/Flash) + function-call-token (Kimi
+K2-Thinking / K2.5 / K2.6).
+
+**Previous phase (Kimi K2):** Kimi K2 family batch landed against schema v6
+(no schema bump required — v6 fields hold cleanly across a third vendor). Three
+K2 slugs added (K2.5, K2.6, K2-Thinking), all 1T total / 32B active / 61L / MLA /
+384 routed × 1 shared experts top-8, all reusing `DeepseekV3ForCausalLM` as the
+text backbone. The Kimi extraction was the first non-Qwen / non-DeepSeek vendor
+and the cleanest cross-vendor stress test for v6 — its `variant_policy` is *both*
+sibling-per-mode (within K2: Base / Instruct / Instruct-0905 / Thinking) *and*
+unified-weights-with-modes (within K2.5/K2.6: thinking / instant /
+preserve-thinking via chat-template kwargs). Three new glossary entries landed
+alongside the extractions: MoonViT, Native INT4 QAT, Agent Swarm / PARL.
 
 **Previous phase (v6):** schema v6 landed (cross-vendor *release-strategy* and
 *runtime-mode* comparison). Driven by a Qwen3.5/3.6 sub-model exploration that
@@ -49,6 +61,9 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 
 **In progress (sourcing → extracting):**
 
+- ✅ `glm-5` — GLM-5 (Feb 2026, 744B / 40B active MoE, MLA + DSA) — **extracted** (first non-DeepSeek vendor to ship DSA; `GlmMoeDsaForCausalLM`; Muon Split adaptation that closes MLA-vs-GQA-8 quality gap and obviates QK-Clip; 28.5T pre-train + staged mid-training to 200K; slime async RL; GRPO+IcePop without KL; deterministic torch.topk in DSA Indexer for RL stability; FP8 rollouts; INT4 QAT during SFT)
+- ✅ `glm-5.1` — GLM-5.1 (Apr 2026, post-training-only refresh of GLM-5) — **extracted** (config byte-identical except `transformers_version`; long-horizon agentic optimization "hundreds of rounds, thousands of tool calls"; SWE-Bench Pro 55.1 → 58.4; chat-template adds `defer_loading` filter + OpenAI-format unwrap + `tool_reference` content type for MCP-style lazy tool loading)
+- ✅ `glm-4.7` — GLM-4.7 (Jan 2026, 358B MoE, predecessor anchor) — **extracted** (post-training-only refresh of GLM-4.6 on the GLM-4.5 ARC architecture; GQA 12:1 + QK-Norm + partial RoPE 0.5; 160-expert MoE; Muon optimizer; FIM-on-all-source-code; introduces Preserved Thinking + Turn-level Thinking inference modes; XML-like tool-call wire format that GLM-5 inherits unchanged)
 - ✅ `kimi-k2-thinking` — Kimi K2-Thinking (text-only, 1T / 32B) — **extracted** (canonical K2-family text-only sibling, native INT4 QAT recipe origin, 200–300 sequential tool calls, Heavy Mode 8-rollout aggregation; `beta_fast=1.0` YaRN delta vs K2.5/K2.6)
 - ✅ `kimi-k2.5` — Kimi K2.5 (Jan 2026, native multimodal) — **extracted** (joint text+vision continual-pretrained on K2-base; MoonViT-3D + MLP projector; Agent Swarm / PARL; zero-vision SFT; Toggle token-efficient RL; INT4 QAT inherited from K2-Thinking)
 - ✅ `kimi-k2.6` — Kimi K2.6 (post-training-only refresh of K2.5) — **extracted** (same architecture; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus — clean parallel to Qwen3.5→3.6 post-training-delta pattern)
@@ -78,14 +93,16 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 - Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
 - Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
-**Recommended next (after this batch):** Kimi broke the Qwen/DeepSeek duopoly; the
-12 extractions now span 3 vendors. Continue widening the vendor surface:
-`llama-3.1-70b` (reference dense GQA + RoPE — would also be the first non-MoE
-extraction since the Qwen3-32B / Qwen3.5-27B dense slugs), `mistral-large-2`
-(European reference), or `glm-4` (Chinese non-Alibaba/non-DeepSeek design
-choices). Then a closed model (`gpt-4o` or `claude-sonnet-4`) to exercise
-`inferred_fields`, which has stayed empty across all 12 open-weight extractions
-so far. Lower-priority deferred schema-iteration candidates from earlier work:
+**Recommended next (after this batch):** GLM batch widened the vendor surface to
+4 (DeepSeek + Qwen + Kimi + Z.AI), 15 extractions total. Highest-value next
+batches by remaining schema stress: (a) **a closed model** (`gpt-4o` or
+`claude-sonnet-4` or `claude-opus-4-5`) to finally exercise `inferred_fields` —
+still empty across all 15 open-weight extractions; (b) **a reference dense
+GQA model** (`llama-3.1-70b` or `mistral-large-2`), the first non-MoE
+extraction since Qwen3-32B / Qwen3.5-27B; (c) **a DeepSeek-V3.2-Exp
+extraction** as the canonical DSA reference (the new DSA glossary entry's
+"first introduced in" anchor — currently unextracted in the repo); (d) **GLM-V
+or GLM-OCR** to add Z.AI's multimodal axis on top of the GLM-5 backbone. Lower-priority deferred schema-iteration candidates from earlier work:
 structured CompressedAttentionConfig (pending second compressed-attention model),
 structured QuantizationConfig (pending second FP4-QAT model — Kimi's INT4 QAT
 gives us a *near*-second since both target MoE expert weights only, but the
@@ -117,6 +134,25 @@ universal (the K2 family doesn't use MTP — `num_nextn_predict_layers=0`).
 > `preserve_thinking` kwarg). Smaller siblings (Kimi-VL-A3B, Moonlight-16B-A3B,
 > Kimi-Linear-48B-A3B-Base) are deferred — their architectures don't share the K2
 > backbone and would need separate sourcing.
+
+**Recently completed (2026-05-10 late evening):**
+
+- GLM family batch landed: 3 slugs against schema v6 with no schema bump
+  required. GLM-4.7 (358B MoE, predecessor anchor on the GLM-4.5 ARC
+  architecture — GQA + QK-Norm + partial RoPE + 160-expert MoE + Muon),
+  GLM-5 (744B / 40B active, *full architecture rewrite* with MLA + DSA +
+  256-expert MoE, Muon Split adaptation closes MLA/GQA-8 gap and obviates
+  QK-Clip, slime async RL with GRPO+IcePop, parameter-shared 3-step MTP),
+  GLM-5.1 (post-training-only refresh, config byte-identical except
+  `transformers_version`, long-horizon agentic delta SWE-Bench Pro 55.1
+  → 58.4, chat-template adds `defer_loading` filter + `tool_reference`
+  content type for MCP-style lazy tool loading). **First non-DeepSeek
+  vendor to ship DSA** — confirmed cross-vendor adoption of a DeepSeek-V3.2
+  architectural innovation. New glossary entry: DSA (DeepSeek Sparse
+  Attention) covering the V3.2-Exp Lightning Indexer mechanism. GLM-family
+  rows added to MLA, DeepSeekMoE, aux-loss-free-routing, MTP, Muon, GRPO,
+  Hybrid Thinking, GQA, QK-Norm, FIM "Used by" tables. **Schema v6 held
+  cleanly across a fourth vendor** — no schema iteration triggered.
 
 **Recently completed (2026-05-10 evening):**
 
@@ -183,21 +219,23 @@ universal (the K2 family doesn't use MTP — `num_nextn_predict_layers=0`).
 
 ## M1 — Open-weight text models
 
-| Slug                | Family   | Status      | Notes file                                                     | Sources priority                                                                                                  |
-| ------------------- | -------- | ----------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `deepseek-v3`       | DeepSeek | `extracted` | [`models/deepseek-v3.md`](./models/deepseek-v3.md)             | **M1 pilot** — extensive paper, exercises MLA + MoE + FP8. Surfaced 7 schema gaps.                                |
-| `deepseek-v4-pro`   | DeepSeek | `extracted` | [`models/deepseek-v4-pro.md`](./models/deepseek-v4-pro.md)     | **Schema-v5 driver.** Hybrid CSA+HCA, mHC residuals, Muon, FP4 QAT, multi-teacher OPD, 1M ctx. 1.6T / 49B active. |
-| `deepseek-v4-flash` | DeepSeek | `extracted` | [`models/deepseek-v4-flash.md`](./models/deepseek-v4-flash.md) | Schema-v5 second-pass validation. Same V4 architecture family at 284B / 13B; layers 0-1 use SWA instead of HCA.   |
-| `deepseek-r1`       | DeepSeek | `backlog`   | —                                                              | RL-focused, exercises `alignment.rl_method`                                                                       |
-| `llama-3.1-70b`     | Llama    | `backlog`   | —                                                              | Reference dense model with GQA                                                                                    |
-| `llama-3.1-405b`    | Llama    | `backlog`   | —                                                              | Largest open dense model                                                                                          |
-| `qwen-2.5-72b`      | Qwen     | `backlog`   | —                                                              | Strong tech report                                                                                                |
-| `qwen3-32b`         | Qwen     | `extracted` | [`models/qwen3-32b.md`](./models/qwen3-32b.md)                 | Dense flagship — GQA, hybrid thinking                                                                             |
-| `qwen3-235b-a22b`   | Qwen     | `extracted` | [`models/qwen3-235b-a22b.md`](./models/qwen3-235b-a22b.md)     | MoE flagship — compare routing with DeepSeek-V3                                                                   |
-| `glm-4`             | GLM      | `backlog`   | —                                                              | Chinese-language design choices                                                                                   |
-| `kimi-k2-thinking`  | Kimi     | `extracted` | [`models/kimi-k2-thinking.md`](./models/kimi-k2-thinking.md)   | K2 text-only Thinking sibling — native INT4 QAT origin, 200–300 sequential tool calls, Heavy Mode aggregation     |
-| `minimax-text-01`   | MiniMax  | `backlog`   | —                                                              | Linear attention variant                                                                                          |
-| `mistral-large-2`   | Mistral  | `backlog`   | —                                                              | European reference point                                                                                          |
+| Slug                | Family   | Status      | Notes file                                                     | Sources priority                                                                                                         |
+| ------------------- | -------- | ----------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `deepseek-v3`       | DeepSeek | `extracted` | [`models/deepseek-v3.md`](./models/deepseek-v3.md)             | **M1 pilot** — extensive paper, exercises MLA + MoE + FP8. Surfaced 7 schema gaps.                                       |
+| `deepseek-v4-pro`   | DeepSeek | `extracted` | [`models/deepseek-v4-pro.md`](./models/deepseek-v4-pro.md)     | **Schema-v5 driver.** Hybrid CSA+HCA, mHC residuals, Muon, FP4 QAT, multi-teacher OPD, 1M ctx. 1.6T / 49B active.        |
+| `deepseek-v4-flash` | DeepSeek | `extracted` | [`models/deepseek-v4-flash.md`](./models/deepseek-v4-flash.md) | Schema-v5 second-pass validation. Same V4 architecture family at 284B / 13B; layers 0-1 use SWA instead of HCA.          |
+| `deepseek-r1`       | DeepSeek | `backlog`   | —                                                              | RL-focused, exercises `alignment.rl_method`                                                                              |
+| `llama-3.1-70b`     | Llama    | `backlog`   | —                                                              | Reference dense model with GQA                                                                                           |
+| `llama-3.1-405b`    | Llama    | `backlog`   | —                                                              | Largest open dense model                                                                                                 |
+| `qwen-2.5-72b`      | Qwen     | `backlog`   | —                                                              | Strong tech report                                                                                                       |
+| `qwen3-32b`         | Qwen     | `extracted` | [`models/qwen3-32b.md`](./models/qwen3-32b.md)                 | Dense flagship — GQA, hybrid thinking                                                                                    |
+| `qwen3-235b-a22b`   | Qwen     | `extracted` | [`models/qwen3-235b-a22b.md`](./models/qwen3-235b-a22b.md)     | MoE flagship — compare routing with DeepSeek-V3                                                                          |
+| `glm-4.7`           | GLM      | `extracted` | [`models/glm-4.7.md`](./models/glm-4.7.md)                     | GLM-4.5 ARC architecture (358B MoE, GQA + QK-Norm + partial RoPE + 160-expert MoE) — predecessor anchor for GLM-5        |
+| `glm-5`             | GLM      | `extracted` | [`models/glm-5.md`](./models/glm-5.md)                         | First non-DeepSeek vendor to ship DSA. 744B / 40B active. MLA + DSA + 256-expert MoE + Muon Split. Schema-v6 4th vendor. |
+| `glm-5.1`           | GLM      | `extracted` | [`models/glm-5.1.md`](./models/glm-5.1.md)                     | Post-training-only refresh of GLM-5 (config byte-identical except `transformers_version`); long-horizon agentic delta.   |
+| `kimi-k2-thinking`  | Kimi     | `extracted` | [`models/kimi-k2-thinking.md`](./models/kimi-k2-thinking.md)   | K2 text-only Thinking sibling — native INT4 QAT origin, 200–300 sequential tool calls, Heavy Mode aggregation            |
+| `minimax-text-01`   | MiniMax  | `backlog`   | —                                                              | Linear attention variant                                                                                                 |
+| `mistral-large-2`   | Mistral  | `backlog`   | —                                                              | European reference point                                                                                                 |
 
 ## M1 — Multimodal extension
 

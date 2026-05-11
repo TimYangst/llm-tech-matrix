@@ -31,7 +31,7 @@ The attention dominates compute at million-token contexts. DeepSeek-V4 attacks t
 ## Reference materials
 
 - DeepSeek-V4 Technical Report Section 2.3 + Figures 3 & 4.
-- DeepSeek Sparse Attention (DSA) reference inside DeepSeek-V3.2.
+- [DeepSeek Sparse Attention (DSA)](./dsa.md) — the V3.2-Exp predecessor sparse-attention scheme that V4 generalizes. CSA reuses DSA's Lightning Indexer mechanism inside its compressed-then-sparse pipeline.
 - Open-source implementation: <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/tree/main/inference>
 
 ## Used by
