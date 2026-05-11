@@ -41,6 +41,7 @@
 - [Group Relative Policy Optimization (GRPO)](./grpo.zh.md)
 - [Hybrid Thinking（chat-template 思考模式融合）](./hybrid-thinking.zh.md)
 - [On-Policy Distillation（多教师 OPD）](./on-policy-distillation.zh.md)
+- [Agent Swarm — 并行智能体 RL（PARL）](./agent-swarm.zh.md)
 
 ### 位置编码 / 长上下文
 
@@ -52,6 +53,11 @@
 
 - [FP8 mixed precision（DeepSeek-V3 变体）](./fp8-mixed-precision.zh.md)
 - [FP4 量化感知训练 (MXFP4)](./fp4-qat.zh.md)
+- [Native INT4 量化感知训练（QAT）](./int4-qat.zh.md)
+
+### 视觉编码器（Vision encoders）
+
+- [MoonViT — 原生分辨率 + 3D 时序视觉编码器](./moonvit.zh.md)
 
 ### 分布式训练
 

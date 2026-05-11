@@ -31,9 +31,10 @@ quality, which is what makes long-context inference economical for very large mo
 
 ## Used by
 
-| Model       | Variation / details                                                                                                |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| DeepSeek-V3 | `kv_lora_rank=512`, `q_lora_rank=1536`, `qk_nope_head_dim=128`, `qk_rope_head_dim=64`, `v_head_dim=128`, 128 heads |
+| Model                                    | Variation / details                                                                                                                                                                                                                                                                                                      |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| DeepSeek-V3                              | `kv_lora_rank=512`, `q_lora_rank=1536`, `qk_nope_head_dim=128`, `qk_rope_head_dim=64`, `v_head_dim=128`, 128 heads                                                                                                                                                                                                       |
+| Kimi K2 family (K2-Thinking, K2.5, K2.6) | Identical MLA dimensions across all three siblings — `kv_lora_rank=512`, `q_lora_rank=1536`, `qk_nope_head_dim=128`, `qk_rope_head_dim=64`, `v_head_dim=128`, 64 heads (half of DeepSeek-V3's 128). HF config reuses the `DeepseekV3ForCausalLM` class for the K2 backbone, so MLA scaling matches V3 modulo head count. |
 
 ## Related techniques
 

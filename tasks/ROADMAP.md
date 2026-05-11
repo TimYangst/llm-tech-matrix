@@ -4,19 +4,37 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — schema v6 landed (cross-vendor *release-strategy* and *runtime-mode*
-comparison). Driven by a Qwen3.5/3.6 sub-model exploration that surfaced three gaps
-the v5 schema couldn't express cleanly: (1) the *variant policy* is invisible — Qwen
-3.5/3.6's deliberate move away from Qwen2.5's separate Math/Coder/VL/Thinking siblings
-toward unified weights with chat-template kwargs has no field to record it; (2)
-`inference_modes[].trigger` is free text — the actual chat-template kwargs
-(`enable_thinking`, `preserve_thinking`) and per-mode sampling presets are buried in
-prose, not machine-queryable; (3) tool-call wire formats vary meaningfully (Qwen3-Coder
-XML-like with `qwen3_coder` parser; DeepSeek-V4 `|DSML|` namespaced XML) and were
-unstructured. Schema v6 adds `metadata.variant_policy`, dual `inference_modes[].kwargs`
-and `sampling_recommended` companions, and `alignment.tool_call_protocol` — all
-backwards-compatible. All 9 prior v5 records migrated and now carry real content
-in the new fields where sources document it.
+**Phase:** M1 — Kimi K2 family batch landed against schema v6 (no schema bump
+required — v6 fields hold cleanly across a third vendor). Three K2 slugs added
+(K2.5, K2.6, K2-Thinking), all 1T total / 32B active / 61L / MLA / 384 routed × 1
+shared experts top-8, all reusing `DeepseekV3ForCausalLM` as the text backbone.
+**The Kimi extraction is the first non-Qwen / non-DeepSeek vendor in the repo
+and the cleanest cross-vendor stress test for v6 yet** — its `variant_policy` is
+*both* sibling-per-mode (within K2: Base / Instruct / Instruct-0905 / Thinking)
+*and* unified-weights-with-modes (within K2.5/K2.6: thinking / instant /
+preserve-thinking via chat-template kwargs), demonstrating that the schema's
+free-text `variant_policy` can carry vendor-specific multi-axis stories that an
+enum couldn't. Tool-call protocol slot now has 4 records to validate against
+(K2-Thinking + K2.5 + K2.6 + DeepSeek-V4), spanning function-call-token (Kimi)
+and `|DSML|`-namespaced XML (DeepSeek) wire formats. Three new glossary entries
+land alongside the extractions: MoonViT (native-resolution + 3D temporal vision
+encoder, NaViT packing), Native INT4 QAT (post-training MoE-expert-only INT4 —
+distinct from V4's FP4 QAT), and Agent Swarm / PARL (parallel-agent RL with
+frozen sub-agents).
+
+**Previous phase (v6):** schema v6 landed (cross-vendor *release-strategy* and
+*runtime-mode* comparison). Driven by a Qwen3.5/3.6 sub-model exploration that
+surfaced three gaps the v5 schema couldn't express cleanly: (1) the *variant
+policy* is invisible — Qwen 3.5/3.6's move away from Qwen2.5's separate
+Math/Coder/VL/Thinking siblings toward unified weights with chat-template kwargs
+had no field to record it; (2) `inference_modes[].trigger` is free text — the
+actual chat-template kwargs (`enable_thinking`, `preserve_thinking`) and per-mode
+sampling presets were buried in prose; (3) tool-call wire formats vary
+meaningfully (Qwen3-Coder XML-like with `qwen3_coder` parser; DeepSeek-V4
+`|DSML|` namespaced XML) and were unstructured. v6 adds `metadata.variant_policy`,
+dual `inference_modes[].kwargs` + `sampling_recommended` companions, and
+`alignment.tool_call_protocol` — all backwards-compatible. All 9 prior v5 records
+migrated.
 
 **Previous phase (v5):** DeepSeek-V4 batch landed. Both V4-Pro (1.6T total / 49B
 active) and V4-Flash (284B / 13B) are extracted against schema v5 (which added
@@ -31,6 +49,9 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 
 **In progress (sourcing → extracting):**
 
+- ✅ `kimi-k2-thinking` — Kimi K2-Thinking (text-only, 1T / 32B) — **extracted** (canonical K2-family text-only sibling, native INT4 QAT recipe origin, 200–300 sequential tool calls, Heavy Mode 8-rollout aggregation; `beta_fast=1.0` YaRN delta vs K2.5/K2.6)
+- ✅ `kimi-k2.5` — Kimi K2.5 (Jan 2026, native multimodal) — **extracted** (joint text+vision continual-pretrained on K2-base; MoonViT-3D + MLP projector; Agent Swarm / PARL; zero-vision SFT; Toggle token-efficient RL; INT4 QAT inherited from K2-Thinking)
+- ✅ `kimi-k2.6` — Kimi K2.6 (post-training-only refresh of K2.5) — **extracted** (same architecture; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus — clean parallel to Qwen3.5→3.6 post-training-delta pattern)
 - ✅ `deepseek-v4-pro` — DeepSeek-V4 Pro (Apr 2026) — **extracted** (first MLA-replacement architecture: hybrid CSA + HCA with KV compression; mHC residuals; Muon optimizer; FP4 QAT; multi-teacher OPD; 3-mode reasoning; schema v5 driven by this extraction)
 - ✅ `deepseek-v4-flash` — DeepSeek-V4 Flash (Apr 2026) — **extracted** (smaller V4 sibling, second-pass schema v5 validation; layers 0-1 use pure SWA instead of pure HCA, otherwise architectural shape identical)
 - ✅ `qwen3.5-27b` — Qwen3.5 dense (Feb 2026) — **extracted** (first hybrid-backbone validation; schema v4 holds)
@@ -57,7 +78,22 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 - Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
 - Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
-**Recommended next (after this batch):** Now even *more* important to break out of the Qwen / DeepSeek duopoly — 9 of 9 extractions are Qwen or DeepSeek. Cross-family dense baseline: `llama-3.1-70b` (reference dense GQA + RoPE), `mistral-large-2` (European reference), or `glm-4` (Chinese-language design choices). Then a closed model (`gpt-4o` or `claude-sonnet-4`) to exercise `inferred_fields`. A non-Qwen/non-DeepSeek model would also stress-test the new v6 `variant_policy` / `tool_call_protocol` fields against a third vendor's release strategy. Lower-priority deferred schema-iteration candidates from V4 extraction: structured CompressedAttentionConfig (pending second compressed-attention model), structured QuantizationConfig (pending second FP4-QAT model), structured RewardModel slot (pending recurrence of Generative Reward Model design).
+**Recommended next (after this batch):** Kimi broke the Qwen/DeepSeek duopoly; the
+12 extractions now span 3 vendors. Continue widening the vendor surface:
+`llama-3.1-70b` (reference dense GQA + RoPE — would also be the first non-MoE
+extraction since the Qwen3-32B / Qwen3.5-27B dense slugs), `mistral-large-2`
+(European reference), or `glm-4` (Chinese non-Alibaba/non-DeepSeek design
+choices). Then a closed model (`gpt-4o` or `claude-sonnet-4`) to exercise
+`inferred_fields`, which has stayed empty across all 12 open-weight extractions
+so far. Lower-priority deferred schema-iteration candidates from earlier work:
+structured CompressedAttentionConfig (pending second compressed-attention model),
+structured QuantizationConfig (pending second FP4-QAT model — Kimi's INT4 QAT
+gives us a *near*-second since both target MoE expert weights only, but the
+representation differs FP4-vs-INT4), structured RewardModel slot (Kimi K2.5's
+GRMs make this a *third* recurrence of Generative Reward Models — V4 OPD,
+DeepSeek-V3 reward model, K2.5 GRMs — getting close to enough recurrences to
+justify a structured slot). MTP-shaped objectives are now confirmed *not*
+universal (the K2 family doesn't use MTP — `num_nextn_predict_layers=0`).
 
 > Note on the Qwen3 family: it ships as 6 dense sizes (0.6B–32B) + 2 MoE flagships
 > (30B-A3B, 235B-A22B). We extracted two slugs only — the 32B dense and 235B-A22B MoE
@@ -69,6 +105,33 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 > 27B + 35B-A3B open-weight for Qwen3.6 so far). We're extracting four total: the
 > dense 27B + smaller MoE 35B-A3B from each generation. Same-size cross-version
 > compare is the cleanest signal for the Qwen3.5→3.6 delta.
+
+> Note on the Kimi K2 family: Moonshot ships sibling-per-mode text-only K2
+> checkpoints (Base / Instruct / Instruct-0905 / Thinking) but only K2-Thinking is
+> extracted — Base/Instruct/Instruct-0905 share the same base weights, and only
+> K2-Thinking ships the post-training innovations (interleaved thinking + tool use,
+> native INT4 QAT) worth comparing across vendors. K2.5/K2.6 are the multimodal
+> generation built on top of K2-Base via continual pre-training; both are
+> extracted because the K2.5→K2.6 delta is a clean post-training-only refresh
+> (architecturally byte-identical config except eos_token_id; chat-template adds
+> `preserve_thinking` kwarg). Smaller siblings (Kimi-VL-A3B, Moonlight-16B-A3B,
+> Kimi-Linear-48B-A3B-Base) are deferred — their architectures don't share the K2
+> backbone and would need separate sourcing.
+
+**Recently completed (2026-05-10 evening):**
+
+- Kimi K2 family batch landed: 3 slugs against schema v6 with no schema bump
+  required. Kimi K2-Thinking (text-only sibling, native INT4 QAT recipe origin,
+  Heavy Mode 8-rollout aggregation), Kimi K2.5 (joint text+vision continual
+  pre-train on K2-base, MoonViT-3D vision encoder, Agent Swarm via PARL,
+  zero-vision SFT, Toggle token-efficient RL), Kimi K2.6 (post-training-only
+  refresh of K2.5, adds `preserve_thinking` 3rd kwarg-only mode, scales Agent
+  Swarm to 300 sub-agents × 4000 steps). All three reuse `DeepseekV3ForCausalLM`
+  as the text backbone (identical MLA config, modulo head count: 64 K2 vs
+  128 V3). 3 new glossary entries: MoonViT, Native INT4 QAT, Agent Swarm /
+  PARL. K2-family rows added to MLA, aux-loss-free-routing, Muon, YaRN,
+  DeepSeekMoE "Used by" tables. **Schema v6 held cleanly across a third
+  vendor** — no schema iteration triggered.
 
 **Recently completed (2026-05-10):**
 
@@ -132,7 +195,7 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 | `qwen3-32b`         | Qwen     | `extracted` | [`models/qwen3-32b.md`](./models/qwen3-32b.md)                 | Dense flagship — GQA, hybrid thinking                                                                             |
 | `qwen3-235b-a22b`   | Qwen     | `extracted` | [`models/qwen3-235b-a22b.md`](./models/qwen3-235b-a22b.md)     | MoE flagship — compare routing with DeepSeek-V3                                                                   |
 | `glm-4`             | GLM      | `backlog`   | —                                                              | Chinese-language design choices                                                                                   |
-| `kimi-k2`           | Kimi     | `backlog`   | —                                                              | Long-context architecture                                                                                         |
+| `kimi-k2-thinking`  | Kimi     | `extracted` | [`models/kimi-k2-thinking.md`](./models/kimi-k2-thinking.md)   | K2 text-only Thinking sibling — native INT4 QAT origin, 200–300 sequential tool calls, Heavy Mode aggregation     |
 | `minimax-text-01`   | MiniMax  | `backlog`   | —                                                              | Linear attention variant                                                                                          |
 | `mistral-large-2`   | Mistral  | `backlog`   | —                                                              | European reference point                                                                                          |
 
@@ -149,6 +212,8 @@ of a text-only LM.
 | `qwen3.5-27b`     | Qwen    | `extracted` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)         | Qwen3.5 dense — hybrid backbone (16×(3 DeltaNet + 1 GatedAttn)), FFN dense 17408, native VL                                                                                  |
 | `qwen3.6-35b-a3b` | Qwen    | `extracted` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md) | Qwen3.6 MoE — architecturally identical to Qwen3.5-35B-A3B (same `Qwen3_5MoeForConditionalGeneration` HF class); deltas: `preserve_thinking` 3rd mode + agentic-coding focus |
 | `qwen3.6-27b`     | Qwen    | `extracted` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)         | Qwen3.6 dense — architecturally identical to Qwen3.5-27B; deltas: `preserve_thinking` 3rd inference mode + agentic-coding post-training focus                                |
+| `kimi-k2.5`       | Kimi    | `extracted` | [`models/kimi-k2.5.md`](./models/kimi-k2.5.md)             | Kimi K2.5 — native multimodal continual-pretrain on K2-base; MoonViT-3D + MLP projector; Agent Swarm via PARL; zero-vision SFT; INT4 QAT inherited from K2-Thinking          |
+| `kimi-k2.6`       | Kimi    | `extracted` | [`models/kimi-k2.6.md`](./models/kimi-k2.6.md)             | Kimi K2.6 — post-training-only refresh of K2.5; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus   |
 | `qwen-2.5-vl-72b` | Qwen    | `backlog`   | —                                                          | Vision encoder + projection fusion                                                                                                                                           |
 | `minicpm-v-2.6`   | MiniCPM | `backlog`   | —                                                          | Compact multimodal                                                                                                                                                           |
 | `glm-4v`          | GLM     | `backlog`   | —                                                          | Native vs projected fusion comparison                                                                                                                                        |
