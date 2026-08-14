@@ -1,0 +1,257 @@
+{
+  "schema_version": 7,
+  "metadata": {
+    "name": "Kimi K3",
+    "family": "Kimi K3",
+    "release_date": "2026-07",
+    "openness": "open_weights",
+    "params_total": "2.8T",
+    "params_active": "104B",
+    "sources": [
+      "https://huggingface.co/moonshotai/Kimi-K3/raw/main/config.json",
+      "https://huggingface.co/moonshotai/Kimi-K3/raw/main/README.md",
+      "https://huggingface.co/moonshotai/Kimi-K3/raw/main/generation_config.json",
+      "https://arxiv.org/pdf/2607.24653",
+      "https://www.kimi.com/blog/kimi-k3"
+    ],
+    "variant_policy": "Single unified open-weight checkpoint — a sharp departure from the K2 line's sibling-per-mode policy (Base / Instruct / Instruct-0905 / Thinking) and a tightening of K2.5/K2.6's unified-weights-with-chat-template-kwargs policy. K3 has no thinking/non-thinking toggle at all: README §6 states 'Kimi K3 always has thinking enabled, and will return reasoning_content.' The only user-facing behavioural axis is the top-level `reasoning_effort` request field ('low' | 'high' | 'max', default 'max'). Internally the vendor DID train separate specialists — paper §4.1.2 crosses 3 RL domains (general / general agents / coding agents) with 3 effort levels, yielding 9 expert models — but these are deliberately consolidated back into one checkpoint via Multi-Teacher On-Policy Distillation (§4.1.3) rather than shipped as siblings. Vision is native, so there is no separate VL sibling either. No Base checkpoint has been released."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 93,
+      "hidden_dim": 7168,
+      "context_window": 1048576,
+      "context_window_notes": "1M tokens (config.max_position_embeddings=1048576, generation_config.max_length=1048576, README §2 'Context Length 1048576'). Reached by a four-stage progressive curriculum rather than by a post-hoc scaling trick (paper §3.4): the window grows 8K → 64K during pre-training, then 256K → 1M during cooldown, concentrating the expensive long-sequence compute in a small fraction of the budget. Because K3 uses NoPE (no explicit positional encoding — position is carried implicitly by the KDA decay/gating recurrence), paper §3.4 states the model 'extrapolates directly to 1M-token contexts without any positional-encoding modification, such as RoPE rescaling or interpolation'. Long-context data is deduplicated (incl. perceptual hashing over video frames), quality-filtered, upsampled, and augmented with synthetic sequences built by permuting and concatenating multimodal documents/sub-tasks so the embedded task can only be solved by attending across the full window.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 96,
+      "num_kv_heads": "[Unknown/Not Disclosed]",
+      "head_dim": "[Unknown/Not Disclosed]",
+      "rope": {
+        "type": "none",
+        "base": "[Unknown/Not Disclosed]",
+        "scaling": null
+      },
+      "mla": {
+        "kv_lora_rank": 512,
+        "q_lora_rank": 1536,
+        "qk_nope_head_dim": 128,
+        "qk_rope_head_dim": 64,
+        "v_head_dim": 128
+      },
+      "variants": [
+        {
+          "name": "kda",
+          "family": "linear_attention",
+          "num_query_heads": 96,
+          "num_kv_heads": "[Unknown/Not Disclosed]",
+          "head_dim": 128,
+          "rope": "None — KDA carries positional information implicitly through its channel-wise decay/gating recurrence. This is what lets the whole model run NoPE.",
+          "notes": "Kimi Delta Attention (paper §2.1.1, inherited from Kimi Linear and extended). Delta-rule recurrence with a channel-wise forget gate: S_t = (I - beta_t k_t k_t^T) Diag(alpha_t) S_{t-1} + beta_t k_t v_t^T. Q/K/V are produced by ShortConv (config.linear_attn_config.short_conv_kernel_size=4) followed by Swish, with L2Norm applied to Q and K; beta_t = Sigmoid(W_beta x_t); the decay logit comes from a low-rank projection plus a per-head bias. Two changes vs Kimi Linear: (1) LOWER-BOUNDED DECAY — the log-decay mapping switches from Kimi Linear's unbounded negative-Softplus to g = g_min * Sigmoid(e^A z) with a learnable per-head log-scale A (init 0) and a fixed g_min = -5 (config.linear_attn_config.gate_lower_bound=-5.0). Every retention factor then satisfies alpha > e^-5, cumulative log-decay over a 16-token tile stays in (-80, 0), the reciprocal rescaling stays inside BF16 range, and — the actual point — both diagonal and off-diagonal chunk tiles can use dense Tensor Core matmuls, eliminating Kimi Linear's position-pair diagonal path. (2) FULL-RANK OUTPUT GATE — the output gate moves from Kimi Linear's low-rank parameterization to an input-dependent full-rank projection: y = W_o[Sigmoid(W_g x) * RMSNorm(o~)] (config.linear_attn_config.use_full_rank_gate=true). Chunkwise-parallel form: recurrent across chunks, parallel within a chunk, via the UT transform. 69 of 93 layers (config.linear_attn_config.kda_layers)."
+        },
+        {
+          "name": "gated_mla",
+          "family": "mla",
+          "num_query_heads": 96,
+          "num_kv_heads": "[Unknown/Not Disclosed]",
+          "head_dim": "[Unknown/Not Disclosed]",
+          "rope": "NoPE — config.mla_use_nope=true. Paper §2.1.2: unlike K2 / K2.5, K3 applies No Position Encoding to ALL MLA layers, so no explicit positional encoding is applied to their queries or keys. config still carries qk_rope_head_dim=64 as part of the inherited MLA head geometry.",
+          "notes": "MLA (DeepSeek-V2 lineage, retained from K2 / K2.5) in the periodic global-attention layers: KV is compressed to a latent c_t = W_c x_t (kv_lora_rank=512, q_lora_rank=1536) and content keys/values are reconstructed by learned up-projections. Two K3 additions: (1) NoPE on all MLA layers — the interleaved KDA layers supply position-sensitivity and recency, MLA supplies unrestricted global content interaction, and decoupling the two means context extension never has to retune a RoPE base or apply YaRN; (2) an input-dependent, channel-wise FULL-RANK output gate y = W_o[Sigmoid(W_g x) * o~] (config.mla_use_output_gate=true), matching KDA's new gate parameterization. Training-precision detail (paper §2.1.2): the attention output is kept in FP32 during training to correct flash-attention's biased rounding error, and the training kernel was redesigned to overlap the doubled on-chip output tile with the KV staging buffers. 24 of 93 layers (config.linear_attn_config.full_attn_layers)."
+        }
+      ],
+      "layer_pattern": "(KDA, KDA, KDA, Gated-MLA) x 23 blocks covering layers 1-92, then one extra Gated-MLA layer at 93 — a 3:1 linear-to-global mixing ratio with a guaranteed global-attention final layer (paper §2.1: 'An additional Gated MLA layer is placed at the end of the backbone, ensuring that the final layer always performs global attention'). Totals 69 KDA + 24 Gated MLA, matching README §2 'Attention-Layer Composition: 69 KDA + 24 Gated MLA'. Explicit in config.linear_attn_config: full_attn_layers=[4,8,...,88,92,93], kda_layers = the remaining 69 indices.",
+      "notes": "Three attention-level choices that cut across both variants. (1) NoPE everywhere — config.mla_use_nope=true; position is carried implicitly by KDA's channel-wise decay recurrence, which is what lets the model extrapolate to 1M tokens with no RoPE rescaling or YaRN. (2) Full-rank input-dependent output gates on BOTH variants — y = W_o[Sigmoid(W_g x) * o~] (config.mla_use_output_gate=true, config.linear_attn_config.use_full_rank_gate=true), replacing Kimi Linear's low-rank gate. (3) The MLA attention output is kept in FP32 during training to correct flash attention's biased rounding error, with the training kernel redesigned to overlap the doubled on-chip output tile with the KV staging buffers."
+    },
+    "ffn": {
+      "ffn_type": "hybrid",
+      "dense_intermediate_size": 33792,
+      "moe": {
+        "num_experts": 896,
+        "num_active_experts": 16,
+        "shared_experts": 2,
+        "expert_intermediate_size": 3072,
+        "routing": "Stable LatentMoE (paper §2.3) — DeepSeekMoE shared+routed organization, but routed experts operate in a COMPACT LATENT SPACE of width 3584 (config.routed_expert_hidden_size, = 0.5x model width) instead of the full 7168, so routing multiplicity can be scaled without communication and expert-weight traffic scaling with it: y = sum_j E_shared_j(x) + W_up(RMSNorm(sum_{i in T_k} p_i * E_routed_i(W_down x))). Sparsity 56 (896/16). Auxiliary-loss-free routing (config.topk_method='noaux_tc') with a sigmoid router (config.moe_router_activation_func='sigmoid'), renormalized mixture weights (config.moe_renormalize=true), routed_scaling_factor=1.0, num_expert_group=1 / topk_group=1 (no grouped or node-limited routing). LOAD BALANCING is Quantile Balancing (QB), new in K3: instead of the fixed-step bias update b <- b + gamma*sign(mean_load - load) of aux-loss-free routing (which oscillates or adapts too slowly at ~10^3 experts per layer), QB sets each expert's bias directly from the router-score quantile matching its target load q = mk/n. Routing runs Top-(k+1) on the biased score so the (k+1)-th entry gives each token's cutoff alpha_i for free; the new bias is then -quantile_{1-k/n}(s_:,j - alpha), mean-centered. The quantile spans the full global batch (millions of margins across ranks and accumulation steps), so it is estimated from a per-expert histogram reduced by a single all-reduce of bin counts — additive counts make the estimate whole-batch-exact up to bin width at a cost of a few hundred bins per expert. The bias regulates dispatch only (it is excluded from p_i,j, so it does not alter mixture weights or router gradients), updates take effect only on the next step, and the final bias is frozen at inference.",
+        "latent_dim": 3584
+      },
+      "layer_partition": "First 1 of 93 layers is dense (intermediate_size=33792); the remaining 92 layers are Stable LatentMoE (config.first_k_dense_replace=1, moe_layer_freq=1). Within a MoE layer the two shared experts run at FULL model width (7168) while the 896 routed experts run in the 3584-wide latent space at per-expert intermediate width 3072."
+    },
+    "components": {
+      "activation": "SiTU-GLU — Sigmoid Tanh Unit GLU (paper §2.3.2; config.hidden_act='situ'). SiTU-GLU(x) = [beta1*tanh(W_g x/beta1) * Sigmoid(W_g x)] * [beta2*tanh(W_u x/beta2)], i.e. the smooth cap softcap(x, beta) = beta*tanh(x/beta) is applied to the linear factor of the Swish gate AND independently to the up branch. K3 sets beta1=4 for the gate branch (config.activation_situ_beta=4.0) and beta2=25 for the up branch (config.activation_situ_linear_beta=25.0), bounding |f(x)| <= beta1*beta2 = 100. Motivation: both multiplicative factors of SwiGLU are unbounded, so coincident large coordinates produce activation outliers and overflow risk in low-precision arithmetic — a real hazard given the 4-matmul-deep routed branch at 2.8T scale. SiTU-GLU keeps SwiGLU's near-origin behaviour while capping large-magnitude growth. Replaces K2's SwiGLU.",
+      "normalization": "RMSNorm (config.rms_norm_eps=1e-5), applied in more places than a standard stack: (a) between routed-expert aggregation and the up-projection W_up — 'Normalized LatentMoE', config.latent_moe_use_norm=true — which desensitizes the routed branch to scale variation before it merges with the full-width shared branch and consistently improves validation loss; (b) head-wise on the KDA recurrent output before the output gate; (c) on the AttnRes keys inside the softmax kernel, so layers with large-magnitude outputs cannot dominate the depth-attention weights; (d) L2Norm (not RMSNorm) on KDA queries and keys. MoonViT-V2 also uses RMSNorm and removes all bias terms from its linear and attention projections.",
+      "embedding_notes": "vocab_size=163840 (README §2: '160K', unchanged from K2). tie_word_embeddings=false. bos_token_id=163584, eos_token_id=163586, pad_token_id=163839. Media placeholder token id 163605 ('<|kimi_image_placeholder|>', config.media_placeholder_token_id). The chat template is XTML (eXtensible Token Markup Language, paper §F): XML-like markup whose angle brackets are replaced by three reserved special tokens [open], [sep], [close], plus [end_of_msg] as the generation stop marker — every structural boundary is an explicit special token, removing tokenization ambiguity at element boundaries and simplifying constrained decoding. Tokenizer implementation ships as encoding_k3.py in the HF repo (no tokenizer_config.json / chat_template.jinja is published)."
+    },
+    "residual_connections": {
+      "kind": "attention-residuals (AttnRes)",
+      "expansion_factor": "[Unknown/Not Disclosed]",
+      "constraint": "Softmax-normalized attention over preceding layer/block representations, with RMSNorm applied to the keys so that large-magnitude layer outputs cannot dominate the weights. Not a width expansion of the residual stream (unlike mHC / Hyper-Connections) — the stream stays in R^d and it is the SOURCE SELECTION over depth that becomes data-dependent.",
+      "iterations": "[Unknown/Not Disclosed]",
+      "dynamic_parameterization": true,
+      "notes": "Attention Residuals (paper §2.2). Standard residual connections compress all prior information into a single state h_l over depth — a bottleneck the paper likens to an RNN over time. AttnRes applies the Transformer's own fix to the depth axis: each layer l holds a LEARNABLE PSEUDO-QUERY q_l = w_l (static per layer), while the keys and values are the actual outputs of all preceding layers (plus the token embedding as source 0, which is therefore always reachable). Attention weights alpha_{i->l} = phi(q_l, k_i)/sum_j phi(q_l, k_j) with phi(q,k) = exp(q^T RMSNorm(k)); h_l = sum_i alpha_{i->l} v_i. So while the query is static, the weights are input-dependent through the keys — hence dynamic_parameterization=true. BLOCK AttnRes is what actually ships: the L layers are partitioned into N blocks of S = L/N; within a block, layer outputs are reduced by summation to a single block representation b_n (with b_0 = the token embedding), and full attention runs only over the N block-level representations — the first layer of block n sees [b_0..b_{n-1}], subsequent layers additionally see the running partial sum b_n^{i-1}. This drops memory and cross-pipeline-stage communication from O(Ld) to O(Nd), bounds inference-time state, and lets parallel inter-block results merge with sequential intra-block partial sums via online softmax. K3 uses a 12-layer block size (config.attn_res_block_size=12), giving 8 blocks over 93 layers (a partial final block) — 9 sources counting the embedding layer. The final output layer aggregates all N block representations. The paper reports N ~ 8 recovers most of the benefit across model scales."
+    },
+    "parallelism_notes": "Pre-training (paper §5.2) combines Pipeline Parallelism with virtual stages (interleaved 1F1B), Expert Parallelism, ZeRO-1 data parallelism, Pipeline ZeRO-2 gradient sharding, and Context Parallelism. Four pieces are K3-specific: (1) MoonEP — an EP scheme delivering PERFECT expert load balance via dynamic redundant experts, planned online from the current micro-batch's router outputs and prefetched before routed-expert compute, with backward gradients staged in a local reduce buffer and reduced back to home ranks; every rank receives exactly S*K tokens, so computation shapes are static and communication is zero-copy (contrast: DeepEP-style schemes leave loads imbalanced and shapes dynamic, causing memory fragmentation). (2) KDA Context Parallelism (§5.1.2, built on DeltaNet context parallelism; implementation upstreamed as FLA PR #691) — the sequence-dimension partitioning that makes 1M-token training tractable for the linear-attention layers. (3) Memory-efficient training (§5.2.2): a unified activation manager where recomputation / quantization / offload are pluggable per-tensor storage policies (most activations use block-wise FP8 plus offload/remote-offload); memory-efficient MoE that rewrites the permuted-probs gradient to avoid the backward dependency on the forward output (after SonicMoE) and recomputes dispatch instead of storing group-GEMM inputs; AttnRes checkpointing plus cache-based pipeline communication so only newly generated block representations cross stage boundaries; cross-PP-rank activation offload over the Mooncake Transfer Engine to even out interleaved-1F1B warmup imbalance; CPU-resident sharded gradients. (4) P2P-based Muon orthogonalization — each rank pulls only the shards of its own parameters instead of all-gathering the full parameter buffer, pipelined at model-chunk granularity. Serving (§5.4) adds KDA-aware prefix-cache management, custom kernels, and cache-/budget-aware fleet scheduling.",
+    "auxiliary_modules": [
+      {
+        "name": "EAGLE-3 draft model (fine-tuned from the pre-trained MTP layer)",
+        "purpose": "speculative_decoding",
+        "architecture": "A single decoder layer mirroring a backbone block — the same shape as an EAGLE-3 draft, which is why the pre-trained MTP layer could be fine-tuned into one directly. Its input fuses low/mid/high-level target features taken from the outputs of the 1st, 4th and final AttnRes blocks, concatenated and projected by a bias-free W_E3 initialized as [0 0 I] so that at initialization the fused representation equals the high-level feature the MTP layer was pre-trained on.",
+        "shipped_in_checkpoint": false,
+        "activation": "",
+        "notes": "Trained with the target frozen, unrolled 7 steps (EAGLE-3 training-time test protocol), optimizing the likelihood-based LK loss — the negative log of the speculative-sampling acceptance rate — rather than a KL surrogate, at temperature 1 with no auxiliary ground-truth cross-entropy term. Follows the same MXFP4/MXFP8 QAT configuration as the main model. NOT in the released checkpoint: config.num_nextn_predict_layers=0 and no draft weights appear in the HF repo, so this records a module the paper documents but the open weights withhold."
+      }
+    ]
+  },
+  "training": {
+    "optimizer": "Per-Head Muon (paper §2.5). K3 keeps Muon for matrix parameters (as in K2) but refines it for attention projections: instead of running Newton-Schulz orthogonalization on the full Q, K, V projection matrices, the momentum matrices are partitioned along the head dimension and each head's block is orthogonalized separately. Rationale: full-matrix orthogonalization treats all heads as one coupled block, so heads with larger gradient/momentum scale dominate the shared update direction while smaller-scale heads get insufficiently normalized updates; per-head orthogonalization equalizes update scale across heads, improving stability at scale — and is slightly cheaper, since Newton-Schulz on tall per-head blocks costs less than on the full matrix. Paired with the weight-clipping mechanism introduced in Kimi K2. Weight decay 0.1 throughout.",
+    "lr_schedule": "Cosine decay with a 1% linear warmup (paper §3.3). Chosen over Warmup-Stable-Decay after an independent scaling-law hyperparameter search PER SCHEDULE (§3.2): the two schedules have substantially different optimal peak learning rates and batch sizes even at fixed model size and token budget, so comparing them under shared hyperparameters is unfair; under each schedule's own optimum, cosine decay consistently reached lower final loss.",
+    "data_total_tokens": "[Unknown/Not Disclosed]",
+    "data_mix": {},
+    "data_mix_notes": "Paper §3.1. Four primary text domains — Web Text, Code, Mathematics, Knowledge — plus a large-scale vision corpus (captions, interleaved image-text documents, OCR, perception, video, visual coding data). No percentages are disclosed. Each text domain is filtered by rule-based heuristics + classifier-based quality scoring + deduplication, with domain-specific sampling rates set by ablations on smaller models; knowledge and mathematics corpora are rephrased using K2's recipe (style/perspective-diverse prompting, chunk-wise autoregressive generation, fidelity verification against the source). Vision data follows the K2.5 taxonomy, with coordinate supervision provided in both absolute and normalized [0,1] formats for resolution-robust localization, and a substantial scale-up of PROGRAMMATIC multimodal data pairing code snippets with their rendered visuals across SVG, 3D assets, Webpage, Game, and CAD schematics — the pre-training counterpart of K3's vision-in-the-loop agentic behaviour. Tokens-per-parameter ratio was retuned by scaling law (§3.2) but the resulting value and the total token count are not reported.",
+    "objectives": {
+      "multi_token_prediction": {
+        "depth": 1,
+        "loss_weight_schedule": "[Unknown/Not Disclosed]",
+        "shared_modules": "Paper Table 1 lists 'Number of MTP Layers: 1 layer' for both K2 and K3, and §4.1.4 states K3 'is pre-trained with a multi-token-prediction (MTP) layer that mirrors the structure of a backbone block'. Post-training repurposes it: since an EAGLE-3 draft model is a single decoder layer of matching structure, the pre-trained MTP layer is fine-tuned into an EAGLE-3-style draft model with the target frozen, unrolled 7 steps during training, its input fusing low/mid/high-level target features taken from the outputs of the 1st, 4th and final AttnRes blocks, concatenated and projected by a bias-free W_E3 initialized as [0 0 I] so it starts out equal to the high-level feature the MTP layer was pre-trained on. Trained on the likelihood-based LK loss (negative log of the speculative-sampling acceptance rate) rather than a KL surrogate, at temperature 1 with no auxiliary ground-truth cross-entropy term, under the same MXFP4/MXFP8 QAT configuration as the main model. NOTE: the released config.json sets num_nextn_predict_layers=0 — the MTP/draft layer is not part of the published checkpoint."
+      },
+      "fill_in_middle": null,
+      "other": [
+        "Native multimodal next-token prediction from step 0 — paper §3.3: language and vision are jointly optimized from the start of training, with visual and textual tokens interleaved under a SINGLE next-token-prediction objective, rather than grafting a vision encoder onto a pre-trained LM through a post-hoc alignment stage.",
+        "Vision encoder trained from scratch under next-token prediction — paper §2.4: MoonViT-V2 is NOT initialized from a contrastively pre-trained model (K2.5 initialized MoonViT-3D from SigLIP). Motivation is training stability (the SigLIP-initialized encoder shows persistently higher vision-tower gradient norms with frequent spikes; the from-scratch one stays stable), plus letting the language-modeling objective shape visual representations directly instead of a contrastive loss that favors global semantics over fine-grained textual/structural cues. MoonViT-V2 matches the SigLIP-initialized baseline on vision evals, which the paper reads as evidence that contrastive pre-training is unnecessary as an initialization for multimodal LMs at scale."
+      ]
+    },
+    "alignment": {
+      "sft": "Paper §4.1.1. Establishes the cold-start policy for RL. Builds on the K2 / K2.5 SFT pipeline with substantially broadened coverage of complex agentic tasks: trajectories are synthesized using DOMAIN-SPECIALIZED MODELS FROM THE PRIOR KIMI SERIES, then put through multi-stage verification and human-in-the-loop annotation. All data is serialized with the XTML-based chat template (§F) so that complex agentic trajectories have one consistent representation. MXFP4/MXFP8 quantization-aware training starts here and runs through the entire post-training stage.",
+      "rl_method": "Large-scale RL across three broad domains — (i) general tasks (general experience, vision, reasoning, faithfulness, search, knowledge work), (ii) general agents (long-horizon assistant tasks, deep research, paragraph-level writing), (iii) coding agents (SWE, coding experience, kernel tasks, web development) — crossed with three reasoning-effort levels {low, high, max}, yielding NINE domain x effort expert models (paper §4.1.2). ALGORITHM: extends the partial-rollout scheme of the K1.5 / K2.5 synchronous RL framework — K completions are sampled for each of N prompts, and the generation phase pauses as soon as a fraction lambda of the N*K trajectories completes, so policy optimization never waits on execution stragglers; paused rollouts are enqueued and prioritized for resumption next iteration (backed by resumable microVM sandboxes, §5.3.2). A long-horizon trajectory therefore spans multiple iterations, and the resulting extreme off-policy staleness is tolerated by a PER-TOKEN REGULARIZATION that constrains updates to a local neighborhood; the underlying policy-optimization algorithm is the one from K2.5. REASONING-EFFORT RL: each problem x gets an initial token budget b0(x) estimated from the cold-start model, and any trajectory whose budget T(y) exceeds tau*b0(x) has its task reward overridden to -1 (T counts thinking tokens for general tasks, cumulative output tokens including tool-call arguments for agentic tasks); a stage-wise curriculum first trains a max-budget variant at large tau, then anneals tau to obtain the high- and low-effort experts, with tau configured per domain under human-in-the-loop guidance. REWARDS for non-verifiable general tasks come from an Agentic Generative Reward Model retaining K2.5's tournament-style group reward with binary comparisons, where the agentic judge must follow a mandatory protocol — read the output, generate a rubric, score each candidate against the rubric, record scores in a scorepad — with a budget-based verbosity control (a candidate exceeding sigma*l0 automatically loses its comparison) to block reward hacking toward verbosity. Environments (§4.2) include a unified white-box RL environment that represents an agent harness as composable modules (tool interfaces, system prompts, context management, skills, memories, subagents) and can instantiate Kimi Code, Claude Code, Codex, OpenClaw and Hermes, plus knowledge-graph-guided task synthesis, verifiable agentic problems, kernel-optimization tasks (rewarded on correctness AND performance across BF16/FP8/FP4), personal-assistant tasks, autonomous-execution tasks, and web-development tasks.",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [
+        {
+          "name": "Supervised Fine-Tuning (cold start)",
+          "method": "sft",
+          "description": "Agentic-heavy instruction data synthesized by domain-specialized prior-generation Kimi models, multi-stage verified and human-annotated, serialized in XTML. MXFP4/MXFP8 QAT begins at this stage."
+        },
+        {
+          "name": "Domain x Effort RL",
+          "method": "rl",
+          "description": "Nine expert models = 3 domains (general / general agents / coding agents) x 3 reasoning-effort levels (low / high / max). Partial-rollout synchronous RL with per-token regularization for off-policy staleness; per-problem token-budget rewards annealed stage-wise to carve out the effort levels; Agentic GRM for non-verifiable rewards. Paper Fig. 8: scaling RL FLOPs raises tool-call step counts and capability together."
+        },
+        {
+          "name": "Multi-Teacher On-Policy Distillation (MOPD)",
+          "method": "distillation",
+          "description": "Consolidates the nine domain/effort experts into the single released model (paper §4.1.3). For domain d and sampled effort e, the corresponding teacher supplies a dense per-token reward r = clip(sg(log pi_teacher(y_t) - log pi_student(y_t)), -R_max, R_max). Because it is a dense reward inside the same RL framework, it inherits infrastructure optimizations like partial-rollout training for long-horizon tasks. Finer-grained top-k distillation objectives were tried and showed no clear advantage in convergence speed or final performance."
+        },
+        {
+          "name": "Deployment-Aware Post-Training",
+          "method": "quantization_aware_training + speculative_decoding_draft_finetuning",
+          "description": "Paper §4.1.4. (a) MXFP4 QAT throughout SFT and RL — MoE expert weights in MXFP4 with MXFP8 activations, all non-expert components (attention projections, latent-MoE projections, shared experts, routers) in higher precision; during RL, rollout and training share the same quantization scheme, eliminating the train-inference mismatch. (b) The pre-trained MTP layer is fine-tuned into an EAGLE-3-style draft model on the LK (acceptance-rate) loss, under the same QAT configuration."
+        }
+      ],
+      "inference_modes": [
+        {
+          "name": "reasoning_effort=max",
+          "trigger": "Top-level `reasoning_effort` request field (default). Internally the chat template renders it as a global option message of type 'thinking-effort', inserted after the tool declaration and before the input messages, stating the requested level in natural language rather than exposing a token budget or changing the generation prefix.",
+          "description": "Default and highest-effort mode; all README §3 benchmark numbers are reported at max. Thinking is always on — there is no non-thinking toggle — and the response carries `reasoning_content` alongside `content`. Trained by the max-budget stage of the effort curriculum (§4.1.2) and consolidated via MOPD from the three max-effort domain experts.",
+          "kwargs": {
+            "reasoning_effort": "max"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 for single-step tasks; 1.0 for agentic tasks"
+          }
+        },
+        {
+          "name": "reasoning_effort=high",
+          "trigger": "Top-level `reasoning_effort` request field set to 'high'.",
+          "description": "Intermediate effort level, obtained by annealing the budget multiplier tau down from the max-budget variant. README §6 lists it as one of three supported levels; paper §6.4 notes that at high effort K3 already matches Claude Opus 4.8's maximum-effort score on Kimi Code Bench 2.0 at roughly one third of the cost.",
+          "kwargs": {
+            "reasoning_effort": "high"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "reasoning_effort=low",
+          "trigger": "Top-level `reasoning_effort` request field set to 'low'.",
+          "description": "Lowest effort level, produced by the most aggressive tau annealing. Still a thinking mode — K3 has no non-thinking mode on the API surface.",
+          "kwargs": {
+            "reasoning_effort": "low"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "preserved thinking (always on)",
+          "trigger": "Not a toggle — mandatory. README §6: the complete assistant message returned by the API must be passed back into `messages` as-is, including `reasoning_content` and `tool_calls`, not just `content`.",
+          "description": "Where K2.6 and Qwen3.6 made `preserve_thinking` an opt-in third mode, K3 makes it the only mode: 'Kimi K3 was trained in the preserved thinking history mode' (README §6), and paper §F states that in thinking mode the think channel is ALWAYS retained in history — kept even when its content is empty — so the model observes a consistent message structure across turns. Dropping prior reasoning silently degrades multi-turn and tool-calling behaviour.",
+          "kwargs": {},
+          "sampling_recommended": {}
+        }
+      ],
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "[open]",
+        "end_token": "[close]",
+        "arguments_schema": "Tool calls live in the `tools` channel of an assistant message. Each call carries `tool` and `index` attributes; `index` numbers parallel calls within a message, and each tool-result message repeats the same tool/index pair and follows the order of its call, so results are unambiguously bound to calls. Arguments are TYPED: string arguments appear as raw text, values of other JSON types are compactly serialized — so free-form text such as code is a first-class citizen rather than an escaped JSON string. A pure-JSON fallback block covers inputs whose arguments cannot be decomposed into typed argument blocks; it occurs only in input tokens, never in model outputs, and its loss is masked during training.",
+        "parser_flags": {},
+        "notes": "XTML (eXtensible Token Markup Language, paper §F) — XML-like markup where the angle-bracket syntax is replaced by three reserved special tokens: an element is `[open]tag attr=\"value\"[sep] ... [close]tag[sep]`, isomorphic to its XML counterpart but with every structural boundary an explicit special token, which removes tokenization ambiguity at element boundaries and simplifies constrained decoding. `[end_of_msg]` is the generation stop marker. Assistant message bodies are organized into CHANNELS (inspired by OpenAI's Harmony format): `think` (reasoning trace), `response` (user-visible answer), `tools` (tool calls). The template is designed for extensibility (new capabilities arrive as backward-compatible message formats, not template revisions), low alignment tax, and decoding friendliness. Request options are not special syntax — `tool_choice`, `response_format` and `thinking-effort` are each translated into a short natural-language instruction placed in context. Global options (tool declaration, reasoning effort) precede all input messages since changing them invalidates the KV cache anyway; one-shot options (tool_choice, response_format) are appended after the input messages so per-request changes leave the history KV cache intact. A third kind, the INPUT OPTION MESSAGE, is interleaved mid-session to supplement or override a global option — this is the mechanism behind DYNAMICALLY LOADED TOOLS: tools retrieved during a conversation are announced via an additional tool-declare message, expanding the available toolset without rebuilding the preceding context. Serving: vLLM, SGLang and TokenSpeed publish K3 recipes; no `--tool-call-parser` flag is documented, and no chat_template.jinja is published in the HF repo (the template lives in the vendor's encoder, encoding_k3.py)."
+      }
+    },
+    "advanced": {
+      "self_distillation": "Multi-Teacher On-Policy Distillation (MOPD) — nine domain x reasoning-effort expert policies distilled into the single released model via a clipped per-token teacher/student log-ratio reward inside the RL framework (paper §4.1.3). This is the same OPD family DeepSeek-V4 uses, but multi-teacher along TWO axes (domain and effort) rather than one. Additionally, SFT trajectories were synthesized by domain-specialized models from the prior Kimi series (§4.1.1), and the EAGLE-3 draft model is distilled from the frozen target on an acceptance-rate objective (§4.1.4).",
+      "mixed_precision": "BF16 master dtype (config.dtype='bfloat16'). NATIVE MXFP4: quantization-aware training runs from the SFT stage onward through all of RL, with MoE EXPERT WEIGHTS in MXFP4 and their input ACTIVATIONS in MXFP8 (README §4; paper §4.1.4) — chosen for broad hardware compatibility. All non-expert components stay in higher precision, confirmed by config.quantization_config.ignore, which excludes self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head, vision_tower and mm_projector; the shipped format is compressed-tensors 'mxfp4-pack-quantized', num_bits=4, type=float, group_size=32, symmetric, strategy=group, observer=minmax. Because rollout and training share the same quantization scheme during RL, there is no train-inference mismatch. This is a shift from the K2 family's native INT4 QAT (K2-Thinking / K2.5 / K2.6) to MXFP4 — the same MX format DeepSeek-V4 uses for its expert weights. During PRE-TRAINING (paper §5.2.2) most activations are stored under block-wise FP8 quantization combined with offload/remote-offload, while the MLA attention output is deliberately kept in FP32 to correct flash-attention's biased rounding error (§2.1.2)."
+    },
+    "stability_notes": "K3's architecture is unusually stability-driven; most of its novel components exist to make 2.8T-parameter training at sparsity 56 numerically well-behaved. (1) SiTU-GLU soft caps both GLU branches (beta1=4, beta2=25, bound 100), because the routed path composes W_down, a gated multi-branch expert FFN, and W_up into a chain of nearly four consecutive matmuls whose ill-conditioning produces exploding internal activations in the routed branch at 2.8T scale. (2) Normalized LatentMoE inserts RMSNorm between expert aggregation and W_up to desensitize the routed branch to scale variation. (3) Quantile Balancing replaces the fixed-step aux-loss-free bias update, which no longer behaves well at ~10^3 experts per layer where imbalance both slows expert-parallel training and leaves some experts poorly trained. (4) KDA's lower-bounded decay (g_min=-5) keeps the reciprocal chunk rescaling inside BF16 dynamic range. (5) Per-Head Muon equalizes update scale across attention heads, which full-matrix orthogonalization skews. (6) The weight-clipping mechanism from Kimi K2 is retained. (7) MoonViT-V2 is trained from scratch rather than SigLIP-initialized specifically because joint optimization with a contrastively pre-trained encoder shows persistently higher vision-tower gradient norms with frequent spikes; MoonViT-V2 also removes all bias terms from its projections to further stabilize from-scratch optimization. (8) MLA attention output kept in FP32 during training to correct flash-attention's biased rounding error.",
+    "quantization": {
+      "weight_format": "mxfp4",
+      "activation_format": "mxfp8",
+      "method": "qat",
+      "scope": "MoE expert weights only. config.quantization_config.ignore excludes self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head, vision_tower and mm_projector; latent-MoE projections and routers also stay in higher precision.",
+      "granularity": "compressed-tensors 'mxfp4-pack-quantized', num_bits=4, type=float, group_size=32, symmetric, strategy=group, observer=minmax",
+      "stage": "QAT from the SFT stage onward through all of RL. During RL, rollout and training share the same quantization scheme, eliminating the train-inference mismatch.",
+      "notes": "A format shift for the vendor: the K2 family (K2-Thinking / K2.5 / K2.6) shipped native INT4, K3 moves to MXFP4 weights + MXFP8 activations 'for broad hardware compatibility' — the same MX format family DeepSeek-V4 uses for its expert weights."
+    }
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
+    "fusion": "native_early",
+    "fusion_notes": "Natively multimodal: paper §2.4 — 'text, images, and videos are processed by a single shared backbone within one context, with no post-hoc modality-alignment stage', and §3.3 — language and vision are jointly optimized from the start of training under a single interleaved next-token-prediction objective. Mechanically the path is still encoder + lightweight MLP projector (MoonViT-V2 -> projector -> shared embedding space -> backbone), i.e. the same shape as K2.5's projection fusion; what makes it native_early rather than projection_mlp is that there is no separately pre-trained encoder and no alignment stage — the encoder itself is trained from scratch under the LM objective. Architecturally this is the foundation for K3's vision-in-the-loop agentic behaviour: rendered outputs and the code that produced them live in the same token stream, so the model can write code, inspect screenshots or video frames of the result, and iteratively refine UIs, graphics and video with no cross-model hand-off. Before projection a pixel-shuffle with 2x2 downsampling cuts visual tokens 4x, keeping inputs up to 3584x3584 pixels affordable inside the 1M-token context (config.vision_config.mm_projector_type='patchmergerv2', merge_kernel_size=[2,2], merge_type='sd2_tpool').",
+    "vision_encoder": {
+      "architecture": "MoonViT-V2 — a 27-layer vision transformer of roughly 0.4B parameters (README §2: 401M), trained ENTIRELY FROM SCRATCH with next-token prediction rather than initialized from a contrastively pre-trained model such as SigLIP (the K2.5 MoonViT-3D approach). Uses RMSNorm and removes all bias terms from its linear and attention projections.",
+      "depth": 27,
+      "hidden_size": 1024,
+      "intermediate_size": 4096,
+      "num_heads": 12,
+      "patch_size": 14,
+      "in_channels": "[Unknown/Not Disclosed]",
+      "output_dim": 7168,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": "[Unknown/Not Disclosed]",
+      "notes": "Images and videos are processed with FULLY SHARED parameters, as in MoonViT-3D: attention is factorized into intra-frame spatial and inter-frame temporal passes, and temporal pooling further compresses tokens along the time dimension (config.vision_config.merge_type='sd2_tpool'). config.vision_config also gives vt_hidden_size=1024, vt_intermediate_size=4096, vt_num_attention_heads=12, vt_num_hidden_layers=27, qkv_hidden_size=1536, mm_hidden_size=1024, text_hidden_size=7168, activation_func='gelu_pytorch_tanh', projector_hidden_act='gelu', norm_type='rmsnorm', attn_bias=false, linear_bias=false, patch_embed_proj_bias=false, pos_emb_type='divided_fixed' with init_pos_emb_height=64 / init_pos_emb_width=64 / init_pos_emb_time=4 and bilinear interpolation, _attn_implementation='flash_attention_2'. The explicit temporal patch size is not stated; init_pos_emb_time=4 is a positional-embedding initialization dimension, not a declared temporal patch size, so it is not recorded as one."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 163605,
+      "video_token_id": "[Unknown/Not Disclosed]",
+      "vision_start_token_id": "[Unknown/Not Disclosed]",
+      "vision_end_token_id": "[Unknown/Not Disclosed]"
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": "Audio is not supported (HF pipeline_tag=image-text-to-text). Video is handled by the shared visual pathway with factorized spatial/temporal attention and temporal pooling."
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "Total pre-training token count is not disclosed. The paper retunes the tokens-per-parameter ratio by scaling law (§3.2) but reports neither the resulting TPP nor the absolute token budget — the first Kimi extraction where this is missing (K2 / K2.5 disclosed theirs).",
+    "MTP layer count contradiction: paper Table 1 lists 'Number of MTP Layers: 1 layer' for K3 and §4.1.4 says the model 'is pre-trained with a multi-token-prediction (MTP) layer', but the released config.json sets num_nextn_predict_layers=0 and no draft-model weights appear in the HF repo. Reading: the MTP layer existed in pre-training and was fine-tuned into an EAGLE-3 draft model for the vendor's own serving stack, but is not part of the published open-weight checkpoint. Recorded as depth=1 (the paper is authoritative on what was trained) with the config discrepancy noted in shared_modules.",
+    "Modality-table contradiction in the model card: README §2 'Modality' says 'Text, Image', but README §1 says K3 'understands text, images, and video within the same model', the paper devotes §2.4 to video handling (factorized temporal attention, temporal pooling, perceptual-hash video dedup in §3.4), and README §3 reports Video-MME and MMVU scores. Recorded as text+image+video; the summary-table cell appears to be an omission.",
+    "RESOLVED IN v7 — `MoEConfig.latent_dim` now holds the LatentMoE routed-expert width (config.routed_expert_hidden_size=3584, 0.5x model width). `expert_intermediate_size` continues to hold the per-expert FFN width (3072). Under v6 the defining parameter of LatentMoE survived only as prose in ffn.moe.routing.",
+    "RESOLVED IN v7 — `training.quantization` (QuantizationConfig) now carries the shipped-weight precision recipe, separate from `advanced.mixed_precision`, which keeps the training-time story (BF16 master dtype, block-wise FP8 activation storage, FP32 attention output). K3 was the 7th record with a distinct quantization recipe and the second MXFP4 model after DeepSeek-V4 Pro/Flash — the exact trigger the conventions changelog had set for the field.",
+    "Instruct (non-thinking) mode exists at the template level but not on the API surface. Paper §F: 'The two generation modes are selected purely through the generation prefix — [open]think[sep] for thinking mode and [open]response[sep] for instruct mode', and describes what history looks like in instruct mode. README §6 nonetheless states 'Kimi K3 always has thinking enabled'. Whether instruct mode is reachable in self-hosted deployments (and whether it is post-trained at all) is not documented; only the three reasoning_effort levels are recorded as inference modes.",
+    "Reasoning-effort levels: the XTML schema reserves FOUR levels (low, medium, high, max) but K3 supports only a subset — README §6 documents low/high/max. Whether 'medium' is silently accepted, rejected, or rounded is not stated.",
+    "The sampling values recorded under reasoning_effort=max are the README §3 EVALUATION configuration (temperature 1.0; top_p 0.95 for single-step tasks, 1.0 for agentic tasks), not an explicitly labelled 'recommended sampling' section — unlike K2.5 / K2.6, whose READMEs had a dedicated recommendation. Treated as the closest available vendor guidance.",
+    "No tokenizer_config.json or chat_template.jinja is published in the HF repo — the XTML template is embedded in the vendor's encoding_k3.py. The tool-call wire format recorded here comes from paper §F prose plus Figure 16, not from a machine-readable template, so exact token spellings beyond [open]/[sep]/[close]/[end_of_msg] are not verifiable from the sources.",
+    "Kimi K2.5's Agent Swarm / PARL does not appear as an architectural or post-training component of K3; the paper cites it only as prior work on test-time scaling (§1) and evaluates swarm orchestration as a benchmark capability (§6.2.1 'Swarm Bench'). Whether K3 keeps the K2.5/K2.6 swarm serving mode is not stated in these sources.",
+    "AttnRes block count: config.attn_res_block_size=12 over 93 layers gives 7 full blocks plus a partial 8th (93 = 7*12 + 9). The paper says K3 'partition[s] its layers into 8 blocks with 12-layer size, giving a partial final block and 9 total blocks when counting the embedding layer'. Recorded as stated; the arithmetic is consistent only if the partial block counts as the 8th.",
+    "RESOLVED IN v7 — the EAGLE-3 draft model now lives in `architecture.auxiliary_modules[]` with `shipped_in_checkpoint: false`, rather than inside `MTPConfig.shared_modules`. The MTP objective and the draft module are recorded separately, since the paper documents a module the open weights withhold."
+  ]
+}
