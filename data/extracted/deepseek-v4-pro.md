@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v4-pro.zh.md](./deepseek-v4-pro.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -84,6 +84,22 @@ RoPE scaling:
 | `heavily_compressed_attention` | `other` | 128 | 1 | 512 | Same partial RoPE / -i output rotation scheme as CSA. | HCA = heavier compression, no sparse selection. KV cache compressed by m'=128 (non-overlapping) into one entry per 128 tokens. Same Multi-Query core attention shape as CSA: n_h=128 query heads from latent d_c=1536, head_dim c=512, sliding-window branch n_win=128, grouped output projection g=16 groups of d_g=1024. No lightning indexer (HCA does dense attention over all compressed entries). Used at layers 0, 1 (pure HCA prefix) and layers 3, 5, 7, ..., 59 (odd-indexed layers in the interleaved zone) per config.compress_ratios. |
 
 **Layer pattern:** [HCA, HCA, CSA, HCA, CSA, HCA, ..., CSA, HCA, CSA] across 61 layers. config.compress_ratios = [128, 128, 4, 128, 4, 128, 4, ...] (62 entries; final 0 marks the MTP head). Layers 0,1 are pure HCA (paper Section 4.2.1: 'For the first two layers, we use HCA'); from layer 2 onwards CSA(m=4) and HCA(m'=128) interleave 1:1. KV cache layout uses cache blocks of lcm(m,m')=128 original tokens per block, yielding k1=32 CSA compressed entries and k2=1 HCA compressed entry per block.
+
+**Sparse attention:**
+
+| | |
+|---|---|
+| Kind | `csa+hca` |
+| Selected entries (top-k) | 1024 |
+| Indexer heads | 64 |
+| Indexer head dim | 128 |
+| KV compression ratio | 4 (CSA, two interleaved softmax-weighted compressors over overlapping windows) / 128 (HCA, non-overlapping) |
+
+**Selection rule:** CSA layers: top-k by lightning indexer over COMPRESSED entries (the V3.2-Exp indexer mechanism applied after compression). HCA layers: no selection — dense attention over heavily compressed entries.
+
+**Training recipe:** Trained in from the start rather than retrofitted, on a curriculum: the first 1T tokens use dense attention, then sparse attention is introduced at the 64K sequence-length stage after a short Lightning-Indexer warm-up pass.
+
+_Notes:_ Extends DSA by adding token-level KV compression before selection. Each layer also carries a supplementary uncompressed sliding-window branch (n_win=128) and a per-head learnable attention sink. See attention.layer_pattern for the CSA/HCA interleave.
 
 ### FFN (moe)
 
@@ -196,6 +212,21 @@ _Notes:_ Distinguishes V4 from V3 (no documented tool-call protocol in V3). The 
 **Self-distillation:** Yes - multi-teacher On-Policy Distillation (OPD) consolidates >10 domain-specialist V4-Pro variants (each a per-domain SFT+GRPO derivative of the same V4-Pro base) into a single unified V4-Pro via reverse KL on student-sampled trajectories with full-vocabulary logit distillation (paper Section 5.1.2). This is intra-family / self-family distillation rather than cross-model distillation. Distinct from DeepSeek-V3 which distilled R1-series long-CoT capability into V3 via SFT data generation; V4 collapses what would have been a mixed-RL stage entirely into multi-teacher OPD.
 
 **Mixed precision:** Pre-training: FP8 (inherits V3 framework). Post-training adds FP4 Quantization-Aware Training (MXFP4; Rouhani et al., 2023) for two components: (1) MoE expert weights - FP32 master weights are quantized to FP4 then dequantized losslessly to FP8 for compute (FP8 E4M3's exponent range absorbs the 1x32 FP4 sub-block scales within a 128x128 FP8 quant block); backward propagates with respect to the same FP8 weights via Straight-Through Estimator; (2) Query-Key path in CSA's lightning indexer - QK activations cached / loaded / multiplied entirely in FP4. Index scores additionally quantized FP32→BF16 (2x speedup for top-k selector at 99.7% KV recall). Inference and RL rollout use native FP4 weights (not simulated quantization), so sampling matches deployment exactly. KV cache uses BF16 for RoPE dimensions and FP8 for the remaining dimensions (~half the size of pure BF16). All other modules remain in BF16/FP8 per V3 conventions. The shipped checkpoint is labeled 'FP4 + FP8 Mixed' (README Model Downloads). config.quantization_config: fmt=e4m3, scale_fmt=ue8m0, weight_block_size=[128,128], activation_scheme=dynamic.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `mxfp4` |
+| Activation format | `fp8-e4m3 (config.quantization_config.activation_scheme='dynamic', scale_fmt='ue8m0')` |
+| Method | `qat` |
+| Granularity | weight_block_size 128x128 FP8 blocks, each absorbing 1x32 FP4 sub-block scales |
+
+**Scope:** MoE expert weights (config.expert_dtype='fp4') plus the Query-Key path of CSA's lightning indexer, whose QK activations are cached, loaded and multiplied entirely in FP4 with index scores further quantized FP32→BF16. Non-expert parameters remain FP8/BF16. KV cache: BF16 for RoPE dimensions, FP8 for the rest.
+
+**Pipeline stage:** Post-training FP4 QAT: FP32 master weights quantized to FP4 then dequantized losslessly to FP8 for compute, backward via straight-through estimator. Inference and RL rollout both use native FP4 weights.
+
+_Notes:_ Shipped checkpoint is labelled 'FP4 + FP8 Mixed'.
 
 **Stability tricks:** Two stability tricks specific to V4 (paper Section 4.2.3 'Mitigating Training Instability'). (1) Anticipatory Routing decouples synchronous updates of the backbone and routing networks: at step t, feature computation uses current params θ_t but routing indices are computed and applied using historical params θ_{t-Δt}. Routing indices are pre-computed at step t-Δt and cached for use at step t (overhead bounded to ~20% wall-clock by carefully orchestrating pipeline execution + EP-comm overlap). Activated dynamically only when an automatic detector observes a loss spike, then reverted to standard training after a stabilization period — average overall overhead is negligible. Empirically tied loss spikes to MoE-layer outliers exacerbated by routing; decoupling breaks the vicious cycle. (2) SwiGLU Clamping bounds the linear and gate components of SwiGLU to suppress outliers: linear ∈ [-10, 10], gate capped at 10 (config.swiglu_limit=10.0). Used throughout the training of both V4-Flash and V4-Pro without compromising performance. The paper notes both tricks are effective but their underlying principles 'remain insufficiently understood'.
 

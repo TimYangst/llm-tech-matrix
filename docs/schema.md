@@ -1,4 +1,4 @@
-# Extraction Schema (v6)
+# Extraction Schema (v7)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -84,6 +84,28 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 - `layer_pattern` — string for hybrid stacks describing layer ordering, e.g.
   `"(L,L,L,F)×10 with L=gated_deltanet, F=gated_attention"`. Empty `""` for
   single-variant stacks.
+- `sparse_attention` — object **(v7+; null for dense attention — the common case)**.
+  A content-dependent sparsification / KV-compression *modifier* layered on top of the
+  variant above. Distinct from `variants` / `layer_pattern`, which model a hybrid *stack*
+  of different attention types: DeepSeek-V3.2-Exp applies DSA uniformly across all 61 MLA
+  layers, so it is a modifier, not a variant. When only some layers carry the modifier
+  (DeepSeek-V4's CSA layers), fill this with the modifier's parameters and describe the
+  split in `layer_pattern`. **Sliding-window attention is not sparse attention in this
+  sense** — it is content-blind and belongs in `variants`.
+  - `kind` — `"dsa"` / `"csa"` / `"hca"` / `"csa+hca"` / `"nsa"` / `"other"`
+  - `selection` — string, how retained entries are chosen (e.g. `"top-k by lightning-indexer score ReLU(q_I · k_I)"`); UNKNOWN when undisclosed
+  - `top_k` — int, entries retained per query (HF key `index_topk`)
+  - `indexer_heads` — int (HF key `index_n_heads`)
+  - `indexer_head_dim` — int (HF key `index_head_dim`)
+  - `kv_compression_ratio` — string, so per-variant values fit (e.g. `"4 (CSA) / 128 (HCA)"`);
+    UNKNOWN when selection runs over uncompressed KV entries (plain DSA)
+  - `training_recipe` — string, how the mechanism was trained in if retrofitted onto a dense
+    checkpoint (warm-up steps/tokens, adaptation budget, freezing scheme); empty when trained
+    from scratch or undisclosed
+  - `notes` — string (free-text)
+- `notes` — string **(v7+)**, free text for attention-level details with no dedicated field:
+  output gates, NoPE decisions, per-head QK normalization, attention sinks, training-precision
+  choices. Empty `""` when the structured fields say everything.
 
 The MLA field names mirror HuggingFace `config.json` keys so extractors can copy them
 directly.
@@ -97,6 +119,12 @@ directly.
   - `num_active_experts` — int (top-k)
   - `shared_experts` — int (count of always-on experts)
   - `expert_intermediate_size` — int (per-expert FFN intermediate width)
+  - `latent_dim` — int **(v7+)**, width of the latent space the *routed* experts operate in
+    when it is narrower than the model hidden dim. LatentMoE-style designs down-project into
+    the routed branch and up-project back to model width, so dispatch traffic and expert
+    weights scale with this instead of `hidden_dim`. Kimi K3: `3584` = 0.5 × hidden 7168
+    (HF key `routed_expert_hidden_size`). UNKNOWN for conventional MoE, where routed experts
+    read and write full model width.
   - `routing` — string describing the routing algorithm (free text)
 - `layer_partition` — string (free-text for hybrids, e.g. `"first 3 dense, remaining 58 MoE"`)
 
@@ -120,6 +148,26 @@ directly.
   - `dynamic_parameterization` — bool (true when the residual mappings are
     input-dependent; false for static learnable weights only)
   - `notes` — string (free-text)
+
+#### Auxiliary modules (optional, v7+)
+
+- `auxiliary_modules` — list of trained, weight-bearing modules **outside the main backbone
+  stack**: speculative-decoding drafts (DeepSeek's DSpark, EAGLE-3 heads), MTP heads regarded
+  as shipped weights. Empty `[]` for models that ship only the backbone. These have no home in
+  `backbone` (not layers of the main stack) or in `training.objectives` (modules, not
+  objectives), and before v7 they smeared across `parallelism_notes` / `layer_partition` /
+  `MTPConfig.shared_modules`.
+  - `name` — e.g. `"DSpark draft model"`, `"EAGLE-3 draft head"`
+  - `purpose` — `"speculative_decoding"` / `"multi_token_prediction"` / `"reward_model"` / `"other"`
+  - `architecture` — string, the module's shape; UNKNOWN when undisclosed
+  - `shipped_in_checkpoint` — bool; `false` when the module was trained but withheld from the
+    open weights (Kimi K3's draft layer: `num_nextn_predict_layers=0`); UNKNOWN when unstated
+  - `activation` — string, how a deployment turns it on (serving flags); empty when N/A
+  - `notes` — string (free-text)
+
+Note the deliberate overlap with `training.objectives.multi_token_prediction`: MTP is an
+objective *and* (sometimes) shipped weights. Record the objective there and the module here
+when both apply.
 
 #### Parallelism / infra
 
@@ -194,7 +242,20 @@ directly.
     - `notes` — string — multi-tool-per-turn handling, version differences, known issues
 - `advanced` — object:
   - `self_distillation` — string description (or `"No"`)
-  - `mixed_precision` — e.g. `"FP8 + BF16"`, `"BF16"`
+  - `mixed_precision` — e.g. `"FP8 + BF16"`, `"BF16"` — what **training** ran in
+- `quantization` — object **(v7+; null when the model ships in its training precision)**.
+  The low-precision recipe of the **shipped weights**, a design axis distinct from
+  `advanced.mixed_precision`: DeepSeek-V4's MXFP4 expert weights, the Kimi K2 family's native
+  INT4, Kimi K3's MXFP4 weights + MXFP8 activations, GLM-5's INT4 QAT during SFT.
+  - `weight_format` — `"mxfp4"` / `"int4"` / `"fp8-e4m3"` / `"nvfp4"` / …
+  - `activation_format` — `"mxfp8"` / `"bf16"` / `"fp8-e4m3 dynamic"` / …
+  - `method` — `"qat"` / `"ptq"` / `"other"`
+  - `scope` — string, which parameters are quantized (e.g. "routed MoE expert weights only;
+    attention projections, shared experts, routers, lm_head and vision tower excluded")
+  - `granularity` — string, block/group structure (e.g. `"group_size=32, symmetric"`)
+  - `stage` — string, when in the pipeline it is applied (e.g. "QAT from SFT onward through
+    all of RL; rollout and training share the scheme, so no train–inference mismatch")
+  - `notes` — string (free-text)
 - `stability_notes` — string (v5+) — training-stability tricks distinct from
   optimizer / lr_schedule / mixed_precision. E.g. DeepSeek-V4's Anticipatory Routing
   (decoupled routing-net synchronization) and SwiGLU Clamping. Empty `""` when none

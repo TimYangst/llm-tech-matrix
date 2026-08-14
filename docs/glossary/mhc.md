@@ -25,10 +25,11 @@ Mappings are dynamically parameterized: the raw `Ã, B̃, C̃` are produced from
 
 ## Used by
 
-| Model             | Variation / details                                                                                                                                                                                                   |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DeepSeek-V4-Pro   | n_hc=4 (config.hc_mult), Sinkhorn t_max=20 (config.hc_sinkhorn_iters), tolerance hc_eps=1e-6. Static + dynamic parameterization. AdamW (not Muon) used to update the static biases and gating factors of mHC modules. |
-| DeepSeek-V4-Flash | Identical mHC config to V4-Pro: n_hc=4, t_max=20, hc_eps=1e-6, dynamic parameterization on. The only V4-family component without scale-knob differences between Flash and Pro.                                        |
+| Model                  | Variation / details                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V4-Pro        | n_hc=4 (config.hc_mult), Sinkhorn t_max=20 (config.hc_sinkhorn_iters), tolerance hc_eps=1e-6. Static + dynamic parameterization. AdamW (not Muon) used to update the static biases and gating factors of mHC modules.                                                                                                                                                         |
+| DeepSeek-V4-Flash      | Identical mHC config to V4-Pro: n_hc=4, t_max=20, hc_eps=1e-6, dynamic parameterization on. The only V4-family component without scale-knob differences between Flash and Pro.                                                                                                                                                                                                |
+| DeepSeek-V4-Flash-0731 | Same mHC configuration as the preview in the backbone (`hc_mult=4`, `hc_sinkhorn_iters=20`, `hc_eps=1e-6`). Newly relevant: the attached **DSpark draft backbone also uses mHC** (DSpark paper §5.1 — "three MoE layers with mHC and a sliding window attention of 128"), so target and draft share residual topology. See [speculative decoding](./speculative-decoding.md). |
 
 ## Related techniques
 

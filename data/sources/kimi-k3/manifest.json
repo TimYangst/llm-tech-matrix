@@ -1,0 +1,60 @@
+{
+  "slug": "kimi-k3",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Kimi K3 HuggingFace config.json (2.8T MoE, KDA + Gated MLA + Stable LatentMoE, native vision)",
+      "sha256": "9710e121a58d03ac92c8d6da287a19541994319afbbe6d6202af001ffd379213",
+      "size_bytes": 7006,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Kimi K3 HF model card",
+      "sha256": "57de265b5842dfa465c6e73b368b0e15a89b8793b5450528dad577da202cc6fe",
+      "size_bytes": 45261,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2607.24653",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Kimi K3: Open Frontier Intelligence — technical report (arXiv:2607.24653)",
+      "sha256": "1a21e4d15de52eb0d4cf09cdbffc6248c497ba6897572cc5574af237c13da51d",
+      "size_bytes": 1790685,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://www.kimi.com/blog/kimi-k3",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Kimi Team blog — K3 launch (weights release date, API pricing)",
+      "sha256": "5fb20af4efc015c4b6856104686522852305dfa72a67eb0cbdc54337a1b32b86",
+      "size_bytes": 307348,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "generation_config",
+      "kind": "other",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3/raw/main/generation_config.json",
+      "archive_url": null,
+      "filename": "generation_config.json",
+      "description": "Kimi K3 default generation config",
+      "sha256": "c6648c25e9705af7fba8847e243840d21b5cc63ddeb6297f750a7ddbb6a02836",
+      "size_bytes": 53,
+      "fetched_at": "2026-08-14"
+    }
+  ]
+}

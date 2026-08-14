@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v4-flash.zh.md](./deepseek-v4-flash.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -83,6 +83,22 @@ RoPE scaling:
 | `heavily_compressed_attention` | `other` | 64 | 1 | 512 | Same partial RoPE / -i output rotation scheme as CSA. | HCA = heavier compression, no sparse selection. KV cache compressed by m'=128 (non-overlapping) into one entry per 128 tokens. Same Multi-Query core attention shape as CSA: n_h=64 query heads from latent d_c=1024, head_dim c=512, sliding-window branch n_win=128, grouped output projection g=8 groups of d_g=1024. No lightning indexer (HCA does dense attention over all compressed entries). Used at layers 3, 5, 7, ..., 41 (odd-indexed layers in the interleaved zone) per config.compress_ratios. |
 
 **Layer pattern:** [SWA, SWA, CSA, HCA, CSA, HCA, ..., HCA, CSA] across 43 layers. config.compress_ratios = [0, 0, 4, 128, 4, 128, ..., 4, 0] (44 entries; final 0 marks the MTP head; the trailing transformer entry at index 42 is 4 = CSA). Layers 0,1 are pure Sliding Window Attention (paper Section 4.2.1: 'For the first two layers, we use pure sliding window attention') - this is the architectural delta from V4-Pro where layers 0,1 use pure HCA. From layer 2 onwards CSA(m=4) and HCA(m'=128) interleave 1:1 with CSA at even-indexed layers 2,4,...,42 and HCA at odd-indexed layers 3,5,...,41 (so the stack ends with CSA at layer 42, not HCA).
+
+**Sparse attention:**
+
+| | |
+|---|---|
+| Kind | `csa+hca` |
+| Selected entries (top-k) | 512 |
+| Indexer heads | 64 |
+| Indexer head dim | 128 |
+| KV compression ratio | 4 (CSA) / 128 (HCA) |
+
+**Selection rule:** CSA layers: top-k by lightning indexer over COMPRESSED entries. HCA layers: no selection — dense attention over heavily compressed entries.
+
+**Training recipe:** First 1T tokens dense; sparse attention introduced at the 64K sequence-length stage after a short Lightning-Indexer warm-up pass.
+
+_Notes:_ Same mechanism as V4-Pro at a smaller selection budget (top-k 512 vs 1024). Layers 0-1 are pure SWA rather than sparse — the Flash-specific deviation from Pro, which uses pure HCA there.
 
 ### FFN (moe)
 
@@ -195,6 +211,21 @@ _Notes:_ Distinguishes V4 from V3 (no documented tool-call protocol in V3). The 
 **Self-distillation:** Yes - multi-teacher On-Policy Distillation (OPD) consolidates >10 domain-specialist V4-Flash variants (each a per-domain SFT+GRPO derivative of the same V4-Flash base) into a single unified V4-Flash via reverse KL on student-sampled trajectories with full-vocabulary logit distillation. Intra-family / self-family distillation rather than cross-model distillation. Same family-level recipe as V4-Pro.
 
 **Mixed precision:** Pre-training: FP8 (inherits V3 framework). Post-training adds FP4 Quantization-Aware Training (MXFP4) for: (1) MoE expert weights - FP32 master weights quantized to FP4 then dequantized losslessly to FP8 for compute (FP8 E4M3's exponent range absorbs the 1x32 FP4 sub-block scales within a 128x128 FP8 quant block); backward via STE; (2) Query-Key path in CSA's lightning indexer - QK activations cached/loaded/multiplied entirely in FP4. Index scores additionally quantized FP32→BF16 (2x speedup at 99.7% KV recall). Inference and RL rollout use native FP4 weights. KV cache uses BF16 for RoPE dimensions and FP8 for the remaining dimensions. Shipped checkpoint labeled 'FP4 + FP8 Mixed' (README Model Downloads). config.quantization_config: fmt=e4m3, scale_fmt=ue8m0, weight_block_size=[128,128], activation_scheme=dynamic. Identical recipe to V4-Pro.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `mxfp4` |
+| Activation format | `fp8-e4m3 (config.quantization_config.activation_scheme='dynamic', scale_fmt='ue8m0')` |
+| Method | `qat` |
+| Granularity | weight_block_size 128x128 FP8 blocks, each absorbing 1x32 FP4 sub-block scales |
+
+**Scope:** MoE expert weights (config.expert_dtype='fp4') plus the Query-Key path of CSA's lightning indexer, whose QK activations are cached, loaded and multiplied entirely in FP4 with index scores further quantized FP32→BF16. Non-expert parameters remain FP8/BF16. KV cache: BF16 for RoPE dimensions, FP8 for the rest.
+
+**Pipeline stage:** Post-training FP4 QAT: FP32 master weights quantized to FP4 then dequantized losslessly to FP8 for compute, backward via straight-through estimator. Inference and RL rollout both use native FP4 weights.
+
+_Notes:_ Shipped checkpoint is labelled 'FP4 + FP8 Mixed'.
 
 **Stability tricks:** Same two V4-family stability tricks as V4-Pro (paper Section 4.2.3 - which describes them for both V4-Flash and V4-Pro). (1) Anticipatory Routing: routing indices computed and applied using historical params θ_{t-Δt} while feature computation uses current params θ_t; pre-computed at step t-Δt and cached for use at step t (overhead bounded to ~20% wall-clock). Activated dynamically only on detected loss spike, then reverted. (2) SwiGLU Clamping: linear component of SwiGLU ∈ [-10, 10], gate component capped at 10 (config.swiglu_limit=10.0). Used throughout the training of both V4-Flash and V4-Pro.
 

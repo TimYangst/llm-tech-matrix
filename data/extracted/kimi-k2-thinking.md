@@ -2,7 +2,7 @@
 
 > 中文版：[kimi-k2-thinking.zh.md](./kimi-k2-thinking.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -164,6 +164,21 @@ _Notes:_ Canonical K2-family tool-call wire format; K2.5 README §6 says 'K2.5 s
 **Self-distillation:** K2-Thinking acts as a teacher for the next generation: K2.5 paper §4.4.1 lists K2-Thinking among the synthesisers of high-quality SFT candidate responses for K2.5, and §4.4.2 evaluates the 'Toggle' token-efficient RL heuristic on K2-Thinking specifically.
 
 **Mixed precision:** BF16 master parameters at training time (config.torch_dtype='bfloat16'); MoE expert weights deployed at native INT4 via post-training QAT (compressed-tensors format, group_size=32, num_bits=4, symmetric, group strategy). README §4: '~2x generation speed improvement while achieving state-of-the-art performance. All benchmark results are reported under INT4 precision.' Excluded from INT4: self_attn, shared_experts, mlp gate/up/down, lm_head — only routed-expert linears are quantised. Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo if a higher-precision deployment is required.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `int4` |
+| Activation format | `[Unknown/Not Disclosed]` |
+| Method | `qat` |
+| Granularity | compressed-tensors pack-quantized, group_size=32, num_bits=4, type=int, symmetric, strategy=group, observer=minmax |
+
+**Scope:** Routed-expert linears only. Excluded via config.quantization_config.ignore: self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head (and vision_tower / mm_projector on the multimodal siblings).
+
+**Pipeline stage:** Post-training QAT; all published benchmark results are reported under INT4 precision.
+
+_Notes:_ Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo for higher-precision deployment.
 
 **Stability tricks:** QK-Clip (within MuonClip) inherited from K2 base; specific to K2-Thinking, README §4 frames the INT4 QAT itself as a stability mitigation: 'thinking models use excessive decoding lengths, and thus quantization often results in substantial performance drops' — QAT during post-training is the workaround that keeps the long-decoding INT4 inference path stable enough to be lossless at benchmark scale.
 

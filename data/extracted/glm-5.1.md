@@ -2,7 +2,7 @@
 
 > 中文版：[glm-5.1.zh.md](./glm-5.1.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -57,6 +57,21 @@
 | qk_nope_head_dim | 192 |
 | qk_rope_head_dim | 64 |
 | v_head_dim | 256 |
+
+**Sparse attention:**
+
+| | |
+|---|---|
+| Kind | `dsa` |
+| Selected entries (top-k) | 2048 |
+| Indexer heads | 32 |
+| Indexer head dim | 128 |
+
+**Selection rule:** Top-k by lightning-indexer score, per the DeepSeek-V3.2-Exp mechanism.
+
+**Training recipe:** Inherited from GLM-5 — a post-training-only refresh, so the indexer weights and the Continued Pre-Training recipe carry over unchanged.
+
+_Notes:_ Config byte-identical to GLM-5 except transformers_version. Same deterministic top-k requirement and indexer-frozen-during-RL discipline.
 
 ### FFN (hybrid)
 
@@ -161,6 +176,18 @@ _Notes:_ Parser names (`glm47` tool-call, `glm45` reasoning) inherited from GLM-
 **Self-distillation:** Yes — inherits GLM-5's On-Policy Cross-Stage Distillation final-stage recipe (paper §3.5). The post-training-only refresh's additional long-horizon agentic RL likely runs through the same distillation finalization, but specifics are not separately disclosed for GLM-5.1.
 
 **Mixed precision:** BF16 master parameters (config.dtype='bfloat16'); FP8 rollouts during RL; INT4 QAT during SFT — all inherited from GLM-5. The GLM-5.1-FP8 deployment sibling is post-training quantized for single-node deployment, mirroring the GLM-5/GLM-5-FP8 pair structure.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `int4` |
+| Activation format | `[Unknown/Not Disclosed]` |
+| Method | `qat` |
+
+**Pipeline stage:** INT4 QAT during SFT, inherited from GLM-5.
+
+_Notes:_ A GLM-5.1-FP8 deployment sibling is post-training quantized, mirroring the GLM-5/GLM-5-FP8 pair.
 
 **Stability tricks:** Inherits GLM-5's stability machinery (Muon Split, deterministic torch.topk DSA Indexer, frozen indexer in RL, off-policy sample dropping, env-failure-sample dropping, IcePop pop-mask). No GLM-5.1-specific stability tricks are disclosed beyond GLM-5's.
 

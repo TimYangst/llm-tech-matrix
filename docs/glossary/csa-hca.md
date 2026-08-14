@@ -36,10 +36,11 @@ The attention dominates compute at million-token contexts. DeepSeek-V4 attacks t
 
 ## Used by
 
-| Model             | Variation / details                                                                                                                                                                                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DeepSeek-V4-Pro   | n_h=128 query heads / head_dim=512 / KV heads=1. CSA: m=4, top-k=1024, indexer (n_I_h=64, c_I=128). HCA: m'=128. Query latent d_c=1536, output groups g=16 of d_g=1024, sliding window n_win=128. Layer 0,1 pure HCA; layers 2-60 interleave CSA/HCA.               |
-| DeepSeek-V4-Flash | n_h=64 query heads / head_dim=512 / KV heads=1. CSA: m=4, top-k=512, indexer (n_I_h=64, c_I=128). HCA: m'=128. Query latent d_c=1024, output groups g=8 of d_g=1024, sliding window n_win=128. Layer 0,1 pure SWA (no compression); layers 2-42 interleave CSA/HCA. |
+| Model                  | Variation / details                                                                                                                                                                                                                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V4-Pro        | n_h=128 query heads / head_dim=512 / KV heads=1. CSA: m=4, top-k=1024, indexer (n_I_h=64, c_I=128). HCA: m'=128. Query latent d_c=1536, output groups g=16 of d_g=1024, sliding window n_win=128. Layer 0,1 pure HCA; layers 2-60 interleave CSA/HCA.                                                           |
+| DeepSeek-V4-Flash      | n_h=64 query heads / head_dim=512 / KV heads=1. CSA: m=4, top-k=512, indexer (n_I_h=64, c_I=128). HCA: m'=128. Query latent d_c=1024, output groups g=8 of d_g=1024, sliding window n_win=128. Layer 0,1 pure SWA (no compression); layers 2-42 interleave CSA/HCA.                                             |
+| DeepSeek-V4-Flash-0731 | Indexer configuration byte-identical to the V4-Flash preview (`index_n_heads=64`, `index_head_dim=128`, `index_topk=512`); the official build is a post-training-only refresh, so CSA/HCA is unchanged. Serving now enables an FP4 indexer cache (vLLM `--attention-config '{"use_fp4_indexer_cache": true}'`). |
 
 ## Related techniques
 

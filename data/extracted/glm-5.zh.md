@@ -2,7 +2,7 @@
 
 > English: [glm-5.md](./glm-5.md)
 
-*Schema 版本: 6*
+*Schema 版本: 7*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -59,6 +59,21 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | qk_nope_head_dim | 192 |
 | qk_rope_head_dim | 64 |
 | v_head_dim | 256 |
+
+**稀疏注意力：**
+
+| | |
+|---|---|
+| 类型 | `dsa` |
+| 保留条目数（top-k） | 2048 |
+| Indexer 头数 | 32 |
+| Indexer 头维度 | 128 |
+
+**选择规则：** Top-k by lightning-indexer score, per the DeepSeek-V3.2-Exp mechanism.
+
+**训练配方：** Continued Pre-Training (paper §2.1.1): indexer-only warm-up for 1000 steps x 14 sequences x 202752 tokens at max LR 5e-3 (~2.84B tokens), then sparse adaptation on 20B tokens — two orders of magnitude cheaper than DeepSeek-V3.2-Exp's 943.7B and still sufficient to recover dense-baseline quality.
+
+_说明：_ First non-DeepSeek adoption of DSA. config.indexer_rope_interleave=true. Paper §2.1.2 ablates DSA against SWA, search-based-pattern SWA, GDN and SimpleGDN and concludes DSA is the only one lossless by construction, since the indexer adapts to content instead of committing to a fixed sparsity pattern. RL-stability requirement (§3.2): the top-k operator must be deterministic — non-deterministic CUDA top-k caused sharp entropy collapse within a few steps, so GLM-5 uses torch.topk and freezes indexer parameters during RL by default.
 
 ### FFN（hybrid）
 
@@ -167,6 +182,18 @@ _说明：_ Wire format and parser names are inherited from GLM-4.7 (the reasoni
 **自蒸馏：** Yes — On-Policy Cross-Stage Distillation is the final post-training stage (paper §3.5). The final checkpoints from each preceding stage (SFT, Reasoning RL, General RL) serve as teachers within a single model lineage; training prompts sampled from each teacher's RL training set and mixed in proportion. Distillation loss replaces GRPO's advantage with the teacher-vs-student log-ratio (stop-gradient on teacher).
 
 **混合精度：** BF16 master parameters (config.dtype='bfloat16'). FP8 rollouts during RL (paper §3.6.2 'Tail-latency reduction with FP8 rollouts and MTP'). INT4 QAT applied during SFT (paper §2.4.3) — a quantization kernel ensures bitwise-identical behavior between training and inference and is used both at training time and offline weight quantization. The FP8 GLM-5-FP8 deployment sibling is post-training quantized for single-node deployment. Pre-training mixed-precision (numerical format used during the 28.5T base run) is not separately disclosed.
+
+### 量化（发布权重）
+
+| | |
+|---|---|
+| 权重格式 | `int4` |
+| 激活格式 | `[Unknown/Not Disclosed]` |
+| 方法 | `qat` |
+
+**所处阶段：** QAT applied during SFT (paper §2.4.3), with a quantization kernel that guarantees bitwise-identical behaviour between training and inference and is used both at training time and for offline weight quantization.
+
+_说明：_ A separate GLM-5-FP8 deployment sibling is POST-training quantized for single-node deployment — a different recipe from this INT4 QAT path.
 
 **稳定性 trick：** Muon Split (paper §2.1) — splitting the up-projection matrices per-head and orthogonalizing each independently keeps attention-logit scale stable during GLM-5 pre-training without QK-Clip (which the K2 family requires when using MuonClip on large transformers). Token-level clipping in the asynchronous Agentic RL [1−ε_l, 1+ε_h] with full token masking outside the trust region (paper §3.3, §4.1.2) — explicitly described as a stability mechanism for long-horizon multi-step rollouts. Drop off-policy samples whose oldest rollout policy version lags the current by more than τ. Deterministic top-k operator (torch.topk) in the DSA Indexer during RL — non-deterministic CUDA top-k implementations caused drastic RL degradation with sharp entropy drops within a few steps. Indexer parameters frozen by default during RL to prevent unstable indexer learning.
 

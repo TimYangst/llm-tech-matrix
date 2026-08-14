@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from llm_tech_matrix.schema import ExtractedModel
+from llm_tech_matrix.schema import UNKNOWN, ExtractedModel
 
 EXTRACTED_DIR = Path("data/extracted")
 
@@ -90,6 +90,16 @@ LABELS: dict[str, dict[str, str]] = {
         "hybrid_attention_variants": "Hybrid attention variants",
         "layer_pattern": "Layer pattern",
         "var_table_header": "| Name | Family | Q heads | KV heads | Head dim | RoPE | Notes |",
+        "attention_notes": "Attention notes",
+        # Sparse attention
+        "sparse_attention": "Sparse attention",
+        "sa_kind": "Kind",
+        "sa_top_k": "Selected entries (top-k)",
+        "sa_indexer_heads": "Indexer heads",
+        "sa_indexer_head_dim": "Indexer head dim",
+        "sa_kv_compression_ratio": "KV compression ratio",
+        "sa_selection": "Selection rule",
+        "sa_training_recipe": "Training recipe",
         # FFN rows
         "dense_intermediate_size": "Dense intermediate size",
         "moe": "MoE",
@@ -97,6 +107,7 @@ LABELS: dict[str, dict[str, str]] = {
         "active_experts_per_token": "Active experts per token",
         "shared_experts": "Shared experts",
         "per_expert_intermediate_size": "Per-expert intermediate size",
+        "moe_latent_dim": "Routed-expert latent dim",
         "routing": "Routing",
         "layer_partition": "Layer partition",
         # Components rows
@@ -138,6 +149,20 @@ LABELS: dict[str, dict[str, str]] = {
         "self_distillation": "Self-distillation",
         "mixed_precision": "Mixed precision",
         "stability_notes": "Stability tricks",
+        # Quantization
+        "quantization": "Quantization (shipped weights)",
+        "q_weight_format": "Weight format",
+        "q_activation_format": "Activation format",
+        "q_method": "Method",
+        "q_granularity": "Granularity",
+        "q_scope": "Scope",
+        "q_stage": "Pipeline stage",
+        # Auxiliary modules
+        "auxiliary_modules": "Auxiliary modules",
+        "am_purpose": "Purpose",
+        "am_architecture": "Architecture",
+        "am_shipped": "Shipped in checkpoint",
+        "am_activation": "How to enable",
         # Residual connections
         "rc_kind": "Kind",
         "rc_expansion_factor": "Expansion factor (n_hc)",
@@ -227,6 +252,16 @@ LABELS: dict[str, dict[str, str]] = {
         "hybrid_attention_variants": "混合注意力变体",
         "layer_pattern": "层模式",
         "var_table_header": "| 名称 | 家族 | Q 头数 | KV 头数 | 头维度 | RoPE | 说明 |",
+        "attention_notes": "注意力补充说明",
+        # Sparse attention
+        "sparse_attention": "稀疏注意力",
+        "sa_kind": "类型",
+        "sa_top_k": "保留条目数（top-k）",
+        "sa_indexer_heads": "Indexer 头数",
+        "sa_indexer_head_dim": "Indexer 头维度",
+        "sa_kv_compression_ratio": "KV 压缩比",
+        "sa_selection": "选择规则",
+        "sa_training_recipe": "训练配方",
         # FFN rows
         "dense_intermediate_size": "Dense 中间维度",
         "moe": "MoE",
@@ -234,6 +269,7 @@ LABELS: dict[str, dict[str, str]] = {
         "active_experts_per_token": "每 token 激活专家数",
         "shared_experts": "共享专家数",
         "per_expert_intermediate_size": "单专家中间维度",
+        "moe_latent_dim": "路由专家潜空间维度",
         "routing": "路由",
         "layer_partition": "层划分",
         # Components rows
@@ -275,6 +311,20 @@ LABELS: dict[str, dict[str, str]] = {
         "self_distillation": "自蒸馏",
         "mixed_precision": "混合精度",
         "stability_notes": "稳定性 trick",
+        # Quantization
+        "quantization": "量化（发布权重）",
+        "q_weight_format": "权重格式",
+        "q_activation_format": "激活格式",
+        "q_method": "方法",
+        "q_granularity": "粒度",
+        "q_scope": "作用范围",
+        "q_stage": "所处阶段",
+        # Auxiliary modules
+        "auxiliary_modules": "辅助模块",
+        "am_purpose": "用途",
+        "am_architecture": "结构",
+        "am_shipped": "是否随权重发布",
+        "am_activation": "启用方式",
         # Residual connections
         "rc_kind": "类型",
         "rc_expansion_factor": "扩展因子（n_hc）",
@@ -551,6 +601,53 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
             else f"**{labels['layer_pattern']}:** {att.layer_pattern}"
         )
         parts.append("")
+    if att.notes:
+        parts.append(
+            f"**{labels['attention_notes']}：** {att.notes}"
+            if lang == "zh"
+            else f"**{labels['attention_notes']}:** {att.notes}"
+        )
+        parts.append("")
+
+    if att.sparse_attention is not None:
+        sa = att.sparse_attention
+        parts.append(
+            f"**{labels['sparse_attention']}：**"
+            if lang == "zh"
+            else f"**{labels['sparse_attention']}:**"
+        )
+        parts.append("")
+        sa_rows: list[tuple[str, Any]] = [
+            (labels["sa_kind"], f"`{sa.kind}`"),
+            (labels["sa_top_k"], sa.top_k),
+            (labels["sa_indexer_heads"], sa.indexer_heads),
+            (labels["sa_indexer_head_dim"], sa.indexer_head_dim),
+        ]
+        if sa.kv_compression_ratio != UNKNOWN:
+            sa_rows.append((labels["sa_kv_compression_ratio"], sa.kv_compression_ratio))
+        parts.append(_table(sa_rows))
+        parts.append("")
+        if sa.selection and sa.selection != UNKNOWN:
+            parts.append(
+                f"**{labels['sa_selection']}：** {sa.selection}"
+                if lang == "zh"
+                else f"**{labels['sa_selection']}:** {sa.selection}"
+            )
+            parts.append("")
+        if sa.training_recipe:
+            parts.append(
+                f"**{labels['sa_training_recipe']}：** {sa.training_recipe}"
+                if lang == "zh"
+                else f"**{labels['sa_training_recipe']}:** {sa.training_recipe}"
+            )
+            parts.append("")
+        if sa.notes:
+            parts.append(
+                f"_{labels['notes']}：_ {sa.notes}"
+                if lang == "zh"
+                else f"_{labels['notes']}:_ {sa.notes}"
+            )
+            parts.append("")
 
     parts.append(
         f"### {labels['ffn']}（{arch.ffn.ffn_type}）"
@@ -569,16 +666,15 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
     if ffn.moe is not None:
         parts.append(f"**{labels['moe']}：**" if lang == "zh" else f"**{labels['moe']}:**")
         parts.append("")
-        parts.append(
-            _table(
-                [
-                    (labels["routed_experts"], ffn.moe.num_experts),
-                    (labels["active_experts_per_token"], ffn.moe.num_active_experts),
-                    (labels["shared_experts"], ffn.moe.shared_experts),
-                    (labels["per_expert_intermediate_size"], ffn.moe.expert_intermediate_size),
-                ]
-            )
-        )
+        moe_rows: list[tuple[str, Any]] = [
+            (labels["routed_experts"], ffn.moe.num_experts),
+            (labels["active_experts_per_token"], ffn.moe.num_active_experts),
+            (labels["shared_experts"], ffn.moe.shared_experts),
+            (labels["per_expert_intermediate_size"], ffn.moe.expert_intermediate_size),
+        ]
+        if ffn.moe.latent_dim != UNKNOWN:
+            moe_rows.append((labels["moe_latent_dim"], ffn.moe.latent_dim))
+        parts.append(_table(moe_rows))
         parts.append("")
         parts.append(
             f"**{labels['routing']}：** {ffn.moe.routing}"
@@ -641,6 +737,43 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
                 else f"_{labels['notes']}:_ {rc.notes}"
             )
         parts.append("")
+
+    if arch.auxiliary_modules:
+        parts.append(f"### {labels['auxiliary_modules']}")
+        parts.append("")
+        for am in arch.auxiliary_modules:
+            parts.append(f"**{am.name}**")
+            parts.append("")
+            parts.append(
+                _table(
+                    [
+                        (labels["am_purpose"], f"`{am.purpose}`"),
+                        (labels["am_shipped"], f"`{am.shipped_in_checkpoint}`"),
+                    ]
+                )
+            )
+            parts.append("")
+            if am.architecture and am.architecture != UNKNOWN:
+                parts.append(
+                    f"**{labels['am_architecture']}：** {am.architecture}"
+                    if lang == "zh"
+                    else f"**{labels['am_architecture']}:** {am.architecture}"
+                )
+                parts.append("")
+            if am.activation:
+                parts.append(
+                    f"**{labels['am_activation']}：** {am.activation}"
+                    if lang == "zh"
+                    else f"**{labels['am_activation']}:** {am.activation}"
+                )
+                parts.append("")
+            if am.notes:
+                parts.append(
+                    f"_{labels['notes']}：_ {am.notes}"
+                    if lang == "zh"
+                    else f"_{labels['notes']}:_ {am.notes}"
+                )
+                parts.append("")
 
     parts.append(f"### {labels['parallelism']}")
     parts.append("")
@@ -850,6 +983,41 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
         else f"**{labels['mixed_precision']}:** {train.advanced.mixed_precision}"
     )
     parts.append("")
+
+    if train.quantization is not None:
+        q = train.quantization
+        parts.append(f"### {labels['quantization']}")
+        parts.append("")
+        q_rows: list[tuple[str, Any]] = [
+            (labels["q_weight_format"], f"`{q.weight_format}`"),
+            (labels["q_activation_format"], f"`{q.activation_format}`"),
+            (labels["q_method"], f"`{q.method}`"),
+        ]
+        if q.granularity != UNKNOWN:
+            q_rows.append((labels["q_granularity"], q.granularity))
+        parts.append(_table(q_rows))
+        parts.append("")
+        if q.scope != UNKNOWN:
+            parts.append(
+                f"**{labels['q_scope']}：** {q.scope}"
+                if lang == "zh"
+                else f"**{labels['q_scope']}:** {q.scope}"
+            )
+            parts.append("")
+        if q.stage:
+            parts.append(
+                f"**{labels['q_stage']}：** {q.stage}"
+                if lang == "zh"
+                else f"**{labels['q_stage']}:** {q.stage}"
+            )
+            parts.append("")
+        if q.notes:
+            parts.append(
+                f"_{labels['notes']}：_ {q.notes}"
+                if lang == "zh"
+                else f"_{labels['notes']}:_ {q.notes}"
+            )
+            parts.append("")
 
     if train.stability_notes:
         parts.append(

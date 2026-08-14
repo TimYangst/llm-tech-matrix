@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-**项目初始化阶段。** 基础脚手架和设计文档已就位，首次抽取尚未开始。
+**M1 进行中。** 已抽取 18 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：Kimi K3、DeepSeek-V4-Flash-0731、DeepSeek-V3.2-Exp。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
 
 当前重点：**M1——文本与多模态大模型。** 战略路线图见 [`docs/roadmap.md`](./docs/roadmap.md)，每个模型的具体状态见 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)。
 

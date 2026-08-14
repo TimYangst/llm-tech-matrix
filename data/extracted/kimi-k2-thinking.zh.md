@@ -2,7 +2,7 @@
 
 > English: [kimi-k2-thinking.md](./kimi-k2-thinking.md)
 
-*Schema 版本: 6*
+*Schema 版本: 7*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -166,6 +166,21 @@ _说明：_ Canonical K2-family tool-call wire format; K2.5 README §6 says 'K2.
 **自蒸馏：** K2-Thinking acts as a teacher for the next generation: K2.5 paper §4.4.1 lists K2-Thinking among the synthesisers of high-quality SFT candidate responses for K2.5, and §4.4.2 evaluates the 'Toggle' token-efficient RL heuristic on K2-Thinking specifically.
 
 **混合精度：** BF16 master parameters at training time (config.torch_dtype='bfloat16'); MoE expert weights deployed at native INT4 via post-training QAT (compressed-tensors format, group_size=32, num_bits=4, symmetric, group strategy). README §4: '~2x generation speed improvement while achieving state-of-the-art performance. All benchmark results are reported under INT4 precision.' Excluded from INT4: self_attn, shared_experts, mlp gate/up/down, lm_head — only routed-expert linears are quantised. Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo if a higher-precision deployment is required.
+
+### 量化（发布权重）
+
+| | |
+|---|---|
+| 权重格式 | `int4` |
+| 激活格式 | `[Unknown/Not Disclosed]` |
+| 方法 | `qat` |
+| 粒度 | compressed-tensors pack-quantized, group_size=32, num_bits=4, type=int, symmetric, strategy=group, observer=minmax |
+
+**作用范围：** Routed-expert linears only. Excluded via config.quantization_config.ignore: self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head (and vision_tower / mm_projector on the multimodal siblings).
+
+**所处阶段：** Post-training QAT; all published benchmark results are reported under INT4 precision.
+
+_说明：_ Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo for higher-precision deployment.
 
 **稳定性 trick：** QK-Clip (within MuonClip) inherited from K2 base; specific to K2-Thinking, README §4 frames the INT4 QAT itself as a stability mitigation: 'thinking models use excessive decoding lengths, and thus quantization often results in substantial performance drops' — QAT during post-training is the workaround that keeps the long-decoding INT4 inference path stable enough to be lossless at benchmark scale.
 

@@ -1,0 +1,82 @@
+{
+  "slug": "deepseek-v3.2-exp",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V3.2-Exp HuggingFace config.json (DSA / DeepSeek Sparse Attention)",
+      "sha256": "c7fa8b191e9936d8e6a57d864baab82b792fae16a116416cdd3a75ba76bc5af1",
+      "size_bytes": 1552,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "DeepSeek-V3.2-Exp HF model card",
+      "sha256": "82ff33612f0f467423a3082dd300e923a94ac14bdec2f44ff22ce0f31ffd1bb4",
+      "size_bytes": 7035,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "generation_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/generation_config.json",
+      "archive_url": null,
+      "filename": "generation_config.json",
+      "description": "DeepSeek-V3.2-Exp generation config",
+      "sha256": "0ef9febae6b6087f4822b02bc9a1c03a83263dabaa931fb9155d061c8951ca07",
+      "size_bytes": 171,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "paper",
+      "kind": "tech_report",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/DeepSeek-V3.2-Exp/main/DeepSeek_V3_2.pdf",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "DeepSeek-V3.2-Exp technical report (DeepSeek_V3_2.pdf)",
+      "sha256": "f8ef04ddf50f924a7d251861d4453d7605ff5711f3941ae8320e1ea780dc3041",
+      "size_bytes": 526189,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "DeepSeek-V3.2-Exp tokenizer config + chat template",
+      "sha256": "2689fc149928cb32970c7e1d592e845f56edcf0b9c04ae4386e387efed992da1",
+      "size_bytes": 4062,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "v3_paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2412.19437",
+      "archive_url": null,
+      "filename": "v3_paper.pdf",
+      "description": "DeepSeek-V3 technical report — cited for the architecture V3.2-Exp inherits unchanged (config.json diff vs V3 is limited to the three indexer keys + scale_fmt + class rename)",
+      "sha256": "812a3fd645c80725354de9d831a6785503007a60681461407f64e97305fa9330",
+      "size_bytes": 1887366,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "release_news",
+      "kind": "blog_html",
+      "url": "https://api-docs.deepseek.com/news/news250929",
+      "archive_url": null,
+      "filename": "release_news.html",
+      "description": "DeepSeek API news 2025-09-29 — V3.2-Exp release announcement (release date, >50% API price cut, V3.1-Terminus kept available until 2025-10-15)",
+      "sha256": "ad31453fca55ec2451f0740ed65022c16e64ce0909ce8294085eec7a1a3fd3cf",
+      "size_bytes": 23816,
+      "fetched_at": "2026-08-14"
+    }
+  ]
+}

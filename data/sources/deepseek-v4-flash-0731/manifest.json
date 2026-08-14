@@ -1,0 +1,82 @@
+{
+  "slug": "deepseek-v4-flash-0731",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V4-Flash-0731 config.json",
+      "sha256": "6c8f3d2d3b48707541b88f32f22ef3f0f8a6b57d8523281e2b8d3cdb0ae9a023",
+      "size_bytes": 1888,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "DeepSeek-V4-Flash-0731 README.md",
+      "sha256": "252acafdc9204d0dba3fde1b0a93d71cd1664a4ceadfe222b60117ed0ccc56ff",
+      "size_bytes": 7238,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "generation_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/generation_config.json",
+      "archive_url": null,
+      "filename": "generation_config.json",
+      "description": "DeepSeek-V4-Flash-0731 generation_config.json",
+      "sha256": "5fccff80f55a4d455bbe516bdd552edf3e9623df95e99fbf2a3c3389fdf91af0",
+      "size_bytes": 170,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "DeepSeek-V4-Flash-0731 tokenizer_config.json",
+      "sha256": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547",
+      "size_bytes": 801,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2606.19348",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "DeepSeek-V4 technical report (arXiv:2606.19348) — shared by V4-Pro and V4-Flash; the HF-hosted DeepSeek_V4.pdf used by the preview manifest is now 404",
+      "sha256": "55b2d72f772ac00de2e470b3ee08443c648d971c7f57c52d6202895665e5978d",
+      "size_bytes": 4713349,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "dspark_paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2607.05147",
+      "archive_url": null,
+      "filename": "dspark_paper.pdf",
+      "description": "DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation (arXiv:2607.05147) — the speculative-decoding module attached to the 0731 checkpoint",
+      "sha256": "522036b0cc16ad4678bd7c278dd0a0ab4da31170af7b97c2041067cc09a8289a",
+      "size_bytes": 1055890,
+      "fetched_at": "2026-08-14"
+    },
+    {
+      "name": "encoding_readme",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/encoding/README.md",
+      "archive_url": null,
+      "filename": "encoding_README.md",
+      "description": "DeepSeek-V4-Flash-0731 encoding/README.md — prompt + tool-call wire format (replaces a Jinja chat template)",
+      "sha256": "294ed6493ebfe5a487f172154d60c494899997fed8806fdd3352dd8e3c33f9de",
+      "size_bytes": 9168,
+      "fetched_at": "2026-08-14"
+    }
+  ]
+}

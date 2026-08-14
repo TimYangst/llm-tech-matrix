@@ -31,6 +31,7 @@
 | Kimi K2-Thinking | 配方原典。`config.quantization_config`：`format='pack-quantized'`、`group_size=32`、`num_bits=4`、`type=int`、`symmetric=true`、`strategy=group`、`observer='minmax'`。Ignore：`lm_head`、`re:.*self_attn.*`、`re:.*shared_experts.*`、`re:.*mlp\\.(gate\|up\|gate_up\|down)_proj.*`。生成速度约 2× 提升；所有 benchmark 在 INT4 精度下完成。 |
 | Kimi K2.5        | 直接沿用 K2-Thinking 的配方（README §4：「Kimi-K2.5 adopts the same native int4 quantization method as Kimi-K2-Thinking」）。`ignore` 多两条以保留视觉管道：`re:vision_tower.*` 和 `re:mm_projector.*`。                                                                                                                                      |
 | Kimi K2.6        | 与 K2.5 完全相同（README §4：「Kimi-K2.6 adopts the same native int4 quantization method as Kimi-K2-Thinking」）。config.quantization_config 与 K2.5 字节级一致，只有无关的 eos_token_id 字段不同。                                                                                                                                           |
+| Kimi K3          | **不再使用 INT4** —— 列在此处是因为它标志着该配方在 Moonshot 的终点。K3 改用 MXFP4 权重 + MXFP8 激活，理由是「更广的硬件兼容性」，并把 QAT 提前：从 SFT 开始贯穿整个 RL，且 rollout 与训练共用同一方案。作用范围不变（仍只限路由专家权重，`ignore` 模式形状相同），因此差异纯粹在数值格式。见 [FP4 QAT (MXFP4)](./fp4-qat.zh.md)。            |
 
 ## 相关技术
 
