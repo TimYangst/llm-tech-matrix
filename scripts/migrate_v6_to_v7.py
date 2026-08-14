@@ -206,8 +206,8 @@ EDITS: dict[str, dict[str, Any]] = {
                 ),
                 "shipped_in_checkpoint": True,
                 "activation": (
-                    "vLLM: --speculative-config '{\"method\":\"dspark\",\"num_speculative_tokens\":7,"
-                    "\"draft_sample_method\":\"greedy\"}'. SGLang: --speculative-algorithm DSPARK with "
+                    'vLLM: --speculative-config \'{"method":"dspark","num_speculative_tokens":7,'
+                    '"draft_sample_method":"greedy"}\'. SGLang: --speculative-algorithm DSPARK with '
                     "NO --speculative-draft-model-path, since target and draft weights come from the "
                     "same checkpoint."
                 ),

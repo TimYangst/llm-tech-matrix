@@ -32,12 +32,14 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Gated DeltaNet](./gated-deltanet.md)
 - [DeepSeek Sparse Attention (DSA)](./dsa.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
+- [Kimi Delta Attention (KDA)](./kda.md)
 
 ### FFN / MoE
 
 - [DeepSeekMoE (fine-grained + shared experts)](./deepseekmoe.md)
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.md)
 - [Global-batch load balancing](./global-batch-load-balancing.md)
+- [Stable LatentMoE (LatentMoE + SiTU-GLU + Quantile Balancing)](./latentmoe.md)
 
 ### Training objectives
 
@@ -70,6 +72,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 ### Distributed training
 
 - [DualPipe pipeline scheduling](./dualpipe.md)
+- [Speculative decoding modules (MTP-1 → EAGLE-3 / DSpark)](./speculative-decoding.md)
 
 ### Optimizers
 
@@ -78,3 +81,4 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 ### Residual connections
 
 - [Manifold-Constrained Hyper-Connections (mHC)](./mhc.md)
+- [Attention Residuals (AttnRes)](./attnres.md)

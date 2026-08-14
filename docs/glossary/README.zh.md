@@ -25,12 +25,14 @@
 - [Gated DeltaNet](./gated-deltanet.zh.md)
 - [DeepSeek Sparse Attention (DSA)](./dsa.zh.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
+- [Kimi Delta Attention (KDA)](./kda.zh.md)
 
 ### FFN / MoE
 
 - [DeepSeekMoE（细粒度 + 共享专家）](./deepseekmoe.zh.md)
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.zh.md)
 - [Global-batch load balancing](./global-batch-load-balancing.zh.md)
+- [Stable LatentMoE（LatentMoE + SiTU-GLU + Quantile Balancing）](./latentmoe.zh.md)
 
 ### 训练目标（Training objectives）
 
@@ -63,6 +65,7 @@
 ### 分布式训练
 
 - [DualPipe pipeline scheduling](./dualpipe.zh.md)
+- [投机解码模块（MTP-1 → EAGLE-3 / DSpark）](./speculative-decoding.zh.md)
 
 ### 优化器
 
@@ -71,3 +74,4 @@
 ### 残差连接
 
 - [Manifold-Constrained Hyper-Connections (mHC)](./mhc.zh.md)
+- [Attention Residuals (AttnRes)](./attnres.zh.md)

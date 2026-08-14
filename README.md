@@ -6,7 +6,7 @@ A structured, continuously updatable knowledge base that tracks and decomposes t
 
 ## Status
 
-**Inception.** Scaffolding and design docs are in place; first extraction has not been run.
+**M1 in progress.** 18 models extracted across 4 vendors (DeepSeek, Qwen, Kimi, Z.AI), all validating against schema v7. Newest records: Kimi K3, DeepSeek-V4-Flash-0731, DeepSeek-V3.2-Exp. No synthesis layer yet — that starts once M1's extraction bar is met.
 
 Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./docs/roadmap.md) for the strategic roadmap and [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) for per-model status.
 
