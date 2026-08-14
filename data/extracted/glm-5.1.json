@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "metadata": {
     "name": "GLM-5.1",
     "family": "GLM-5",
@@ -41,6 +41,16 @@
         "qk_nope_head_dim": 192,
         "qk_rope_head_dim": 64,
         "v_head_dim": 256
+      },
+      "sparse_attention": {
+        "kind": "dsa",
+        "selection": "Top-k by lightning-indexer score, per the DeepSeek-V3.2-Exp mechanism.",
+        "top_k": 2048,
+        "indexer_heads": 32,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "[Unknown/Not Disclosed]",
+        "training_recipe": "Inherited from GLM-5 — a post-training-only refresh, so the indexer weights and the Continued Pre-Training recipe carry over unchanged.",
+        "notes": "Config byte-identical to GLM-5 except transformers_version. Same deterministic top-k requirement and indexer-frozen-during-RL discipline."
       }
     },
     "ffn": {
@@ -139,7 +149,16 @@
       "self_distillation": "Yes — inherits GLM-5's On-Policy Cross-Stage Distillation final-stage recipe (paper §3.5). The post-training-only refresh's additional long-horizon agentic RL likely runs through the same distillation finalization, but specifics are not separately disclosed for GLM-5.1.",
       "mixed_precision": "BF16 master parameters (config.dtype='bfloat16'); FP8 rollouts during RL; INT4 QAT during SFT — all inherited from GLM-5. The GLM-5.1-FP8 deployment sibling is post-training quantized for single-node deployment, mirroring the GLM-5/GLM-5-FP8 pair structure."
     },
-    "stability_notes": "Inherits GLM-5's stability machinery (Muon Split, deterministic torch.topk DSA Indexer, frozen indexer in RL, off-policy sample dropping, env-failure-sample dropping, IcePop pop-mask). No GLM-5.1-specific stability tricks are disclosed beyond GLM-5's."
+    "stability_notes": "Inherits GLM-5's stability machinery (Muon Split, deterministic torch.topk DSA Indexer, frozen indexer in RL, off-policy sample dropping, env-failure-sample dropping, IcePop pop-mask). No GLM-5.1-specific stability tricks are disclosed beyond GLM-5's.",
+    "quantization": {
+      "weight_format": "int4",
+      "activation_format": "[Unknown/Not Disclosed]",
+      "method": "qat",
+      "scope": "[Unknown/Not Disclosed]",
+      "granularity": "[Unknown/Not Disclosed]",
+      "stage": "INT4 QAT during SFT, inherited from GLM-5.",
+      "notes": "A GLM-5.1-FP8 deployment sibling is post-training quantized, mirroring the GLM-5/GLM-5-FP8 pair."
+    }
   },
   "multimodal": null,
   "inferred_fields": [],

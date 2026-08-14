@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v6).
+"""Pydantic models for the extraction schema (v7).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
@@ -108,6 +108,64 @@ class AttentionVariant(_Strict):
     )
 
 
+class SparseAttentionConfig(_Strict):
+    """Content-dependent sparsification and/or KV compression layered on top of an attention variant.
+
+    Distinct from `Attention.variants` / `layer_pattern`, which model a *hybrid stack* of
+    different attention types across layers. This subobject models a *modifier* applied to
+    an attention variant — e.g. DeepSeek-V3.2-Exp's DSA sits on top of MLA uniformly across
+    all 61 layers, and GLM-5 applies the same mechanism on its own MLA. For hybrid stacks
+    where only some layers carry the modifier (DeepSeek-V4's CSA layers), populate this with
+    the modifier's parameters and describe the layer split in `Attention.layer_pattern`.
+
+    None when the model uses dense attention (the common case). Sliding-window attention is
+    NOT sparse attention in this sense — it is content-blind and belongs in `variants`.
+    """
+
+    kind: str = Field(
+        description=(
+            'Mechanism name, e.g. "dsa" (DeepSeek Sparse Attention), "csa" (compressed sparse '
+            'attention), "hca" (heavily compressed attention), "nsa" (native sparse attention), '
+            '"other".'
+        )
+    )
+    selection: str = Field(
+        default=UNKNOWN,
+        description=(
+            "How the retained entries are chosen, e.g. "
+            '"top-k by lightning-indexer score ReLU(q_I . k_I)", "learned block routing". '
+            "UNKNOWN when undisclosed."
+        ),
+    )
+    top_k: int | str = Field(
+        default=UNKNOWN,
+        description="Number of key-value entries retained per query (HF key: index_topk).",
+    )
+    indexer_heads: int | str = Field(
+        default=UNKNOWN, description="Scoring-path head count (HF key: index_n_heads)."
+    )
+    indexer_head_dim: int | str = Field(
+        default=UNKNOWN, description="Scoring-path per-head dim (HF key: index_head_dim)."
+    )
+    kv_compression_ratio: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Sequence-dimension KV compression applied before/with selection, as a string so "
+            'per-variant values fit, e.g. "4 (CSA) / 128 (HCA)". UNKNOWN when the mechanism '
+            "selects over uncompressed KV entries (plain DSA)."
+        ),
+    )
+    training_recipe: str = Field(
+        default="",
+        description=(
+            "How the mechanism was trained in, if it was retrofitted onto a dense checkpoint "
+            "(warm-up steps/tokens, adaptation budget, frozen-parameter scheme). Empty when "
+            "trained from scratch or undisclosed."
+        ),
+    )
+    notes: str = ""
+
+
 class Attention(_Strict):
     variant: str = Field(description='e.g. "MHA", "GQA", "MLA", "sliding_window", "hybrid"')
     num_heads: int | str = UNKNOWN
@@ -137,6 +195,21 @@ class Attention(_Strict):
         description=(
             'Layer ordering pattern for hybrid stacks, e.g. "(L,L,L,F)x10 with '
             'L=gated_deltanet, F=gated_attention". Empty for single-variant stacks.'
+        ),
+    )
+    sparse_attention: SparseAttentionConfig | None = Field(
+        default=None,
+        description=(
+            "Content-dependent sparsification / KV-compression modifier layered on the variant "
+            "above (DSA, CSA, HCA, NSA). None for dense attention."
+        ),
+    )
+    notes: str = Field(
+        default="",
+        description=(
+            "Free text for attention-level details with no dedicated field — output gates, "
+            "NoPE decisions, per-head QK normalization, attention sinks, training-precision "
+            "choices. Empty when the structured fields say everything."
         ),
     )
 
@@ -193,6 +266,17 @@ class MoEConfig(_Strict):
     shared_experts: int | str = UNKNOWN
     expert_intermediate_size: int | str = Field(
         default=UNKNOWN, description="Per-expert FFN intermediate width"
+    )
+    latent_dim: int | str = Field(
+        default=UNKNOWN,
+        description=(
+            "Width of the latent space the ROUTED experts operate in, when it is narrower than "
+            "the model hidden dim (LatentMoE-style designs: a down-projection feeds the routed "
+            "branch and an up-projection returns to model width, so dispatch traffic and expert "
+            "weights scale with this instead of hidden_dim). Kimi K3: 3584 = 0.5x hidden 7168 "
+            "(HF key: routed_expert_hidden_size). UNKNOWN for conventional MoE, where routed "
+            "experts read and write full model width."
+        ),
     )
     routing: str = Field(description="Routing algorithm description (free text)")
 
@@ -264,6 +348,52 @@ class ResidualConfig(_Strict):
     notes: str = ""
 
 
+class AuxiliaryModule(_Strict):
+    """A trained, weight-bearing module that is not part of the main backbone stack.
+
+    Speculative-decoding drafts (DeepSeek's DSpark, EAGLE-3 heads), MTP heads viewed as
+    shipped weights, and similar attachments. These have no home in `backbone` (they are not
+    layers of the main stack) or in `training.objectives` (they are modules, not objectives),
+    and before v7 they smeared across parallelism_notes / layer_partition / MTP.shared_modules.
+
+    Note the deliberate overlap with `TrainingObjectives.multi_token_prediction`: MTP is an
+    objective *and* (sometimes) shipped weights. Record the objective there and the module
+    here when both apply.
+    """
+
+    name: str = Field(description='e.g. "DSpark draft model", "EAGLE-3 draft head", "MTP head"')
+    purpose: str = Field(
+        description=(
+            'What it is for, e.g. "speculative_decoding", "multi_token_prediction", '
+            '"reward_model", "other".'
+        )
+    )
+    architecture: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Shape of the module, e.g. '3 MoE layers with mHC and sliding-window attention "
+            "of 128, plus a rank-256 Markov head'. UNKNOWN when undisclosed."
+        ),
+    )
+    shipped_in_checkpoint: bool | str = Field(
+        default=UNKNOWN,
+        description=(
+            "True when the module's weights are in the released checkpoint, False when it was "
+            "trained but withheld (Kimi K3's draft layer: config num_nextn_predict_layers=0). "
+            "UNKNOWN when the sources do not say."
+        ),
+    )
+    activation: str = Field(
+        default="",
+        description=(
+            "How a deployment turns it on, e.g. "
+            '\'vLLM --speculative-config {"method":"dspark"}; SGLang --speculative-algorithm '
+            "DSPARK (no separate draft path — same checkpoint)'. Empty when not applicable."
+        ),
+    )
+    notes: str = ""
+
+
 class Architecture(_Strict):
     backbone: Backbone
     attention: Attention
@@ -274,6 +404,14 @@ class Architecture(_Strict):
         description=(
             "Structured residual-stream topology. None when the model uses standard "
             "residual connections (the common case)."
+        ),
+    )
+    auxiliary_modules: list[AuxiliaryModule] = Field(
+        default_factory=list,
+        description=(
+            "Trained, weight-bearing modules outside the main backbone stack "
+            "(speculative-decoding drafts, MTP heads as shipped weights). Empty for models "
+            "that ship only the backbone."
         ),
     )
     parallelism_notes: str
@@ -325,7 +463,14 @@ class AlignmentStage(_Strict):
     """
 
     name: str = Field(description='e.g. "Long-CoT Cold Start", "Reasoning RL"')
-    method: str = Field(description='e.g. "sft", "rl", "distillation", "rejection_sampling+sft"')
+    method: str = Field(
+        description=(
+            'e.g. "sft", "rl", "distillation", "rejection_sampling+sft", '
+            '"continued_pretraining" (a pre-training stage that is part of an ordered pipeline '
+            "— DeepSeek-V3.2-Exp's DSA warm-up and sparse-adaptation stages), "
+            '"quantization_aware_training".'
+        )
+    )
     description: str = Field(description="Data, signals, key recipe details")
 
 
@@ -449,6 +594,49 @@ class Alignment(_Strict):
     )
 
 
+class QuantizationConfig(_Strict):
+    """Low-precision deployment recipe, distinct from training-time mixed precision.
+
+    `Advanced.mixed_precision` describes what the TRAINING ran in (FP8 GEMMs, BF16 master
+    weights). This subobject describes what the SHIPPED WEIGHTS are, which by 2026 is a
+    separate design axis with its own cross-vendor story: DeepSeek-V4 MXFP4 expert weights,
+    the Kimi K2 family's native INT4, Kimi K3's MXFP4 weights + MXFP8 activations, GLM-5's
+    INT4 QAT during SFT. None when the model ships in its training precision.
+    """
+
+    weight_format: str = Field(
+        description='e.g. "mxfp4", "int4", "fp8-e4m3", "nvfp4". UNKNOWN if undisclosed.'
+    )
+    activation_format: str = Field(
+        default=UNKNOWN,
+        description='e.g. "mxfp8", "bf16", "fp8-e4m3 dynamic". UNKNOWN if undisclosed.',
+    )
+    method: str = Field(
+        default=UNKNOWN,
+        description='"qat" (quantization-aware training), "ptq" (post-training quantization), "other".',
+    )
+    scope: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Which parameters are quantized, e.g. 'routed MoE expert weights only; attention "
+            "projections, shared experts, routers, lm_head and vision tower excluded'."
+        ),
+    )
+    granularity: str = Field(
+        default=UNKNOWN,
+        description='Block/group structure, e.g. "group_size=32, symmetric", "block 128x128".',
+    )
+    stage: str = Field(
+        default="",
+        description=(
+            "When in the pipeline quantization is applied, e.g. 'QAT from SFT onward through "
+            "all of RL; rollout and training share the scheme, so no train-inference mismatch'. "
+            "Empty when not disclosed."
+        ),
+    )
+    notes: str = ""
+
+
 class Advanced(_Strict):
     self_distillation: str
     mixed_precision: str
@@ -468,6 +656,13 @@ class Training(_Strict):
     objectives: TrainingObjectives = Field(default_factory=TrainingObjectives)
     alignment: Alignment
     advanced: Advanced
+    quantization: QuantizationConfig | None = Field(
+        default=None,
+        description=(
+            "Low-precision recipe of the SHIPPED weights (vs Advanced.mixed_precision, which "
+            "describes training precision). None when the model ships in training precision."
+        ),
+    )
     stability_notes: str = Field(
         default="",
         description=(

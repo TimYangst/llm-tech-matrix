@@ -2,7 +2,7 @@
 
 > 中文版：[kimi-k2.6.zh.md](./kimi-k2.6.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -167,6 +167,21 @@ _Notes:_ Wire format unchanged from K2.5 (and K2-Thinking). README §6 notes K2.
 **Self-distillation:** [Unknown/Not Disclosed] — K2.6 README does not restate distillation choices. Likely inherits K2.5's pattern (data synthesis from K2 + K2-Thinking + in-house experts) but not stated.
 
 **Mixed precision:** BF16 master parameters (config.dtype='bfloat16'); MoE expert weights deployed at INT4 via QAT (compressed-tensors, group_size=32, num_bits=4, type=int, format=pack-quantized) — same recipe as K2.5 / K2-Thinking. K2.6 README §4 explicitly: 'Kimi-K2.6 adopts the same native int4 quantization method as Kimi-K2-Thinking.' Routed-expert linears only — config.quantization_config.ignore excludes self_attn, shared_experts, mlp gate/up/down projections, lm_head, vision_tower, and mm_projector.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `int4` |
+| Activation format | `[Unknown/Not Disclosed]` |
+| Method | `qat` |
+| Granularity | compressed-tensors pack-quantized, group_size=32, num_bits=4, type=int, symmetric, strategy=group, observer=minmax |
+
+**Scope:** Routed-expert linears only. Excluded via config.quantization_config.ignore: self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head (and vision_tower / mm_projector on the multimodal siblings).
+
+**Pipeline stage:** Post-training QAT; all published benchmark results are reported under INT4 precision.
+
+_Notes:_ Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo for higher-precision deployment.
 
 **Stability tricks:** Inherits K2.5's QK-Clip in MuonClip and (presumably) the token-level log-ratio gradient masking from RL. Not restated in the K2.6 README.
 

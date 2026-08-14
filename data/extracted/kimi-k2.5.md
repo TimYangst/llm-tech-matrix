@@ -2,7 +2,7 @@
 
 > 中文版：[kimi-k2.5.zh.md](./kimi-k2.5.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
@@ -176,6 +176,21 @@ _Notes:_ K2.5 inherits its tool-call wire format from Kimi K2 (README §6: 'Inte
 **Self-distillation:** Yes — K2.5's SFT data is synthesized by K2 + K2-Thinking + a suite of in-house expert models (paper §4.4.1). The Toggle algorithm in §4.4.2 is also evaluated using K2-Thinking as the trained model.
 
 **Mixed precision:** BF16 master parameters (config.dtype='bfloat16'); MoE expert weights deployed at INT4 via Quantization-Aware Training (compressed-tensors format, group_size=32, num_bits=4, type=int, symmetric, group strategy, observer=minmax) — applied to routed-expert linears only. self_attn, shared_experts, mlp gate/up/down projections, lm_head, vision_tower, and mm_projector remain at high precision (excluded via config.quantization_config.ignore patterns). The K2-base pre-training mixed precision is not restated in the K2.5 report and the K2 tech report has not been published.
+
+### Quantization (shipped weights)
+
+| | |
+|---|---|
+| Weight format | `int4` |
+| Activation format | `[Unknown/Not Disclosed]` |
+| Method | `qat` |
+| Granularity | compressed-tensors pack-quantized, group_size=32, num_bits=4, type=int, symmetric, strategy=group, observer=minmax |
+
+**Scope:** Routed-expert linears only. Excluded via config.quantization_config.ignore: self_attn, shared_experts, the dense mlp gate/up/down projections, lm_head (and vision_tower / mm_projector on the multimodal siblings).
+
+**Pipeline stage:** Post-training QAT; all published benchmark results are reported under INT4 precision.
+
+_Notes:_ Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo for higher-precision deployment.
 
 **Stability tricks:** QK-Clip — applied throughout MuonClip pre-training and post-training, prevents the attention-logit explosion historically observed with Muon on large transformers. Token-level log-ratio gradient masking (paper §4.4.2 eq. 1) is described explicitly as a stability mechanism for long-horizon multi-step tool-use RL: tokens whose policy-vs-old log-ratio falls outside [α, β] have their gradients zeroed, bounding off-policy drift regardless of advantage sign.
 

@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "metadata": {
     "name": "GLM-5",
     "family": "GLM-5",
@@ -41,6 +41,16 @@
         "qk_nope_head_dim": 192,
         "qk_rope_head_dim": 64,
         "v_head_dim": 256
+      },
+      "sparse_attention": {
+        "kind": "dsa",
+        "selection": "Top-k by lightning-indexer score, per the DeepSeek-V3.2-Exp mechanism.",
+        "top_k": 2048,
+        "indexer_heads": 32,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "[Unknown/Not Disclosed]",
+        "training_recipe": "Continued Pre-Training (paper §2.1.1): indexer-only warm-up for 1000 steps x 14 sequences x 202752 tokens at max LR 5e-3 (~2.84B tokens), then sparse adaptation on 20B tokens — two orders of magnitude cheaper than DeepSeek-V3.2-Exp's 943.7B and still sufficient to recover dense-baseline quality.",
+        "notes": "First non-DeepSeek adoption of DSA. config.indexer_rope_interleave=true. Paper §2.1.2 ablates DSA against SWA, search-based-pattern SWA, GDN and SimpleGDN and concludes DSA is the only one lossless by construction, since the indexer adapts to content instead of committing to a fixed sparsity pattern. RL-stability requirement (§3.2): the top-k operator must be deterministic — non-deterministic CUDA top-k caused sharp entropy collapse within a few steps, so GLM-5 uses torch.topk and freezes indexer parameters during RL by default."
       }
     },
     "ffn": {
@@ -158,7 +168,16 @@
       "self_distillation": "Yes — On-Policy Cross-Stage Distillation is the final post-training stage (paper §3.5). The final checkpoints from each preceding stage (SFT, Reasoning RL, General RL) serve as teachers within a single model lineage; training prompts sampled from each teacher's RL training set and mixed in proportion. Distillation loss replaces GRPO's advantage with the teacher-vs-student log-ratio (stop-gradient on teacher).",
       "mixed_precision": "BF16 master parameters (config.dtype='bfloat16'). FP8 rollouts during RL (paper §3.6.2 'Tail-latency reduction with FP8 rollouts and MTP'). INT4 QAT applied during SFT (paper §2.4.3) — a quantization kernel ensures bitwise-identical behavior between training and inference and is used both at training time and offline weight quantization. The FP8 GLM-5-FP8 deployment sibling is post-training quantized for single-node deployment. Pre-training mixed-precision (numerical format used during the 28.5T base run) is not separately disclosed."
     },
-    "stability_notes": "Muon Split (paper §2.1) — splitting the up-projection matrices per-head and orthogonalizing each independently keeps attention-logit scale stable during GLM-5 pre-training without QK-Clip (which the K2 family requires when using MuonClip on large transformers). Token-level clipping in the asynchronous Agentic RL [1−ε_l, 1+ε_h] with full token masking outside the trust region (paper §3.3, §4.1.2) — explicitly described as a stability mechanism for long-horizon multi-step rollouts. Drop off-policy samples whose oldest rollout policy version lags the current by more than τ. Deterministic top-k operator (torch.topk) in the DSA Indexer during RL — non-deterministic CUDA top-k implementations caused drastic RL degradation with sharp entropy drops within a few steps. Indexer parameters frozen by default during RL to prevent unstable indexer learning."
+    "stability_notes": "Muon Split (paper §2.1) — splitting the up-projection matrices per-head and orthogonalizing each independently keeps attention-logit scale stable during GLM-5 pre-training without QK-Clip (which the K2 family requires when using MuonClip on large transformers). Token-level clipping in the asynchronous Agentic RL [1−ε_l, 1+ε_h] with full token masking outside the trust region (paper §3.3, §4.1.2) — explicitly described as a stability mechanism for long-horizon multi-step rollouts. Drop off-policy samples whose oldest rollout policy version lags the current by more than τ. Deterministic top-k operator (torch.topk) in the DSA Indexer during RL — non-deterministic CUDA top-k implementations caused drastic RL degradation with sharp entropy drops within a few steps. Indexer parameters frozen by default during RL to prevent unstable indexer learning.",
+    "quantization": {
+      "weight_format": "int4",
+      "activation_format": "[Unknown/Not Disclosed]",
+      "method": "qat",
+      "scope": "[Unknown/Not Disclosed]",
+      "granularity": "[Unknown/Not Disclosed]",
+      "stage": "QAT applied during SFT (paper §2.4.3), with a quantization kernel that guarantees bitwise-identical behaviour between training and inference and is used both at training time and for offline weight quantization.",
+      "notes": "A separate GLM-5-FP8 deployment sibling is POST-training quantized for single-node deployment — a different recipe from this INT4 QAT path."
+    }
   },
   "multimodal": null,
   "inferred_fields": [],

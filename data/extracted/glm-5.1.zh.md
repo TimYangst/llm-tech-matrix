@@ -2,7 +2,7 @@
 
 > English: [glm-5.1.md](./glm-5.1.md)
 
-*Schema 版本: 6*
+*Schema 版本: 7*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -59,6 +59,21 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 | qk_nope_head_dim | 192 |
 | qk_rope_head_dim | 64 |
 | v_head_dim | 256 |
+
+**稀疏注意力：**
+
+| | |
+|---|---|
+| 类型 | `dsa` |
+| 保留条目数（top-k） | 2048 |
+| Indexer 头数 | 32 |
+| Indexer 头维度 | 128 |
+
+**选择规则：** Top-k by lightning-indexer score, per the DeepSeek-V3.2-Exp mechanism.
+
+**训练配方：** Inherited from GLM-5 — a post-training-only refresh, so the indexer weights and the Continued Pre-Training recipe carry over unchanged.
+
+_说明：_ Config byte-identical to GLM-5 except transformers_version. Same deterministic top-k requirement and indexer-frozen-during-RL discipline.
 
 ### FFN（hybrid）
 
@@ -163,6 +178,18 @@ _说明：_ Parser names (`glm47` tool-call, `glm45` reasoning) inherited from G
 **自蒸馏：** Yes — inherits GLM-5's On-Policy Cross-Stage Distillation final-stage recipe (paper §3.5). The post-training-only refresh's additional long-horizon agentic RL likely runs through the same distillation finalization, but specifics are not separately disclosed for GLM-5.1.
 
 **混合精度：** BF16 master parameters (config.dtype='bfloat16'); FP8 rollouts during RL; INT4 QAT during SFT — all inherited from GLM-5. The GLM-5.1-FP8 deployment sibling is post-training quantized for single-node deployment, mirroring the GLM-5/GLM-5-FP8 pair structure.
+
+### 量化（发布权重）
+
+| | |
+|---|---|
+| 权重格式 | `int4` |
+| 激活格式 | `[Unknown/Not Disclosed]` |
+| 方法 | `qat` |
+
+**所处阶段：** INT4 QAT during SFT, inherited from GLM-5.
+
+_说明：_ A GLM-5.1-FP8 deployment sibling is post-training quantized, mirroring the GLM-5/GLM-5-FP8 pair.
 
 **稳定性 trick：** Inherits GLM-5's stability machinery (Muon Split, deterministic torch.topk DSA Indexer, frozen indexer in RL, off-policy sample dropping, env-failure-sample dropping, IcePop pop-mask). No GLM-5.1-specific stability tricks are disclosed beyond GLM-5's.
 

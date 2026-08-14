@@ -2,7 +2,7 @@
 
 > English: [qwen3.6-27b.md](./qwen3.6-27b.md)
 
-*Schema 版本: 6*
+*Schema 版本: 7*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 

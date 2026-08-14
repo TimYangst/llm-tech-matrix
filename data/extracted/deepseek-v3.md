@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v3.zh.md](./deepseek-v3.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 

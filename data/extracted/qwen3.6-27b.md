@@ -2,7 +2,7 @@
 
 > 中文版：[qwen3.6-27b.zh.md](./qwen3.6-27b.zh.md)
 
-*Schema version: 6*
+*Schema version: 7*
 
 ## Overview
 
