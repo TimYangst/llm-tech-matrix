@@ -32,6 +32,7 @@ mRoPE 与 YaRN 自然组合：YaRN 因子在每个轴内独立伸缩频率，与
 | Qwen3.5-35B-A3B | mRoPE 配置与 27B 兄弟完全相同：`mrope_section=[11, 11, 10]`，`mrope_interleaved=true`，`partial_rotary_factor=0.25`，`rope_theta=10,000,000`。在每 4 层 1 层应用（40 层中 10 个 Gated Attention 层）。mRoPE 设置在 dense-27B 和 MoE-35B-A3B 间是家族级固定的。                                                                                                                  |
 | Qwen3.6-27B     | mRoPE 配置与 Qwen3.5-27B 完全相同——同样的 section、interleaving、partial-rotary 比例、base。后训练-only 的 3.6 刷新原样继承。                                                                                                                                                                                                                                                   |
 | Qwen3.6-35B-A3B | mRoPE 配置与 Qwen3.5-35B-A3B 完全相同（也与全部四个 Qwen3.5/3.6 slug 完全相同）；家族级固定。                                                                                                                                                                                                                                                                                   |
+| Qwen3.8-27B     | mRoPE 配置与 Qwen3.5/3.6-27B 完全相同——`mrope_section=[11,11,10]`、`mrope_interleaved=true`、`partial_rotary_factor=0.25`、base 10,000,000。注意同代内的对照：纯文本的 **Qwen3.8-2.4T-A95B 完全去掉了 mRoPE**（没有 `mrope_section` / `mrope_interleaved`），退回普通 partial RoPE——因为没有视觉轴需要划分。                                                                    |
 
 ## 相关技术
 

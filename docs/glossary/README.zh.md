@@ -45,6 +45,7 @@
 - [Hybrid Thinking（chat-template 思考模式融合）](./hybrid-thinking.zh.md)
 - [On-Policy Distillation（多教师 OPD）](./on-policy-distillation.zh.md)
 - [Agent Swarm — 并行智能体 RL（PARL）](./agent-swarm.zh.md)
+- [推理强度控制（Reasoning-effort control）](./reasoning-effort.zh.md)
 
 ### 位置编码 / 长上下文
 

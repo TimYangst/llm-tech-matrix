@@ -52,6 +52,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Hybrid Thinking (chat-template thinking-mode fusion)](./hybrid-thinking.md)
 - [On-Policy Distillation (multi-teacher OPD)](./on-policy-distillation.md)
 - [Agent Swarm — Parallel-Agent RL (PARL)](./agent-swarm.md)
+- [Reasoning-effort control](./reasoning-effort.md)
 
 ### Position embedding / long context
 

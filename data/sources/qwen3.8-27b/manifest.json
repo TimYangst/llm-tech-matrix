@@ -1,0 +1,60 @@
+{
+  "slug": "qwen3.8-27b",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.8-27B HuggingFace config.json",
+      "sha256": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab",
+      "size_bytes": 4312,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json — chat_template with the new reasoning_effort kwarg",
+      "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+      "size_bytes": 17928,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — architecture summary, benchmarks, best practices",
+      "sha256": "57e4bdb258ee1a7d2635c5174ebd4e56abe392505cdb5f8bbb356b0dc4293641",
+      "size_bytes": 65012,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.8",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post 'Qwen3.8-Max: A New Bar for Coding and Cowork' (August 2026); SPA so saved HTML may be JS shell only",
+      "sha256": "da96ba91d32db63a40ca6411b61964433d20dd37d39b5c48a027c439b3d123e5",
+      "size_bytes": 94358,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "HF preprocessor_config.json — vision encoder image preprocessing",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size_bytes": 390,
+      "fetched_at": "2026-08-20"
+    }
+  ]
+}

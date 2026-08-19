@@ -86,7 +86,7 @@ RoPE scaling：
 
 **Dense 中间维度：** `17408`
 
-**层划分：** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant (config.mlp_only_layers=[]).
+**层划分：** Uniform dense SwiGLU FFN across all 64 layers regardless of attention variant. (Qwen3.5-27B's config carried `mlp_only_layers=[]`; the Qwen3.6 config drops the key entirely — there is no dense/MoE split to describe for a dense model either way.)
 
 ### 组件
 
