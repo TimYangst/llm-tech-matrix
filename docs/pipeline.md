@@ -45,16 +45,27 @@ Code: `src/llm_tech_matrix/sourcing/`
 
 This is the AI-driven layer. The extraction prompt frames the model as a "Senior AI Researcher" and enforces the no-hallucination rule (see `schema.md` cardinal rule).
 
-What lives here:
+What actually lives here today:
 
-- Prompt templates (one per source type: config.json, paper, blog)
-- A merging step that reconciles fields extracted from multiple sources for the same model
-- Pydantic validation of the final output against `schema.py`
-- Logging of `[Unknown/Not Disclosed]` fields and `inferred_fields` notes
+- `.claude/skills/extract-model/SKILL.md` — the extraction procedure itself. Extraction is
+  agent-driven, not code-driven: there is no prompt-template module and no automated
+  multi-source merge step. The skill reads the cached sources and writes the JSON.
+- `src/llm_tech_matrix/extraction/render.py` — deterministic JSON → Markdown renderer,
+  producing **two** committed files per model: `<slug>.md` (English chrome) and
+  `<slug>.zh.md` (Chinese chrome). Field values stay in source-language English so the
+  Markdown remains a faithful view of the JSON. Never hand-edit the output; change the
+  JSON, or the `LABELS` dicts in `render.py`.
+- `scripts/validate_extractions.py` — Pydantic validation of every extracted JSON against
+  `schema.py`. This is the CI gate, and it is the real enforcement point for the contract.
+- `docs/glossary/` — the shared vocabulary the rendered summaries lean on. Each entry
+  carries a "Used by" table, so extraction has a step that writes *back* into the glossary.
+
+Not built (and not currently missed): prompt templates per source type, an automated
+merge/reconcile step, structured logging of `[Unknown/Not Disclosed]` rates.
 
 What does **not** live here: cross-model logic. One model in, one JSON out.
 
-Code: `src/llm_tech_matrix/extraction/` and `.claude/skills/extract-model/`
+Code: `src/llm_tech_matrix/extraction/`, `scripts/`, and `.claude/skills/extract-model/`
 
 ## Layer 3: Synthesis & analytics
 
@@ -68,6 +79,13 @@ What lives here:
 - Static charts (matplotlib/plotly) saved alongside the report
 
 This layer is intentionally last: it cannot work until enough extractions exist. **Don't over-build it early.** Start with one or two reports driven by real questions, not infrastructure-first.
+
+**Status: not started.** `src/llm_tech_matrix/synthesis/` is an empty package and
+`data/reports/` does not exist yet. The "enough extractions" bar M1 set (≥10) has been
+met — see [`roadmap.md`](./roadmap.md) — so this layer is now unblocked rather than
+premature. The glossary "Used by" tables are currently doing the cross-model comparison
+job by hand, and they are the natural first thing a synthesis tool should generate
+instead.
 
 Code: `src/llm_tech_matrix/synthesis/`
 

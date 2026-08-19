@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-**M1 进行中。** 已抽取 18 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：Kimi K3、DeepSeek-V4-Flash-0731、DeepSeek-V3.2-Exp。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
+**M1 进行中。** 已抽取 20 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：Qwen3.8-27B、Qwen3.8-2.4T-A95B（首个开放权重的 Qwen-Max 级模型）、Kimi K3。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
 
 当前重点：**M1——文本与多模态大模型。** 战略路线图见 [`docs/roadmap.md`](./docs/roadmap.md)，每个模型的具体状态见 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)。
 
@@ -25,21 +25,27 @@
 
 ```
 docs/                  权威参考文档（愿景、Schema、流水线、约定、路线图）
+  glossary/            分技术的中英双语小词条，每条带"使用此技术的模型"表
 src/llm_tech_matrix/   Python 包
   schema.py            Pydantic 模型 —— docs/schema.md 的可执行版本
-  sourcing/            第一层 —— 拉取 HF config、论文、博客
-  extraction/          第二层 —— Schema 严格的 LLM 抽取
-  synthesis/           第三层 —— 跨模型对比与趋势报告
+  sourcing/            第一层 —— 拉取 HF config、论文、博客；manifest + sha256
+  extraction/          第二层 —— render.py（JSON → 双语 Markdown）。抽取本身由
+                       .claude/skills/extract-model skill 驱动，不是代码逻辑。
+  synthesis/           第三层 —— 空包，尚未开始（见 docs/roadmap.md）
+scripts/               validate_extractions.py（CI 的 schema 闸门）+ schema 迁移脚本
 data/
-  sources/<model>/     原始抓取文件（config.json、paper.pdf、manifest.json）
+  sources/<model>/     manifest.json（提交进 git）+ 缓存的原始文件（gitignore）
   extracted/<model>.json  通过 Schema 校验的抽取产物（提交进 git）
-  reports/             生成的综合分析报告
+  extracted/<model>.md    渲染出的英文摘要（提交进 git，由 .json 生成）
+  extracted/<model>.zh.md 渲染出的中文摘要（提交进 git，由 .json 生成）
+  reports/             生成的综合分析报告 —— 尚未创建
 tasks/
-  ROADMAP.md           各模型状态总表
+  ROADMAP.md           各模型状态总表 + Current focus
   models/<model>.md    每个模型的笔记、数据源、未决问题
-.claude/skills/        Claude Code skills（extract-model 等）
-tests/                 Schema 校验和流水线测试
+.claude/skills/        Claude Code skills（extract-model、draft-pr）
 ```
+
+目前还没有测试套件 —— CI 跑的 schema 闸门是 `scripts/validate_extractions.py`。
 
 ## 快速开始
 
@@ -77,11 +83,20 @@ uv run pre-commit install     # 激活 git hook
 
 ## 添加一个新模型抽取
 
-1. 在 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) 中添加条目，状态为 `backlog`。
-2. 创建 `tasks/models/<model-slug>.md`，列出数据源 URL。
-3. 运行 `extract-model` skill（或参照 [`docs/schema.md`](./docs/schema.md) 手动抽取）。
-4. 用 `src/llm_tech_matrix/schema.py` 校验输出文件 `data/extracted/<model-slug>.json`。
-5. 把路线图中的状态更新为 `extracted`。
+1. 在 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) 中添加条目，状态为 `backlog`，并创建
+   `tasks/models/<model-slug>.md` 列出候选数据源 URL。
+2. 注册数据源 —— 这一步会下载文件、记录 sha256 并写入 manifest：
+   `uv run python -m llm_tech_matrix.sourcing add <slug> --name config --kind hf_config --url ... --filename config.json`
+   （若有 PDF 资产，再跑 `python -m llm_tech_matrix.sourcing.pdf_to_text <slug>`）。
+3. 运行 `extract-model` skill（或参照 [`docs/schema.md`](./docs/schema.md) 手动抽取），
+   产出 `data/extracted/<model-slug>.json`。
+4. 用 `src/llm_tech_matrix/schema.py` 校验 —— 这也是 CI 强制执行的闸门。
+5. 渲染需要提交的双语摘要：`uv run python -m llm_tech_matrix.extraction.render <slug>`。
+   **不要手改**生成的 `.md` / `.zh.md`，要改就改 JSON 或改渲染器。
+6. 给相关的 [`docs/glossary/`](./docs/glossary/) 词条补"使用此技术的模型"行（`.md` 和
+   `.zh.md` 都要改），并把路线图状态更新为 `extracted`。
+
+完整流程见 [`.claude/skills/extract-model/SKILL.md`](./.claude/skills/extract-model/SKILL.md)。
 
 ## 铁律
 

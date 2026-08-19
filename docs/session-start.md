@@ -44,6 +44,8 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 | `src/llm_tech_matrix/sourcing/`            | Fetch CLI, manifest schema, pdf_to_text.                                 |
 | `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer.                                                |
 | `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                 |
+| `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.            |
+| `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump.                         |
 
 ## How to pick a next task
 
@@ -63,8 +65,19 @@ In rough priority order:
    next. Just did open weights? Do a closed model to exercise `inferred_fields`. Just
    did text-only? Do a multimodal one.
 
-4. **Don't build the synthesis layer yet.** Don't write cross-model reports until
-   ≥10 models are extracted (per [`docs/roadmap.md`](./roadmap.md) M1 exit criteria).
+4. **The synthesis layer is now unblocked** (it was gated on ≥10 extractions; the repo
+   passed 20 in 2026-08). It is still *unstarted*: `src/llm_tech_matrix/synthesis/` is an
+   empty package and `data/reports/` does not exist. Per
+   [`docs/roadmap.md`](./roadmap.md), the first report is the critical-path item for
+   closing M1 — but it should be driven by one real question (suggested threads:
+   optimizer evolution, MoE routing, or reasoning-effort mechanisms), not by building
+   infrastructure first. The hand-maintained "Used by" tables in `docs/glossary/` are the
+   obvious first thing to generate from `data/extracted/*.json`.
+
+5. **The other standing gap is closed models.** `inferred_fields` is empty across all 20
+   records, so the mechanism the schema was designed around has never run. Any closed
+   model fixes that; `qwen3.7-max` is currently the cheapest one (see
+   [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)).
 
 ## Common workflows
 
