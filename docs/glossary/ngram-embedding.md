@@ -55,8 +55,8 @@ specificity are rare and worth keeping.
 
 ## Used by
 
-| Model | Variation / details |
-| ----- | ------------------- |
+| Model              | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Qwen3.8-Flash-Next | A **single** n-gram embedding layer at **layer 2**, holding **51B parameters** in a 20,000,000-entry table (`ngram_size=3` — bigrams/trigrams, `heads_per_ngram=8`, embed dim 2560, depthwise conv kernel 4, `split_ngram_parts=128`). Tables are held **off-accelerator in host memory and asynchronously prefetched**, so the 51B is reported separately from the 125B backbone total. Trained with Adam, weight decay disabled; the layer's key/value projections are on [Muon](./muon.md). |
 
 ## Related techniques

@@ -57,8 +57,8 @@ recommend a higher learning rate and batch size.
 
 ## Used by
 
-| Model | Variation / details |
-| ----- | ------------------- |
+| Model              | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Qwen3.8-Flash-Next | `n_r = 4` branches (`hc_count=4`), low-rank bottleneck of `d/8 = 320` (`hc_lowrank=320`), a **separate GR module for the attention block and the MLP block of every layer**. Read: per-branch RMSNorm with its own gain → elementwise sigmoid gate predicted from all branches → mean of gated branches. Write: `s = 2·σ(W_w vec(R̂))`, one scalar per branch. No static term, no special init. Ablation at 25B-A3B / 560B tokens: pre-norm 1.617 loss / 50.91 avg → mHC static 1.596 / 52.49 → mHC dynamic 1.594 / 54.47 → **GR 1.590 / 54.66**. Residual state supports FP8 storage at inference to contain the memory traffic of 4 branches. |
 
 ## Related techniques

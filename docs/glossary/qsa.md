@@ -52,8 +52,8 @@ latency while IndexShare is still below baseline at 0.5.
 
 ## Used by
 
-| Model | Variation / details |
-| ----- | ------------------- |
+| Model              | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Qwen3.8-Flash-Next | Micro-block size `r=4`, token budget `K=2048` (512 blocks), indexer MQA with 4 query heads + 1 shared key head, indexer head_dim 128, partial RoPE on 64 of 128 indexer dims to match the core attention's rotary dimension. Applied to **every** full-attention layer — 12 of 48 in the backbone, plus the MTP module's attention layer. Retrofitted during CPT at 256K: 1,000 indexer-only steps (~2B tokens, lr 1e-3), then 8,000 joint steps (~200B tokens, lr 2.5e-5). Kernel-level speedup at 1M context: **7.6× prefill, 4.9× decode**. |
 
 ## Related techniques

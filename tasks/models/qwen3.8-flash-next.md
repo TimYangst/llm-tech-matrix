@@ -83,12 +83,12 @@ inside the Qwen3.8 name: 27B is Apache-2.0, 2.4T-A95B is `qwen3.8-max`).
 
 **The four design moves, and what each is for**
 
-| Component | Bottleneck it attacks | Headline number |
-| --- | --- | --- |
-| GDN hybrid 3:1 | Quadratic mixing + linear KV growth | Beats full-attn on 8/9, SWA-hybrid on 7/9 |
-| QSA | DSA's own `O(n²)` indexer cost | `O(n²/r)`; 7.6× prefill / 4.9× decode at 1M |
-| Gated Residual | Pre-norm signal attenuation; stability | +3.56 avg pts over pre-norm; no loss spikes |
-| N-gram embedding | Capacity per FLOP; accelerator memory | 51B params off-accelerator, ~0 per-token FLOPs |
+| Component        | Bottleneck it attacks                  | Headline number                                |
+| ---------------- | -------------------------------------- | ---------------------------------------------- |
+| GDN hybrid 3:1   | Quadratic mixing + linear KV growth    | Beats full-attn on 8/9, SWA-hybrid on 7/9      |
+| QSA              | DSA's own `O(n²)` indexer cost         | `O(n²/r)`; 7.6× prefill / 4.9× decode at 1M    |
+| Gated Residual   | Pre-norm signal attenuation; stability | +3.56 avg pts over pre-norm; no loss spikes    |
+| N-gram embedding | Capacity per FLOP; accelerator memory  | 51B params off-accelerator, ~0 per-token FLOPs |
 
 **Loss ≠ benchmarks — the report's recurring theme.** Three documented disagreements:
 n-gram vocabulary scaling lowers loss monotonically while downstream saturates;
