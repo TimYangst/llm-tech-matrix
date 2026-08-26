@@ -11,7 +11,7 @@ The authoritative source list is `data/sources/glm-5.3-flash/manifest.json` (com
 - [x] `config` (`hf_config`) — `https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/config.json`
 - [x] `chat_template`, `tokenizer_config`, `processor_config` (`other`), `readme` (`model_card`)
 - [x] `paper` (`arxiv_pdf`) — GLM-5 family report `https://arxiv.org/pdf/2602.15763`
-      (predates this architecture and cannot cover it — registered because the card cites it)
+  (predates this architecture and cannot cover it — registered because the card cites it)
 - [x] `blog` (`blog_html`) — `https://z.ai/blog/glm-5.3-flash` (SPA shell, 0 chars)
 
 Considered but excluded:
@@ -58,14 +58,14 @@ N/A — open-weight under MIT.
 **This model is a synthesis of four other vendors' ideas.** That is the story worth
 recording:
 
-| Component | Origin in this repo | GLM's version |
-| --- | --- | --- |
-| KDA linear attention | Kimi (Kimi Linear → K3) | **First non-Moonshot KDA deployment** |
-| NoPE attention | Kimi K3 | Same choice; Qwen tested and *rejected* NoPE |
-| mHC widened residual | DeepSeek-V4 | **Second vendor to ship mHC**, Sinkhorn kept |
-| SwiGLU clamping | DeepSeek-V4 | Adopted (`swiglu_limit=10.0`) |
-| Key-pooled DSA indexer | Qwen (QSA, Aug 2026) | Convergent — `index_kpool=4` |
-| 3:1 linear:full cadence | Qwen 3.x, Kimi K3 | Third independent convergence |
+| Component               | Origin in this repo     | GLM's version                                |
+| ----------------------- | ----------------------- | -------------------------------------------- |
+| KDA linear attention    | Kimi (Kimi Linear → K3) | **First non-Moonshot KDA deployment**        |
+| NoPE attention          | Kimi K3                 | Same choice; Qwen tested and *rejected* NoPE |
+| mHC widened residual    | DeepSeek-V4             | **Second vendor to ship mHC**, Sinkhorn kept |
+| SwiGLU clamping         | DeepSeek-V4             | Adopted (`swiglu_limit=10.0`)                |
+| Key-pooled DSA indexer  | Qwen (QSA, Aug 2026)    | Convergent — `index_kpool=4`                 |
+| 3:1 linear:full cadence | Qwen 3.x, Kimi K3       | Third independent convergence                |
 
 **GLM switched sides on the indexer question in two months.** GLM-5.2 answered DSA's
 residual O(L²) indexer cost with *cross-layer* index sharing (IndexShare). GLM-5.3-Flash

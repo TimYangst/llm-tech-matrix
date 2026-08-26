@@ -76,6 +76,5 @@ HLE 31 → 40.5, SWE-bench Pro 58.4 → 62.1, NL2Repo 42.7 → 48.9, MCP-Atlas 7
 Gains this large are not attributable to an attention-efficiency change — there is
 substantial unpublished post-training behind this release.
 
-**New runtime axis**: `reasoning_effort` ∈ {high, max}, emitted as a `<|system|>Reasoning
-Effort: Max` prompt prefix — the same mechanism family as DeepSeek-V4's prefix approach.
+**New runtime axis**: `reasoning_effort` ∈ {high, max}, emitted as a `<|system|>Reasoning Effort: Max` prompt prefix — the same mechanism family as DeepSeek-V4's prefix approach.
 Unknown values silently fall back to `max` (the *most* expensive level), where Qwen3.8 raises.
