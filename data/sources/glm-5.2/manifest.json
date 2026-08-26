@@ -1,0 +1,82 @@
+{
+  "slug": "glm-5.2",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/zai-org/GLM-5.2/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "GLM-5.2 HuggingFace config.json",
+      "sha256": "185f93ee6d12548e16a847e279dc0c3c90b1524c970b0866b42fb545747d859a",
+      "size_bytes": 3732,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.2/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "HF chat_template.jinja",
+      "sha256": "172dc74a35e1752df75ecfb2b2cf9326d2852bb1379868ebeec9571654489679",
+      "size_bytes": 5076,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.2/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json",
+      "sha256": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+      "size_bytes": 761,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/zai-org/GLM-5.2/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card",
+      "sha256": "ed5aca8ce3dc5f8de626c87e488444343e43b1dcbdeb0e643dc72fea63ab06e8",
+      "size_bytes": 10905,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.15763",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "GLM-5 technical report (arXiv 2602.15763) — the family report both 5.2 and 5.3-Flash cite",
+      "sha256": "e20742ff36e08dc361de6973f7f72ad38e107edf8fd92d2a777a8428fc9b8f0e",
+      "size_bytes": 6177650,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "indexshare_paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2603.12201",
+      "archive_url": null,
+      "filename": "indexshare.pdf",
+      "description": "IndexShare paper (arXiv 2603.12201) — indexer reuse across sparse-attention layers, introduced with GLM-5.2",
+      "sha256": "fc2112da624ec7852e20fc83df36cafe1f32e58b5aa9c44b840f0bf157c9beb2",
+      "size_bytes": 533208,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://z.ai/blog/glm-5.2",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Z.ai blog post for GLM-5.2",
+      "sha256": "a9e8c2b6f34717d69e3a0aa26bb117256a4d8c95bd299910c2a693000ee88fe8",
+      "size_bytes": 598,
+      "fetched_at": "2026-08-27"
+    }
+  ]
+}

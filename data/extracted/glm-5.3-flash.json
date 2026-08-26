@@ -1,0 +1,244 @@
+{
+  "schema_version": 7,
+  "metadata": {
+    "name": "GLM-5.3-Flash",
+    "family": "GLM-5",
+    "release_date": "2026-08",
+    "openness": "open_weights",
+    "params_total": "320B",
+    "params_active": "18B",
+    "sources": [
+      "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/config.json",
+      "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/chat_template.jinja",
+      "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/tokenizer_config.json",
+      "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/README.md",
+      "https://arxiv.org/pdf/2602.15763",
+      "https://z.ai/blog/glm-5.3-flash"
+    ],
+    "variant_policy": "**A new architecture line, not a 5.2 refresh.** HF class is `Glm5NextForConditionalGeneration` (model_type `glm5_next`) versus `GlmMoeDsaForCausalLM` for GLM-5 / 5.1 / 5.2 — the 'Next' naming mirrors Qwen's `qwen4_exp` move of shipping a next-generation architecture under a current version number. README: 'GLM-5.3-Flash starts from a newly trained base model, with its architecture and training recipe redesigned around capability and efficiency.' It is also **the first natively multimodal model in the GLM-5 series**. Distribution differs from every prior GLM record: the primary `GLM-5.3-Flash` repo ships **FP8-quantized weights** (`quantization_config`: e4m3, dynamic activation scaling) with a separate `GLM-5.3-Flash-BF16` repo for the unquantized checkpoint — the reverse of the GLM-5 / 5.1 / 5.2 pattern where bf16 was primary and FP8 the sibling. MIT licence, as with 5.2. Runtime modes: `reasoning_effort` ∈ {low, high, max} (max default) — the low level is new — and **`enable_thinking` is gone**: the template always opens a `<think>` block, so there is no non-thinking mode. `clear_thinking` now defaults to false, i.e. **full reasoning history is preserved by default**."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 45,
+      "hidden_dim": 4096,
+      "context_window": 1048576,
+      "context_window_notes": "1,048,576 native, carried over from GLM-5.2's 1M window. No YaRN or other scaling block is documented — the window is native. Long-context serving cost is the stated design driver: 'we introduce a hybrid architecture combining sparse and linear attention, sharply reducing long-context serving costs while preserving precise long-context capabilities'.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 64,
+      "num_kv_heads": "[Unknown/Not Disclosed]",
+      "head_dim": "[Unknown/Not Disclosed]",
+      "rope": {
+        "type": "none",
+        "base": "[Unknown/Not Disclosed]",
+        "scaling": null
+      },
+      "mla": {
+        "kv_lora_rank": 512,
+        "q_lora_rank": 1536,
+        "qk_nope_head_dim": 256,
+        "qk_rope_head_dim": 0,
+        "v_head_dim": 256
+      },
+      "variants": [
+        {
+          "name": "kda_linear_attention",
+          "family": "linear_attention",
+          "num_query_heads": 64,
+          "num_kv_heads": 64,
+          "head_dim": 128,
+          "rope": "Not applicable — linear attention carries position implicitly in its recurrent state.",
+          "notes": "**Z.AI adopts Kimi Delta Attention.** `config.text_config.linear_attn_config` = {num_heads: 64, head_dim: 128, short_conv_kernel_size: 4, gate_lower_bound: -5.0}, and the layer list is literally named `kda_layers`. This is the first time in this repo that a KDA-family linear attention appears outside Moonshot's own models (Kimi Linear → Kimi K3). `gate_lower_bound=-5.0` bounds the decay gate from below, capping how fast the recurrent state can be forgotten. 34 of 45 layers."
+        },
+        {
+          "name": "dsa_mla",
+          "family": "sparse_softmax_attention",
+          "num_query_heads": 64,
+          "num_kv_heads": "[Unknown/Not Disclosed]",
+          "head_dim": 256,
+          "rope": "**NoPE** — `mla_use_nope: true` with `qk_rope_head_dim: 0` and `qk_nope_head_dim: 256`. GLM's MLA path drops rotary position encoding entirely, relying on the interleaved KDA layers to carry position. This is the same choice Kimi K3 made and the opposite of Qwen3.8-Flash-Next, which tested NoPE and rejected it for post-training generation behaviour.",
+          "notes": "MLA with DSA sparsification (config layer type `deepseek_sparse_attention`). Down-projections `kv_lora_rank=512` / `q_lora_rank=1536` (narrower q path than GLM-5.2's 2048), `v_head_dim=256`. 11 of 45 layers."
+        }
+      ],
+      "layer_pattern": "(K,K,K,S)×11 + K with K=kda_linear_attention, S=dsa_mla. `config.text_config.layer_types` is 34 `linear_attention` + 11 `deepseek_sparse_attention`, with the sparse layers at indices 3, 7, 11, … 43 and a trailing KDA layer at 44. The same **3:1 linear-to-full cadence** Qwen uses in its hybrid line and Kimi K3 uses for KDA:Gated-MLA — three vendors independently converged on 3:1.",
+      "sparse_attention": {
+        "kind": "dsa",
+        "selection": "Top-k by lightning-indexer score, but over **pooled key blocks** rather than individual tokens: `index_kpool=4` with `index_kpool_compress=true` compresses the key sequence 4:1 before scoring, and `index_kpool_always_select_tail=true` forces the trailing (incomplete) block to always be selected.",
+        "top_k": 2048,
+        "indexer_heads": 32,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "4 (indexer keys pooled 4:1 before scoring — `index_kpool=4`, `index_kpool_compress=true`)",
+        "training_recipe": "[Unknown/Not Disclosed] — the model is described as starting from a newly trained base, so DSA is presumably trained in rather than retrofitted, but no recipe is given for either the indexer or the key-pooling.",
+        "notes": "**This is the same idea Qwen shipped as QSA, appearing at another vendor within days.** GLM-5.2's answer to DSA's residual O(L²) indexer cost was cross-layer index sharing (IndexShare); GLM-5.3-Flash's answer is within-layer key compression — which is precisely the trade Qwen's Qwen3.8-Flash-Next report argued for, on the grounds that cross-layer sharing weakens in hybrid stacks where full-attention layers are separated by linear-attention layers. GLM-5.3-Flash *is* such a hybrid stack, and it switched sides accordingly: `index_share_for_mtp_iteration=true` remains (index reuse into MTP steps), but the per-layer `indexer_types` Full/Shared partition of GLM-5.2 is gone — every one of the 11 sparse layers computes its own selection. See [qsa](../../docs/glossary/qsa.md) and [indexshare](../../docs/glossary/indexshare.md)."
+      },
+      "notes": "Three separate efficiency mechanisms compose in this stack: 3:1 KDA linear attention (constant-state token mixing on 34 layers), NoPE MLA (no rotary, low-rank KV) on the remaining 11, and key-pooled DSA on top of those 11. `head_dim` is set to 0 in the config because neither path uses the plain per-head dim."
+    },
+    "ffn": {
+      "ffn_type": "hybrid",
+      "dense_intermediate_size": 12288,
+      "moe": {
+        "num_experts": 288,
+        "num_active_experts": 8,
+        "shared_experts": 1,
+        "expert_intermediate_size": 2048,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Auxiliary-loss-free routing (`topk_method='noaux_tc'`) with sigmoid affinity scoring, `routed_scaling_factor=2.5`, `norm_topk_prob=true`, `n_group=1` / `topk_group=1`, `moe_router_dtype='float32'` — the GLM-5 line's routing carried over unchanged. Expert count rises 256 → **288** while per-expert width stays 2048 and top-k stays 8, so sparsity increases (8/288 ≈ 2.8% vs 8/256 = 3.1%). A `router_aux_loss_coef=0.001` key is also present alongside `noaux_tc`; under aux-loss-free routing this coefficient is not the primary balancing mechanism."
+      },
+      "layer_partition": "First 3 of 45 layers are dense FFN (intermediate_size=12288); the remaining 42 are MoE. `first_k_dense_replace=3`, and the config also enumerates `mlp_layer_types` (3 `dense` + 42 `sparse`). Note the dense layers coincide with KDA layers 0-2, so the bottom of the stack is linear-attention + dense-FFN throughout."
+    },
+    "components": {
+      "activation": "SwiGLU with **clamping** — `swiglu_limit: 10.0`, present in both the text config and the vision config. This is the same guard DeepSeek-V4 introduced as SwiGLU Clamping and that Qwen3.8-Flash-Next explicitly reports *not* needing; GLM adopts it here.",
+      "normalization": "RMSNorm, `rms_norm_eps=1e-05`. `attention_bias=false` on the text side; the vision encoder sets `attention_bias=true`.",
+      "embedding_notes": "`tie_word_embeddings=false`, `vocab_size=154880` — the GLM-5 line's vocabulary, unchanged, now carrying multimodal control ids: image 154854, video 154855, image_start/end 154830/154831, video_start/end 154832/154833. Three EOS ids (154820 / 154827 / 154829) and `pad_token_id=154820` as before."
+    },
+    "residual_connections": {
+      "kind": "mhc",
+      "expansion_factor": 4,
+      "constraint": "Manifold constraint via Sinkhorn-Knopp projection onto doubly stochastic matrices, `hc_eps=1e-06`.",
+      "iterations": 20,
+      "dynamic_parameterization": "[Unknown/Not Disclosed]",
+      "notes": "**Z.AI adopts DeepSeek-V4's Manifold-Constrained Hyper-Connections.** `mhc: true`, `hc_mult: 4` (4× widened residual stream), `hc_sinkhorn_iters: 20`, `hc_eps: 1e-06`. README: 'The model also adopts Manifold-Constrained Hyper-Connections (mHC) to further improve scaling efficiency.' The FP8 `modules_to_not_convert` list confirms the implementation ships per-layer `hc_attn_base` / `hc_attn_fn` / `hc_attn_scale` and `hc_ffn_*` tensors, all held out of quantization, plus a `hyper_connection` module — i.e. a separate mHC block for the attention and FFN sublayers of every layer, matching DeepSeek-V4's structure. Whether the read/write operators are data-dependent (as in mHC's dynamic form) is not stated. This is the **second vendor to ship mHC**, and it lands the same month Qwen shipped Gated Residual — a third design in the same widened-residual family that deliberately drops the Sinkhorn-constrained mixing operator GLM keeps here."
+    },
+    "auxiliary_modules": [
+      {
+        "name": "MTP layer",
+        "purpose": "multi_token_prediction / speculative_decoding",
+        "architecture": "`num_nextn_predict_layers=1`, parameter-shared MTP as in the GLM-5 line.",
+        "shipped_in_checkpoint": true,
+        "activation": "[Unknown/Not Disclosed] — README links SGLang / vLLM / TokenSpeed / KTransformers recipes rather than printing flags.",
+        "notes": "`index_share_for_mtp_iteration=true` carries over from GLM-5.2: the DSA top-k selections are reused across MTP speculative-decoding iterations rather than recomputed per step."
+      }
+    ],
+    "parallelism_notes": "[Unknown/Not Disclosed]. The model card defers to the GLM-5 family report (arXiv 2602.15763), which predates this architecture."
+  },
+  "training": {
+    "optimizer": "[Unknown/Not Disclosed] for GLM-5.3-Flash specifically. The GLM-5 family report documents Muon with Z.AI's 'Muon Split' per-head adaptation; whether that carries into the redesigned recipe is not stated.",
+    "lr_schedule": "[Unknown/Not Disclosed]",
+    "data_total_tokens": "30T (multimodal pre-training corpus; README: 'our latest 30T-token multimodal pre-training corpus')",
+    "data_mix": {},
+    "data_mix_notes": "The one concrete pre-training disclosure is the corpus size: a **30T-token multimodal corpus**, described as 'our latest'. No modality split, no domain mix, no curriculum. The model is explicitly a fresh base: 'GLM-5.3-Flash starts from a newly trained base model, with its architecture and training recipe redesigned around capability and efficiency.' The efficiency claim is the headline: 320B total / 18B active, outperforming GLM-5.2 'across benchmarks and real-world workloads at one-tenth the price, while approaching Claude Opus 4.8 on coding and agentic benchmarks'. No benchmark table is inlined in the model card (results are shipped as an image), so no numeric deltas are recorded here — see open_questions.",
+    "objectives": {
+      "multi_token_prediction": {
+        "depth": "[Unknown/Not Disclosed]",
+        "loss_weight_schedule": "[Unknown/Not Disclosed]",
+        "shared_modules": "`num_nextn_predict_layers=1`, parameter-shared, as in the GLM-5 line."
+      },
+      "fill_in_middle": null,
+      "other": []
+    },
+    "alignment": {
+      "sft": "[Unknown/Not Disclosed]",
+      "rl_method": "[Unknown/Not Disclosed]",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [],
+      "inference_modes": [
+        {
+          "name": "thinking / reasoning_effort=max",
+          "trigger": "Default, and unconditional — the template resolves `effective_reasoning_effort` before any thinking check and emits `<|system|>Reasoning Effort: Max` as the prompt prefix. Unlike GLM-5.2, the effort line is no longer guarded by `enable_thinking`, because there is no `enable_thinking`.",
+          "description": "Deepest reasoning level.",
+          "kwargs": {
+            "reasoning_effort": "max"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95"
+          }
+        },
+        {
+          "name": "thinking / reasoning_effort=high",
+          "trigger": "`reasoning_effort=\"high\"`. The template accepts `'low'` and `'high'` and silently falls back to `max` for anything else.",
+          "description": "Intermediate reasoning level.",
+          "kwargs": {
+            "reasoning_effort": "high"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "thinking / reasoning_effort=low",
+          "trigger": "`reasoning_effort=\"low\"`. **New in 5.3-Flash** — GLM-5.2 accepted only {high, max}.",
+          "description": "Cheapest reasoning level, extending the effort axis downward as the model targets Flash-tier cost.",
+          "kwargs": {
+            "reasoning_effort": "low"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "preserved thinking (default ON)",
+          "trigger": "Default. `clear_thinking` now defaults to `false` (`clear_thinking if clear_thinking is defined else false`), so `<think>` blocks from the entire history are retained unless the caller passes `clear_thinking=true`. GLM-5.2's default was the opposite — latest-turn-only.",
+          "description": "Full multi-turn reasoning carryover by default. The same default flip Qwen made with `preserve_thinking` in the Qwen3.8 generation, arrived at independently and expressed through the inverse-polarity kwarg.",
+          "kwargs": {
+            "clear_thinking": "false"
+          },
+          "sampling_recommended": {}
+        }
+      ],
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<tool_call>",
+        "end_token": "</tool_call>",
+        "arguments_schema": "GLM-line XML-like format with per-arg key/value blocks and tool schemas declared as JSON in a `<tools>` system block. The template adds a `tool_references_to_response` macro that expands a `tool_reference` back into a full `<tool_response><tools>…</tools></tool_response>` payload — the MCP-style lazy tool-loading mechanism introduced in GLM-5.1, now with an explicit rehydration path.",
+        "parser_flags": {},
+        "notes": "The README links SGLang / vLLM / TokenSpeed / KTransformers cookbooks rather than printing parser flags."
+      }
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed] for training. Notably the **primary released checkpoint is FP8** (e4m3, dynamic activation scaling) with bf16 shipped separately as `GLM-5.3-Flash-BF16`, inverting the GLM-5 / 5.1 / 5.2 convention."
+    },
+    "quantization": {
+      "weight_format": "FP8 (e4m3)",
+      "activation_format": "dynamic per-tensor scaling (`activation_scheme: dynamic`)",
+      "method": "[Unknown/Not Disclosed] — the config records the released format but not whether it came from QAT or post-hoc conversion. Z.AI used INT4 QAT during SFT for GLM-5; no equivalent statement is made here.",
+      "scope": "Backbone linear layers. Held out of quantization (`modules_to_not_convert`): the full mHC apparatus (`hyper_connection`, per-layer `hc_attn_base/fn/scale`, `hc_ffn_base/fn/scale`), all KDA state-path tensors (`A_log`, `dt_bias`, conv1d kernels, the a/b/f/g low-rank projections, `o_norm`), every layernorm, `lm_head`, `model.embed_tokens`, `mapping_proj`, and the `attn_mha` / `attn_mqa` paths.",
+      "granularity": "[Unknown/Not Disclosed]",
+      "stage": "Released-checkpoint format; the primary repo ships FP8 and `GLM-5.3-Flash-BF16` ships the unquantized weights.",
+      "notes": "The exclusion list is itself informative: it is a precise inventory of the components Z.AI considers numerically fragile — the widened-residual mHC operators and the linear-attention recurrent state path, exactly the two newest parts of the architecture."
+    },
+    "stability_notes": "Three guards visible in the config, all borrowed rather than invented: `swiglu_limit=10.0` (SwiGLU clamping, from DeepSeek-V4), `moe_router_dtype='float32'` (carried from GLM-5.2), and `gate_lower_bound=-5.0` on the KDA decay gate. The mHC Sinkhorn projection (`hc_sinkhorn_iters=20`) is also a stability-bearing constraint. No narrative stability discussion is published for this model."
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
+    "fusion": "native_early",
+    "fusion_notes": "**The first natively multimodal model in the GLM-5 series** (README). Vision tokens are inlined into the shared backbone via dedicated control ids (`<|begin_of_image|>` / `<|image|>` / `<|end_of_image|>` and the video equivalents), and `vision_config.out_hidden_size=4096` matches the LM hidden size. A `projection_intermediate_size=10240` indicates an MLP projector between encoder and backbone rather than direct dimension matching. Note the HF `pipeline_tag` is still `text-generation` despite the multimodal class and processor config — a metadata lag, not a capability statement.",
+    "vision_encoder": {
+      "architecture": "ViT (`vision_config.model_type = glm5_next_vision`), 24 layers, `attention_bias=true`, SwiGLU with the same `swiglu_limit=10.0` clamp as the text side. Fixed `image_size=448` rather than the native-resolution approach Qwen and Moonshot use.",
+      "depth": 24,
+      "hidden_size": 1024,
+      "intermediate_size": 4096,
+      "num_heads": 16,
+      "patch_size": 14,
+      "in_channels": 3,
+      "output_dim": 4096,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": 2,
+      "notes": "`hidden_act=silu`, `rms_norm_eps=1e-05`, `projection_intermediate_size=10240`. A compact encoder relative to the models it sits alongside (Qwen3.8's is 27 layers / 1152 hidden; Kimi's MoonViT-V2 is trained from scratch at larger scale), consistent with the Flash-tier cost target."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 154854,
+      "video_token_id": 154855,
+      "vision_start_token_id": 154830,
+      "vision_end_token_id": 154831
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": "**The chat template contains an `emit_audio()` macro** that renders `<|begin_of_audio|><|end_of_audio|>` for `audio` / `audio_url` / `input_audio` content items — but the config declares no audio encoder and no audio token id, and the README claims only image and video. Either the audio path is scaffolding for a future release or it is served by a component not present in this checkpoint. Recorded as UNKNOWN rather than claimed; see open_questions."
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "**No numeric benchmark table is published in the model card** — results ship only as a rendered image (`bench_53.png`), so no GLM-5.3-Flash vs GLM-5.2 deltas are recorded in this extraction. The card's prose claims are: outperforms GLM-5.2 across benchmarks and real-world workloads at one-tenth the price, and approaches Claude Opus 4.8 on coding and agentic benchmarks. If Z.AI publishes a text table (as it did for 5.2), re-extract.",
+    "**The chat template handles audio but nothing else does.** `emit_audio()` renders audio control tokens, yet there is no audio encoder in the config, no audio token id, and no audio claim in the README. Whether this is forward-looking scaffolding or an undocumented capability is unresolved.",
+    "Post-training is entirely undisclosed — no SFT, no RL algorithm, no reward design, no agentic-environment description, despite agentic capability being the headline claim.",
+    "Optimizer and training recipe for the redesigned architecture are undisclosed. The model card defers to the February GLM-5 report, which predates this architecture and cannot cover it. Given how much changed (KDA, NoPE MLA, mHC, key-pooled DSA), the deferral leaves the entire optimization story unknown.",
+    "Whether the FP8 primary checkpoint came from quantization-aware training or post-hoc conversion is not stated. Z.AI used INT4 QAT during SFT for GLM-5, so a QAT path would be in character, but `training.quantization.method` is recorded UNKNOWN rather than assumed.",
+    "mHC's read/write operators may be static or data-dependent; the config exposes only `mhc`, `hc_mult`, `hc_sinkhorn_iters` and `hc_eps`, so `dynamic_parameterization` is UNKNOWN. DeepSeek-V4's own records would predict dynamic, but that is a cross-model prior, not evidence.",
+    "The 30T-token corpus is described as multimodal but no text/image/video split is given, and it is not stated how it relates to the corpus behind GLM-5 / 5.2.",
+    "HF `pipeline_tag` is `text-generation` while the model is natively multimodal with a processor config. Treated as vendor metadata lag; worth re-checking if downstream tooling routes on the tag.",
+    "GLM-5.3-Flash is a **Flash-tier model with no full-size sibling released** — there is no GLM-5.3. Whether the `glm5_next` architecture will carry a flagship, and whether this Flash release is functioning as a public preview the way Qwen3.8-Flash-Next does for Qwen4, is not stated.",
+    "Cached blog.html at z.ai/blog/glm-5.3-flash is a client-side-rendered SPA shell (0 characters of extractable text), so blog content was unavailable at extraction time."
+  ]
+}
