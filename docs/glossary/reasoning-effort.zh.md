@@ -30,14 +30,15 @@
 
 ## 使用此技术的模型
 
-| 模型 | 变体 / 细节 |
-| ---- | ----------- |
-| DeepSeek-V4-Pro | 三档：`non-think` / `think-high` / `think-max`。`think-max` 通过在 system prompt 前置一段特殊指令实现（"Reasoning Effort: Absolute maximum with no shortcuts permitted…"）；`non-think` 则是靠*没有*这个前缀来选中，所以强度前缀是唯一载体。 |
-| DeepSeek-V4-Flash | 与 V4-Pro 相同的三档结构、相同的 prompt 前缀机制。 |
-| DeepSeek-V4-Flash-0731 | 正式版**重命名了档位**：预览版的最高档 "Think Max" 前缀现在叫 `high`，而 `max` 是新增的、更强的一档。`encoding/README.md` 把每一档的前缀原文都钉死了——本仓库里文档最精确的实现。 |
-| Kimi K3 | 顶层 `reasoning_effort` 请求字段（默认 `max` / `high` / `low`）。chat template 把它渲染为类型为 `thinking-effort` 的全局 option message，放在工具声明之后、对话之前——是*带类型的槽位*而非自由散文。K3 根本没有思考开关，强度是唯一的深度控制。 |
-| Qwen3.8-27B | `reasoning_effort` chat-template kwarg，档位 `xhigh`（默认）/ `medium` / `low`；非法值直接抛异常。实现方式是把指令注入 system message（没有 system 就合成一个，有工具就前置到 tools system 块里）。**`medium` 不注入任何文本**，所以「中间档」其实是无指令的基线，只有两个极端被引导。`enable_thinking=false` 时整段逻辑被跳过。 |
-| Qwen3.8-2.4T-A95B | 与 27B 相同的三档和相同的注入机制，但档位解析是*无条件*的——因为模板拒绝 `enable_thinking=false`，没有 non-thinking 分支可跳过。 |
+| 模型                   | 变体 / 细节                                                                                                                                                                                                                                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DeepSeek-V4-Pro        | 三档：`non-think` / `think-high` / `think-max`。`think-max` 通过在 system prompt 前置一段特殊指令实现（"Reasoning Effort: Absolute maximum with no shortcuts permitted…"）；`non-think` 则是靠*没有*这个前缀来选中，所以强度前缀是唯一载体。                                                                                     |
+| DeepSeek-V4-Flash      | 与 V4-Pro 相同的三档结构、相同的 prompt 前缀机制。                                                                                                                                                                                                                                                                               |
+| DeepSeek-V4-Flash-0731 | 正式版**重命名了档位**：预览版的最高档 "Think Max" 前缀现在叫 `high`，而 `max` 是新增的、更强的一档。`encoding/README.md` 把每一档的前缀原文都钉死了——本仓库里文档最精确的实现。                                                                                                                                                 |
+| Kimi K3                | 顶层 `reasoning_effort` 请求字段（默认 `max` / `high` / `low`）。chat template 把它渲染为类型为 `thinking-effort` 的全局 option message，放在工具声明之后、对话之前——是*带类型的槽位*而非自由散文。K3 根本没有思考开关，强度是唯一的深度控制。                                                                                   |
+| Qwen3.8-27B            | `reasoning_effort` chat-template kwarg，档位 `xhigh`（默认）/ `medium` / `low`；非法值直接抛异常。实现方式是把指令注入 system message（没有 system 就合成一个，有工具就前置到 tools system 块里）。**`medium` 不注入任何文本**，所以「中间档」其实是无指令的基线，只有两个极端被引导。`enable_thinking=false` 时整段逻辑被跳过。 |
+| Qwen3.8-2.4T-A95B      | 与 27B 相同的三档和相同的注入机制，但档位解析是*无条件*的——因为模板拒绝 `enable_thinking=false`，没有 non-thinking 分支可跳过。                                                                                                                                                                                                  |
+| Qwen3.8-Flash-Next     | 与 Qwen3.8-27B 完全相同——`chat_template.jinja` 是逐字节相同的文件（仅差一个结尾换行），因此是同样的三档、同样的注入字符串、同样「medium 什么都不注入」的怪癖。这点值得记下，因为这个模型*其他所有部分*都是全新架构：运行时控制接口被刻意跨架构代际保持不变。                                                                     |
 
 ## 相关技术
 

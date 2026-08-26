@@ -73,15 +73,15 @@ and into the Gated DeltaNet V state (48 → 128 heads).
 **Benchmarks** (model card, labelled Qwen3.8-Max; columns are Opus 4.8, Fable 5,
 GPT 5.6 Sol (max), Qwen3.7-Max, Qwen3.8-Max):
 
-| Benchmark | Qwen3.7-Max | Qwen3.8-Max |
-| --- | --- | --- |
-| Terminal Bench 2.1 | 74.5 | 86.6 |
-| SWE-bench Pro | 60.6 | 67.7 |
-| DeepSWE 1.1 | 21.6 | 56.6 |
-| FrontierSWE | 40.7 | 73.5 |
-| QwenSWEBench | 63.4 | 80.7 |
-| CoWorkBench | 64.6 | 74.8 |
-| JobBench | 31.3 | 53.4 |
+| Benchmark                        | Qwen3.7-Max | Qwen3.8-Max |
+| -------------------------------- | ----------- | ----------- |
+| Terminal Bench 2.1               | 74.5        | 86.6        |
+| SWE-bench Pro                    | 60.6        | 67.7        |
+| DeepSWE 1.1                      | 21.6        | 56.6        |
+| FrontierSWE                      | 40.7        | 73.5        |
+| QwenSWEBench                     | 63.4        | 80.7        |
+| CoWorkBench                      | 64.6        | 74.8        |
+| JobBench                         | 31.3        | 53.4        |
 | Agents' Last Exam (pass / score) | 11.8 / 31.1 | 27.0 / 52.4 |
-| GPQA Diamond | 92.4 | 92.6 |
-| HLE | 41.4 | 43.6 |
+| GPQA Diamond                     | 92.4        | 92.6        |
+| HLE                              | 41.4        | 43.6        |

@@ -6,7 +6,7 @@ A structured, continuously updatable knowledge base that tracks and decomposes t
 
 ## Status
 
-**M1 in progress.** 20 models extracted across 4 vendors (DeepSeek, Qwen, Kimi, Z.AI), all validating against schema v7. Newest records: Qwen3.8-27B, Qwen3.8-2.4T-A95B (the first open-weight Qwen-Max-class model), Kimi K3. No synthesis layer yet — that starts once M1's extraction bar is met.
+**M1 in progress.** 21 models extracted across 4 vendors (DeepSeek, Qwen, Kimi, Z.AI), all validating against schema v7. Newest records: Qwen3.8-Flash-Next (a Qwen4 architecture preview, and the first Qwen record backed by a technical report), Qwen3.8-2.4T-A95B (the first open-weight Qwen-Max-class model), Qwen3.8-27B. No synthesis layer yet — that starts once M1's extraction bar is met.
 
 Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./docs/roadmap.md) for the strategic roadmap and [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) for per-model status.
 

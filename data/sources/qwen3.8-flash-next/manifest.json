@@ -1,0 +1,82 @@
+{
+  "slug": "qwen3.8-flash-next",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.8-Flash-Next HuggingFace config.json",
+      "sha256": "889658f2508e8c61d409b02e70e0d78d8d4452ec65aaafbe129805d213d2e74b",
+      "size_bytes": 4745,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "HF chat_template.jinja — split out of tokenizer_config.json in this release",
+      "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "size_bytes": 8952,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json",
+      "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+      "size_bytes": 17928,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "preprocessor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/preprocessor_config.json",
+      "archive_url": null,
+      "filename": "preprocessor_config.json",
+      "description": "HF preprocessor_config.json — vision encoder image preprocessing",
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "size_bytes": 390,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — architecture summary, benchmarks, best practices",
+      "sha256": "d75f249f4024af64518a5cb1fbb3d3f133eb09d3bce40be48df2e456e1c8cf46",
+      "size_bytes": 64796,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "tech_report",
+      "kind": "tech_report",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen3.8-Flash-Next/main/tech_report.pdf",
+      "archive_url": null,
+      "filename": "tech_report.pdf",
+      "description": "Qwen3.8-Flash-Next technical report PDF (QwenLM/Qwen3.8-Flash-Next GitHub repo) — the first Qwen 3.x tech report",
+      "sha256": "04f263446d74a35cb7cea368574e0c561f3b05c133be2c777ac884404063655d",
+      "size_bytes": 2366146,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.8-flash-next",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post for Qwen3.8-Flash-Next; SPA so saved HTML may be JS shell only",
+      "sha256": "404824398784e1ef30264121d458a612811e424fa56354a1383d4073deda2ce2",
+      "size_bytes": 94358,
+      "fetched_at": "2026-08-27"
+    }
+  ]
+}

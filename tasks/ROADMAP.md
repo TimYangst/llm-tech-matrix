@@ -4,11 +4,36 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — **Qwen3.8 batch: the open-weight Qwen line rejoins the front, and a
-Max-class model opens for the first time.** Two slugs added (`qwen3.8-27b`,
-`qwen3.8-2.4t-a95b`), taking the repo to **20 extractions across 4 vendors**, all on
-schema v7 with **no schema bump required** — the v6/v7 fields absorbed both records
-cleanly, including a brand-new runtime-control axis.
+**Phase:** M1 — **Qwen3.8 batch, then a Qwen4 architecture preview.** Three slugs added
+(`qwen3.8-27b`, `qwen3.8-2.4t-a95b`, `qwen3.8-flash-next`), taking the repo to
+**21 extractions across 4 vendors**, all on schema v7 with **no schema bump required**.
+
+**`qwen3.8-flash-next` is the most important record of the batch, and it is not a Qwen3.8
+model.** Despite the name, its HF class is `Qwen4ExpForConditionalGeneration` (model_type
+`qwen4_exp`) and the card says plainly: *"This experimental preview of the architecture
+that will underpin Qwen4."* It also breaks a two-year drought — **it is the first Qwen 3.x
+record in this repo backed by an actual technical report.** Every prior Qwen extraction
+carried "no technical report exists" as an open question and had UNKNOWN across the entire
+optimizer / stability / scaling-law surface; this one has 20 pages of ablations. Four new
+load-bearing components: **QSA** (DSA-descended sparse attention that compresses the
+*indexer's own input* into micro-blocks, dropping indexing from O(n²) to O(n²/r) — 7.6×
+prefill / 4.9× decode at 1M), **Gated Residual** (4-branch widened stream, elementwise
+data-dependent read gate, per-branch scalar write, `H_res` deleted), **N-gram embedding**
+(51B params in a 20M-entry table held in *host memory* and prefetched, at layer 2 so the
+fetch overlaps layer 1), and a carefully partitioned **Muon/AdamW** recipe. 125B total but
+only **6B activated** — it beats Qwen3.8-27B-Base on all 14 base benchmarks and the ~3×
+larger Qwen3.7-Plus-Base (397B-A17B) on 8 of 14, at ~1/3 the activated params, ~1/3 the
+tokens and ~1/9 the training FLOPs.
+
+Three cross-vendor facts this record establishes: Qwen is now the **third vendor shipping
+DSA-lineage sparse attention** (after DeepSeek and Z.AI) and the first to attack the
+indexer's own asymptotic cost; **every major vendor in the repo is now on Muon**; and Qwen
+reports full-scale training with **no loss spikes and neither qk-clip (Kimi) nor
+SwiGLU-clip (DeepSeek-V4)**, attributing the margin to Gated Residual — a structural fix
+replacing two vendors' explicit clipping crutches. It also settles the RoPE-vs-NoPE
+question in the opposite direction from Kimi K3: Qwen tested NoPE, found it
+indistinguishable in pre-training but prone to "a substantially higher rate of endless
+generation after post-training", and kept RoPE.
 
 **Qwen3.8-27B** (2026-08-05, Apache-2.0) is the cleanest frozen-architecture record in
 the repo. Its `config.json` is **byte-identical to Qwen3.6-27B except
@@ -154,6 +179,7 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 
 **In progress (sourcing → extracting):**
 
+- ✅ `qwen3.8-flash-next` — **Qwen4 architecture preview** shipped under a 3.8 name (Aug 2026, 125B / 6B active + 51B off-accelerator n-gram embeddings) — **extracted** (HF class `Qwen4ExpForConditionalGeneration`; first Qwen record with a real tech report; QSA micro-block sparse attention, Gated Residual, n-gram embedding tables in host memory, Muon/AdamW split recipe; third vendor on DSA-lineage sparse attention)
 - ✅ `qwen3.8-27b` — Qwen3.8 dense (Aug 2026, 27B, native VL) — **extracted** (config byte-identical to Qwen3.6-27B except `transformers_version` — a frozen backbone across 3.5 → 3.6 → 3.8; adds `reasoning_effort` xhigh/medium/low as system-message injection; `preserve_thinking` default flips OFF → ON)
 - ✅ `qwen3.8-2.4t-a95b` — Qwen3.8 Max-class MoE (Aug 2026, 2.4T / 95B active) — **extracted** (first open-weight Qwen-Max; largest record in the repo; text-only unlike every prior Qwen 3.x open checkpoint; first model in the repo with no non-thinking mode; 512 experts top-10 + 1 shared under classic aux-loss; custom `qwen3.8-max` licence)
 - ✅ `kimi-k3` — Kimi K3 (Jul 2026, 2.8T / 104B active, native multimodal, 1M ctx) — **extracted** (full architecture rewrite: KDA + Gated MLA 3:1 with NoPE; Block AttnRes at 12-layer blocks; Stable LatentMoE 896/16 in a 3584-wide latent space with SiTU-GLU + Quantile Balancing; Per-Head Muon; MXFP4 weights + MXFP8 activations QAT from SFT through RL; MoonViT-V2 trained from scratch; nine domain×effort RL experts consolidated by MOPD; XTML chat template; schema-v7 driver)
@@ -191,7 +217,7 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 - Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
 - Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
-**Recommended next (after this batch):** 20 extractions, 4 vendors, schema v7 holding.
+**Recommended next (after this batch):** 21 extractions, 4 vendors, schema v7 holding.
 Highest-value next work, in order:
 
 1. **Close the DeepSeek lineage.** `deepseek-v3.1` / `v3.1-terminus` is now the most
@@ -199,7 +225,7 @@ Highest-value next work, in order:
    V3.2-Exp benchmark row currently compares against a model with no record. Then
    `deepseek-v3.2` (the non-Exp 2025-12 release) and `deepseek-r1`.
 2. **A closed model — and `qwen3.7-max` is now the cheapest way in.** `inferred_fields`
-   is *still* empty across all 20 open-weight extractions, so the mechanism the schema was
+   is *still* empty across all 21 open-weight extractions, so the mechanism the schema was
    designed around has never been exercised. Qwen3.7-Max / 3.7-Plus (API-only, 2026-05/06)
    is the strongest candidate: it fills the one unobservable generation in an otherwise
    fully-extracted Qwen lineage, and same-family architectural priors make the inferences
@@ -248,9 +274,12 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 > since (verified against the HF `Qwen` org listing). **Qwen3.7 opened nothing at all**;
 > it exists only as hosted API models (Qwen3.7-Max 2026-05, Qwen3.7-Plus 2026-06), so the
 > open-weight lineage runs 3.6 → 3.8 and 3.7 is tracked in the closed-models table.
-> Qwen3.8 opened two: 27B dense (Apache-2.0, native VL) and 2.4T-A95B (custom
-> `qwen3.8-max` licence, text-only). We extract six Qwen 3.x slugs total: dense 27B +
-> smaller MoE 35B-A3B from 3.5 and 3.6, then 27B + the 2.4T Max-class model from 3.8.
+> Qwen3.8 opened three, under **three different licences**: 27B dense (Apache-2.0,
+> native VL), 2.4T-A95B (custom `qwen3.8-max`, text-only), and **Qwen3.8-Flash-Next**
+> (custom `qwen-community-1.0`) — which despite its 3.8 name is a **Qwen4 architecture
+> preview** (`Qwen4ExpForConditionalGeneration`) and should not be read as a 3.8 sibling.
+> We extract seven Qwen 3.x slugs total: dense 27B + smaller MoE 35B-A3B from 3.5 and 3.6,
+> then 27B + the 2.4T Max-class model + Flash-Next from 3.8.
 > Same-size cross-version compare (27B at 3.5 / 3.6 / 3.8) is the cleanest signal for the
 > per-generation delta, and it is what established that the backbone has been frozen for
 > three generations.
@@ -268,6 +297,25 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 > deferred, but **Kimi-Linear-48B-A3B has been promoted to a recommended next**: it is the
 > KDA origin K3 builds on, so it now anchors a glossary entry the way DeepSeek-V3.2-Exp
 > anchors DSA.
+
+**Recently completed (2026-08-27):**
+
+- `qwen3.8-flash-next` — the batch's most consequential record, and a Qwen4 architecture
+  preview wearing a 3.8 version number. **First Qwen 3.x extraction backed by a real
+  technical report**, which retires the standing "no Qwen tech report exists" open question
+  and fills the optimizer / stability / scaling-law surface that had been UNKNOWN across
+  every prior Qwen record. 125B total / 6B activated / 48L / hidden 2560 / 512 experts
+  top-10 + 1 shared, plus 51B of n-gram embedding tables held in host memory and 4B of MTP.
+- 3 new bilingual glossary entries: **qsa**, **gated-residual**, **ngram-embedding**.
+  "Used by" rows added to DSA (QSA as descendant), mHC (GR as sibling), AttnRes (as the
+  vendor's own head-to-head baseline), Muon (Qwen joins), Gated DeltaNet (sigmoid output
+  gate + zero-centered RMSNorm), MTP, mRoPE (the NoPE rejection), GQA, YaRN,
+  hybrid-thinking, reasoning-effort and speculative-decoding.
+- Still **no schema bump** — v7 absorbed a genuinely new architecture. Two fits were
+  stretched and are recorded as open questions rather than papered over: the n-gram
+  embedding sits in `auxiliary_modules` despite being inside the forward pass, and
+  three-way parameter accounting (125B + 51B + 4B) does not fit a single `params_total`
+  string.
 
 **Recently completed (2026-08-20):**
 
@@ -444,19 +492,20 @@ older projection-fusion multimodal models below them. They sit in this table bec
 their primary characterization includes vision, not because they're a "VL extension"
 of a text-only LM.
 
-| Slug              | Family  | Status      | Notes file                                                 | Source priority                                                                                                                                                                                         |
-| ----------------- | ------- | ----------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `qwen3.5-35b-a3b` | Qwen    | `extracted` | [`models/qwen3.5-35b-a3b.md`](./models/qwen3.5-35b-a3b.md) | Qwen3.5 MoE — hybrid (10×(3 DeltaNet + 1 GatedAttn)) + 256-expert MoE (top-8 + 1 shared, w 512); native VL                                                                                              |
-| `qwen3.5-27b`     | Qwen    | `extracted` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)         | Qwen3.5 dense — hybrid backbone (16×(3 DeltaNet + 1 GatedAttn)), FFN dense 17408, native VL                                                                                                             |
-| `qwen3.6-35b-a3b` | Qwen    | `extracted` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md) | Qwen3.6 MoE — architecturally identical to Qwen3.5-35B-A3B (same `Qwen3_5MoeForConditionalGeneration` HF class); deltas: `preserve_thinking` 3rd mode + agentic-coding focus                            |
-| `qwen3.6-27b`     | Qwen    | `extracted` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)         | Qwen3.6 dense — architecturally identical to Qwen3.5-27B; deltas: `preserve_thinking` 3rd inference mode + agentic-coding post-training focus                                                           |
-| `kimi-k2.5`       | Kimi    | `extracted` | [`models/kimi-k2.5.md`](./models/kimi-k2.5.md)             | Kimi K2.5 — native multimodal continual-pretrain on K2-base; MoonViT-3D + MLP projector; Agent Swarm via PARL; zero-vision SFT; INT4 QAT inherited from K2-Thinking                                     |
-| `kimi-k3`         | Kimi    | `extracted` | [`models/kimi-k3.md`](./models/kimi-k3.md)                 | Kimi K3 — 2.8T/104B, KDA + Gated MLA 3:1, AttnRes, Stable LatentMoE 896/16, SiTU-GLU, NoPE, MXFP4/MXFP8 QAT, MoonViT-V2 from scratch. Full rewrite of the K2 architecture; schema-v7 driver             |
-| `kimi-k2.6`       | Kimi    | `extracted` | [`models/kimi-k2.6.md`](./models/kimi-k2.6.md)             | Kimi K2.6 — post-training-only refresh of K2.5; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus                              |
-| `qwen3.8-27b`     | Qwen    | `extracted` | [`models/qwen3.8-27b.md`](./models/qwen3.8-27b.md)         | Qwen3.8 dense — `config.json` byte-identical to Qwen3.6-27B except `transformers_version`; frozen backbone across 3.5 → 3.6 → 3.8. Deltas: `reasoning_effort` 3 levels, `preserve_thinking` default ON. |
-| `qwen-2.5-vl-72b` | Qwen    | `backlog`   | —                                                          | Vision encoder + projection fusion                                                                                                                                                                      |
-| `minicpm-v-2.6`   | MiniCPM | `backlog`   | —                                                          | Compact multimodal                                                                                                                                                                                      |
-| `glm-4v`          | GLM     | `backlog`   | —                                                          | Native vs projected fusion comparison                                                                                                                                                                   |
+| Slug                 | Family  | Status      | Notes file                                                       | Source priority                                                                                                                                                                                                                                                                             |
+| -------------------- | ------- | ----------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `qwen3.5-35b-a3b`    | Qwen    | `extracted` | [`models/qwen3.5-35b-a3b.md`](./models/qwen3.5-35b-a3b.md)       | Qwen3.5 MoE — hybrid (10×(3 DeltaNet + 1 GatedAttn)) + 256-expert MoE (top-8 + 1 shared, w 512); native VL                                                                                                                                                                                  |
+| `qwen3.5-27b`        | Qwen    | `extracted` | [`models/qwen3.5-27b.md`](./models/qwen3.5-27b.md)               | Qwen3.5 dense — hybrid backbone (16×(3 DeltaNet + 1 GatedAttn)), FFN dense 17408, native VL                                                                                                                                                                                                 |
+| `qwen3.6-35b-a3b`    | Qwen    | `extracted` | [`models/qwen3.6-35b-a3b.md`](./models/qwen3.6-35b-a3b.md)       | Qwen3.6 MoE — architecturally identical to Qwen3.5-35B-A3B (same `Qwen3_5MoeForConditionalGeneration` HF class); deltas: `preserve_thinking` 3rd mode + agentic-coding focus                                                                                                                |
+| `qwen3.6-27b`        | Qwen    | `extracted` | [`models/qwen3.6-27b.md`](./models/qwen3.6-27b.md)               | Qwen3.6 dense — architecturally identical to Qwen3.5-27B; deltas: `preserve_thinking` 3rd inference mode + agentic-coding post-training focus                                                                                                                                               |
+| `kimi-k2.5`          | Kimi    | `extracted` | [`models/kimi-k2.5.md`](./models/kimi-k2.5.md)                   | Kimi K2.5 — native multimodal continual-pretrain on K2-base; MoonViT-3D + MLP projector; Agent Swarm via PARL; zero-vision SFT; INT4 QAT inherited from K2-Thinking                                                                                                                         |
+| `kimi-k3`            | Kimi    | `extracted` | [`models/kimi-k3.md`](./models/kimi-k3.md)                       | Kimi K3 — 2.8T/104B, KDA + Gated MLA 3:1, AttnRes, Stable LatentMoE 896/16, SiTU-GLU, NoPE, MXFP4/MXFP8 QAT, MoonViT-V2 from scratch. Full rewrite of the K2 architecture; schema-v7 driver                                                                                                 |
+| `kimi-k2.6`          | Kimi    | `extracted` | [`models/kimi-k2.6.md`](./models/kimi-k2.6.md)                   | Kimi K2.6 — post-training-only refresh of K2.5; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus                                                                                                                  |
+| `qwen3.8-flash-next` | Qwen    | `extracted` | [`models/qwen3.8-flash-next.md`](./models/qwen3.8-flash-next.md) | **Qwen4 architecture preview** under a 3.8 name (`Qwen4ExpForConditionalGeneration`). 125B / 6B active + 51B host-memory n-gram embeddings + 4B MTP. QSA micro-block sparse attention, Gated Residual (4 branches, no `H_res`), Muon/AdamW split. **First Qwen record with a tech report.** |
+| `qwen3.8-27b`        | Qwen    | `extracted` | [`models/qwen3.8-27b.md`](./models/qwen3.8-27b.md)               | Qwen3.8 dense — `config.json` byte-identical to Qwen3.6-27B except `transformers_version`; frozen backbone across 3.5 → 3.6 → 3.8. Deltas: `reasoning_effort` 3 levels, `preserve_thinking` default ON.                                                                                     |
+| `qwen-2.5-vl-72b`    | Qwen    | `backlog`   | —                                                                | Vision encoder + projection fusion                                                                                                                                                                                                                                                          |
+| `minicpm-v-2.6`      | MiniCPM | `backlog`   | —                                                                | Compact multimodal                                                                                                                                                                                                                                                                          |
+| `glm-4v`             | GLM     | `backlog`   | —                                                                | Native vs projected fusion comparison                                                                                                                                                                                                                                                       |
 
 ## M1 — Closed models (inference)
 

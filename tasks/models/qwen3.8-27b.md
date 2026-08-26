@@ -76,15 +76,15 @@ to Qwen3.5-27B.
 **Benchmarks vs Qwen3.6-27B** (from the model card; comparison columns are Qwen3.6-27B,
 Qwen3.7-Plus, Muse Glimmer-30B, Opus 4.6 Max):
 
-| Benchmark | 3.6-27B | 3.8-27B |
-| --- | --- | --- |
-| Terminal Bench 2.1 (Terminus) | 63.4 | 73.0 |
-| SWE-bench Pro | 53.5 | 61.7 |
-| NL2Repo-Bench | 36.2 | 42.3 |
-| DeepSWE 1.1 | 13.3 | 42.2 |
-| QwenSWEBench | 49.3 | 79.0 |
-| CoWorkBench | 61.0 | 70.7 |
-| JobBench | 21.8 | 33.4 |
+| Benchmark                          | 3.6-27B     | 3.8-27B     |
+| ---------------------------------- | ----------- | ----------- |
+| Terminal Bench 2.1 (Terminus)      | 63.4        | 73.0        |
+| SWE-bench Pro                      | 53.5        | 61.7        |
+| NL2Repo-Bench                      | 36.2        | 42.3        |
+| DeepSWE 1.1                        | 13.3        | 42.2        |
+| QwenSWEBench                       | 49.3        | 79.0        |
+| CoWorkBench                        | 61.0        | 70.7        |
+| JobBench                           | 21.8        | 33.4        |
 | Agents' Last Exam (pass@1 / score) | 10.6 / 27.3 | 20.4 / 42.9 |
 
 **Open vs hosted**: the README says a hosted Qwen3.8-27B is coming on Qwen Cloud with
