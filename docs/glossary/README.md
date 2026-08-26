@@ -34,6 +34,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
 - [Kimi Delta Attention (KDA)](./kda.md)
 - [Qwen Sparse Attention (QSA)](./qsa.md)
+- [IndexShare / IndexCache (cross-layer index reuse)](./indexshare.md)
 
 ### FFN / MoE
 

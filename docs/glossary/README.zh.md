@@ -27,6 +27,7 @@
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
 - [Kimi Delta Attention (KDA)](./kda.zh.md)
 - [Qwen 稀疏注意力（QSA）](./qsa.zh.md)
+- [IndexShare / IndexCache（跨层索引复用）](./indexshare.zh.md)
 
 ### FFN / MoE
 

@@ -39,6 +39,8 @@
 | Qwen3.8-27B            | `reasoning_effort` chat-template kwarg，档位 `xhigh`（默认）/ `medium` / `low`；非法值直接抛异常。实现方式是把指令注入 system message（没有 system 就合成一个，有工具就前置到 tools system 块里）。**`medium` 不注入任何文本**，所以「中间档」其实是无指令的基线，只有两个极端被引导。`enable_thinking=false` 时整段逻辑被跳过。 |
 | Qwen3.8-2.4T-A95B      | 与 27B 相同的三档和相同的注入机制，但档位解析是*无条件*的——因为模板拒绝 `enable_thinking=false`，没有 non-thinking 分支可跳过。                                                                                                                                                                                                  |
 | Qwen3.8-Flash-Next     | 与 Qwen3.8-27B 完全相同——`chat_template.jinja` 是逐字节相同的文件（仅差一个结尾换行），因此是同样的三档、同样的注入字符串、同样「medium 什么都不注入」的怪癖。这点值得记下，因为这个模型*其他所有部分*都是全新架构：运行时控制接口被刻意跨架构代际保持不变。                                                                     |
+| GLM-5.2                | **GLM 第一个带强度档位的模型。** 只有两档：`reasoning_effort` ∈ {high, max}，默认 `max`，以 \`\<                                                                                                                                                                                                                                 |
+| GLM-5.3-Flash          | 新增 **`low`** 档：{low, high, max}，默认仍是 `max`，仍是系统提示前缀。由于 `enable_thinking` 被移除，档位解析变成无条件的——没有 non-thinking 分支可跳过。未知值同样静默回退到 `max`。                                                                                                                                           |
 
 ## 相关技术
 
