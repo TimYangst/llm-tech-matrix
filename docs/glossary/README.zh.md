@@ -26,6 +26,7 @@
 - [DeepSeek Sparse Attention (DSA)](./dsa.zh.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
 - [Kimi Delta Attention (KDA)](./kda.zh.md)
+- [Qwen 稀疏注意力（QSA）](./qsa.zh.md)
 
 ### FFN / MoE
 
@@ -33,6 +34,7 @@
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.zh.md)
 - [Global-batch load balancing](./global-batch-load-balancing.zh.md)
 - [Stable LatentMoE（LatentMoE + SiTU-GLU + Quantile Balancing）](./latentmoe.zh.md)
+- [N-gram 嵌入（卸载到主机内存的容量扩展）](./ngram-embedding.zh.md)
 
 ### 训练目标（Training objectives）
 
@@ -45,6 +47,7 @@
 - [Hybrid Thinking（chat-template 思考模式融合）](./hybrid-thinking.zh.md)
 - [On-Policy Distillation（多教师 OPD）](./on-policy-distillation.zh.md)
 - [Agent Swarm — 并行智能体 RL（PARL）](./agent-swarm.zh.md)
+- [推理强度控制（Reasoning-effort control）](./reasoning-effort.zh.md)
 
 ### 位置编码 / 长上下文
 
@@ -75,3 +78,4 @@
 
 - [Manifold-Constrained Hyper-Connections (mHC)](./mhc.zh.md)
 - [Attention Residuals (AttnRes)](./attnres.zh.md)
+- [门控残差（Gated Residual, GR）](./gated-residual.zh.md)

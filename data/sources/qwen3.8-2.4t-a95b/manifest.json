@@ -1,0 +1,49 @@
+{
+  "slug": "qwen3.8-2.4t-a95b",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Qwen3.8-2.4T-A95B HuggingFace config.json",
+      "sha256": "4e3819548967e319ab435d044a3a331dbe3b078590ce822e9d74b79430533987",
+      "size_bytes": 3951,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json — chat_template with the new reasoning_effort kwarg",
+      "sha256": "a4a70308585bebf75f240af83d569586dbcce75626ec324e2f4fe82a72153623",
+      "size_bytes": 16438,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — architecture summary, benchmarks, best practices",
+      "sha256": "7690c680c2d6eb284179ef5dd4db63260d248531cae9087b09b2c2200230f331",
+      "size_bytes": 35755,
+      "fetched_at": "2026-08-20"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://qwen.ai/blog?id=qwen3.8",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Qwen Team blog post 'Qwen3.8-Max: A New Bar for Coding and Cowork' (August 2026); SPA so saved HTML may be JS shell only",
+      "sha256": "d6ed44ade9d41475cff1ee312a5099ca236747d6c6be28e03212f8c3eec1f6a3",
+      "size_bytes": 94358,
+      "fetched_at": "2026-08-20"
+    }
+  ]
+}

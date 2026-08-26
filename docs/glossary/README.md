@@ -33,6 +33,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [DeepSeek Sparse Attention (DSA)](./dsa.md)
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
 - [Kimi Delta Attention (KDA)](./kda.md)
+- [Qwen Sparse Attention (QSA)](./qsa.md)
 
 ### FFN / MoE
 
@@ -40,6 +41,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Auxiliary-loss-free routing](./aux-loss-free-routing.md)
 - [Global-batch load balancing](./global-batch-load-balancing.md)
 - [Stable LatentMoE (LatentMoE + SiTU-GLU + Quantile Balancing)](./latentmoe.md)
+- [N-gram Embedding (off-accelerator capacity scaling)](./ngram-embedding.md)
 
 ### Training objectives
 
@@ -52,6 +54,7 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Hybrid Thinking (chat-template thinking-mode fusion)](./hybrid-thinking.md)
 - [On-Policy Distillation (multi-teacher OPD)](./on-policy-distillation.md)
 - [Agent Swarm — Parallel-Agent RL (PARL)](./agent-swarm.md)
+- [Reasoning-effort control](./reasoning-effort.md)
 
 ### Position embedding / long context
 
@@ -82,3 +85,4 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 
 - [Manifold-Constrained Hyper-Connections (mHC)](./mhc.md)
 - [Attention Residuals (AttnRes)](./attnres.md)
+- [Gated Residual (GR)](./gated-residual.md)
