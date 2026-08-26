@@ -4,9 +4,21 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — **Qwen3.8 batch, then a Qwen4 architecture preview.** Three slugs added
-(`qwen3.8-27b`, `qwen3.8-2.4t-a95b`, `qwen3.8-flash-next`), taking the repo to
-**21 extractions across 4 vendors**, all on schema v7 with **no schema bump required**.
+**Phase:** M1 — **August catch-up: the Qwen3.8 line, a Qwen4 preview, and the GLM line
+brought current.** Five slugs added (`qwen3.8-27b`, `qwen3.8-2.4t-a95b`,
+`qwen3.8-flash-next`, `glm-5.2`, `glm-5.3-flash`), taking the repo to **23 extractions
+across 4 vendors**, all on schema v7 with **no schema bump required**.
+
+**The two batches together tell one story: the vendors have started building from each
+other's parts, in public, within weeks.** GLM-5.3-Flash is the clearest single case — it
+ships **KDA** (Kimi's linear attention, first deployment outside Moonshot), **NoPE**
+attention (Kimi K3's choice, which Qwen tested and rejected), **mHC** with Sinkhorn
+(DeepSeek-V4's residual topology, second vendor to ship it), **SwiGLU clamping**
+(DeepSeek-V4 again, and the exact guard Qwen reports *not* needing), and a **key-pooled DSA
+indexer** that is mechanically the same idea Qwen shipped as QSA days earlier. Meanwhile
+Qwen3.8-Flash-Next's report benchmarks against **IndexShare** — GLM-5.2's technique, by
+name — and GLM-5.3-Flash then abandons IndexShare for exactly the reason Qwen's report
+gives. Four vendors, one design conversation.
 
 **`qwen3.8-flash-next` is the most important record of the batch, and it is not a Qwen3.8
 model.** Despite the name, its HF class is `Qwen4ExpForConditionalGeneration` (model_type
@@ -179,6 +191,8 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 
 **In progress (sourcing → extracting):**
 
+- ✅ `glm-5.3-flash` — **new GLM architecture line** under a Flash name (Aug 2026, 320B / 18B active, native multimodal) — **extracted** (`Glm5NextForConditionalGeneration`; 3:1 KDA + NoPE-MLA/DSA hybrid; mHC with Sinkhorn-20; key-pooled DSA indexer; SwiGLU clamp; 288 experts; FP8-primary distribution; first natively multimodal GLM-5-series model; 30T-token multimodal corpus)
+- ✅ `glm-5.2` — GLM-5.2 (Jun 2026, 78L / 256 experts, MIT) — **extracted** (first GLM with a reasoning-effort axis; **IndexShare** cross-layer indexer reuse, 21 Full / 57 Shared layers, 2.9× fewer per-token FLOPs at 1M; context 202,752 → 1,048,576; MTP acceptance length +20%)
 - ✅ `qwen3.8-flash-next` — **Qwen4 architecture preview** shipped under a 3.8 name (Aug 2026, 125B / 6B active + 51B off-accelerator n-gram embeddings) — **extracted** (HF class `Qwen4ExpForConditionalGeneration`; first Qwen record with a real tech report; QSA micro-block sparse attention, Gated Residual, n-gram embedding tables in host memory, Muon/AdamW split recipe; third vendor on DSA-lineage sparse attention)
 - ✅ `qwen3.8-27b` — Qwen3.8 dense (Aug 2026, 27B, native VL) — **extracted** (config byte-identical to Qwen3.6-27B except `transformers_version` — a frozen backbone across 3.5 → 3.6 → 3.8; adds `reasoning_effort` xhigh/medium/low as system-message injection; `preserve_thinking` default flips OFF → ON)
 - ✅ `qwen3.8-2.4t-a95b` — Qwen3.8 Max-class MoE (Aug 2026, 2.4T / 95B active) — **extracted** (first open-weight Qwen-Max; largest record in the repo; text-only unlike every prior Qwen 3.x open checkpoint; first model in the repo with no non-thinking mode; 512 experts top-10 + 1 shared under classic aux-loss; custom `qwen3.8-max` licence)
@@ -217,7 +231,7 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 - Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
 - Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
-**Recommended next (after this batch):** 21 extractions, 4 vendors, schema v7 holding.
+**Recommended next (after this batch):** 23 extractions, 4 vendors, schema v7 holding.
 Highest-value next work, in order:
 
 1. **Close the DeepSeek lineage.** `deepseek-v3.1` / `v3.1-terminus` is now the most
@@ -225,7 +239,7 @@ Highest-value next work, in order:
    V3.2-Exp benchmark row currently compares against a model with no record. Then
    `deepseek-v3.2` (the non-Exp 2025-12 release) and `deepseek-r1`.
 2. **A closed model — and `qwen3.7-max` is now the cheapest way in.** `inferred_fields`
-   is *still* empty across all 21 open-weight extractions, so the mechanism the schema was
+   is *still* empty across all 23 open-weight extractions, so the mechanism the schema was
    designed around has never been exercised. Qwen3.7-Max / 3.7-Plus (API-only, 2026-05/06)
    is the strongest candidate: it fills the one unobservable generation in an otherwise
    fully-extracted Qwen lineage, and same-family architectural priors make the inferences
@@ -284,6 +298,17 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 > per-generation delta, and it is what established that the backbone has been frozen for
 > three generations.
 
+> Note on the GLM family: Z.AI's release cadence has decoupled version numbers from
+> architecture. GLM-4.7 → GLM-5 was a full rewrite; GLM-5 → GLM-5.1 was post-training only
+> (byte-identical config); GLM-5.2 is a genuine architecture change on the same topology;
+> and **GLM-5.3-Flash is a new architecture line entirely** (`Glm5NextForConditionalGeneration`)
+> shipped under a Flash name with no full-size sibling — structurally the same move Qwen
+> made with Qwen3.8-Flash-Next. Five GLM slugs are extracted (4.7, 5, 5.1, 5.2, 5.3-Flash).
+> Not extracted: `GLM-4.7-Flash` (Jan 2026, an older-generation Flash tier),
+> `GLM-4.6V` / `GLM-OCR` / `Glyph` (the separate multimodal and OCR lines — now partly
+> superseded as a comparison point, since GLM-5.3-Flash brings vision into the main line),
+> and the ASR / TTS / image / video models, which are out of M1 scope.
+
 > Note on the Kimi family: Moonshot ships sibling-per-mode text-only K2 checkpoints
 > (Base / Instruct / Instruct-0905 / Thinking) but only K2-Thinking is extracted —
 > Base/Instruct/Instruct-0905 share the same base weights, and only K2-Thinking ships the
@@ -297,6 +322,18 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 > deferred, but **Kimi-Linear-48B-A3B has been promoted to a recommended next**: it is the
 > KDA origin K3 builds on, so it now anchors a glossary entry the way DeepSeek-V3.2-Exp
 > anchors DSA.
+
+**Recently completed (2026-08-27, GLM catch-up):**
+
+- `glm-5.2` (Jun 2026) and `glm-5.3-flash` (Aug 2026) close a four-month GLM gap — the
+  repo's newest GLM record had been GLM-5.1 from April. **Neither is a refresh.**
+  GLM-5.2 changes the architecture (IndexShare, 1M window, rope_theta 1e6 → 8e6) and
+  GLM-5.3-Flash changes the architecture *line* (`Glm5NextForConditionalGeneration`).
+- 1 new bilingual glossary entry: **indexshare** (IndexCache, arXiv 2603.12201 — the paper
+  Qwen's report cites by a different name than its own title). "Used by" rows added to
+  KDA (first non-Moonshot deployment), mHC (second vendor), DSA (both models), QSA (GLM as
+  convergent evolution), reasoning-effort, hybrid-thinking, MTP and aux-loss-free routing.
+- Still **no schema bump**. v7 absorbed a second genuinely new architecture in one week.
 
 **Recently completed (2026-08-27):**
 
@@ -482,6 +519,7 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 | `glm-5.1`                | GLM      | `extracted` | [`models/glm-5.1.md`](./models/glm-5.1.md)                               | Post-training-only refresh of GLM-5 (config byte-identical except `transformers_version`); long-horizon agentic delta.                                                                                                               |
 | `kimi-k2-thinking`       | Kimi     | `extracted` | [`models/kimi-k2-thinking.md`](./models/kimi-k2-thinking.md)             | K2 text-only Thinking sibling — native INT4 QAT origin, 200–300 sequential tool calls, Heavy Mode aggregation                                                                                                                        |
 | `qwen3.8-2.4t-a95b`      | Qwen     | `extracted` | [`models/qwen3.8-2.4t-a95b.md`](./models/qwen3.8-2.4t-a95b.md)           | **First open-weight Qwen-Max-class model** and the repo's largest record. 2.4T / 95B active, 92L, 512 experts top-10 + 1 shared, classic aux-loss. Text-only and thinking-only — both properties of the open release, not the model. |
+| `glm-5.2`                | GLM      | `extracted` | [`models/glm-5.2.md`](./models/glm-5.2.md)                               | **IndexShare** cross-layer indexer reuse (21 Full / 57 Shared of 78 layers, 2.9× fewer per-token FLOPs at 1M) + 1M context + reasoning-effort axis. MIT. Not a refresh — a real architecture change on the GLM-5 topology.           |
 | `minimax-text-01`        | MiniMax  | `backlog`   | —                                                                        | Linear attention variant                                                                                                                                                                                                             |
 | `mistral-large-2`        | Mistral  | `backlog`   | —                                                                        | European reference point                                                                                                                                                                                                             |
 
@@ -501,6 +539,7 @@ of a text-only LM.
 | `kimi-k2.5`          | Kimi    | `extracted` | [`models/kimi-k2.5.md`](./models/kimi-k2.5.md)                   | Kimi K2.5 — native multimodal continual-pretrain on K2-base; MoonViT-3D + MLP projector; Agent Swarm via PARL; zero-vision SFT; INT4 QAT inherited from K2-Thinking                                                                                                                         |
 | `kimi-k3`            | Kimi    | `extracted` | [`models/kimi-k3.md`](./models/kimi-k3.md)                       | Kimi K3 — 2.8T/104B, KDA + Gated MLA 3:1, AttnRes, Stable LatentMoE 896/16, SiTU-GLU, NoPE, MXFP4/MXFP8 QAT, MoonViT-V2 from scratch. Full rewrite of the K2 architecture; schema-v7 driver                                                                                                 |
 | `kimi-k2.6`          | Kimi    | `extracted` | [`models/kimi-k2.6.md`](./models/kimi-k2.6.md)                   | Kimi K2.6 — post-training-only refresh of K2.5; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus                                                                                                                  |
+| `glm-5.3-flash`      | GLM     | `extracted` | [`models/glm-5.3-flash.md`](./models/glm-5.3-flash.md)           | **New GLM architecture line** (`glm5_next`). 320B / 18B active, first natively multimodal GLM-5-series model. 3:1 KDA + NoPE-MLA/DSA hybrid, mHC (Sinkhorn-20), key-pooled DSA indexer, 288 experts, FP8-primary.                                                                           |
 | `qwen3.8-flash-next` | Qwen    | `extracted` | [`models/qwen3.8-flash-next.md`](./models/qwen3.8-flash-next.md) | **Qwen4 architecture preview** under a 3.8 name (`Qwen4ExpForConditionalGeneration`). 125B / 6B active + 51B host-memory n-gram embeddings + 4B MTP. QSA micro-block sparse attention, Gated Residual (4 branches, no `H_res`), Muon/AdamW split. **First Qwen record with a tech report.** |
 | `qwen3.8-27b`        | Qwen    | `extracted` | [`models/qwen3.8-27b.md`](./models/qwen3.8-27b.md)               | Qwen3.8 dense — `config.json` byte-identical to Qwen3.6-27B except `transformers_version`; frozen backbone across 3.5 → 3.6 → 3.8. Deltas: `reasoning_effort` 3 levels, `preserve_thinking` default ON.                                                                                     |
 | `qwen-2.5-vl-72b`    | Qwen    | `backlog`   | —                                                                | Vision encoder + projection fusion                                                                                                                                                                                                                                                          |

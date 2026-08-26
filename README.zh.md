@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-**M1 进行中。** 已抽取 21 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：Qwen3.8-Flash-Next（Qwen4 架构预览，也是本仓库第一个有技术报告支撑的 Qwen 记录）、Qwen3.8-2.4T-A95B（首个开放权重的 Qwen-Max 级模型）、Qwen3.8-27B。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
+**M1 进行中。** 已抽取 23 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：GLM-5.3-Flash（全新的 GLM 架构线，融合了 Kimi 的 KDA、DeepSeek 的 mHC 与 Qwen 式的 key 池化稀疏注意力）、GLM-5.2、Qwen3.8-Flash-Next（Qwen4 架构预览）。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
 
 当前重点：**M1——文本与多模态大模型。** 战略路线图见 [`docs/roadmap.md`](./docs/roadmap.md)，每个模型的具体状态见 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)。
 

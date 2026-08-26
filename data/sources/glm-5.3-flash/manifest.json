@@ -1,0 +1,82 @@
+{
+  "slug": "glm-5.3-flash",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "GLM-5.3-Flash HuggingFace config.json",
+      "sha256": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+      "size_bytes": 69416,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "chat_template",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "HF chat_template.jinja",
+      "sha256": "34d5ee66b12fa6446cdae131c352b8f68cd85369e0e6fda115583805fada3891",
+      "size_bytes": 10644,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json",
+      "sha256": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+      "size_bytes": 761,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card",
+      "sha256": "4f46db37e6a7cbe3a494d6d7f616a96f4fffe6d1de68be361199a715c8d928fc",
+      "size_bytes": 7238,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2602.15763",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "GLM-5 technical report (arXiv 2602.15763) — the family report both 5.2 and 5.3-Flash cite",
+      "sha256": "e20742ff36e08dc361de6973f7f72ad38e107edf8fd92d2a777a8428fc9b8f0e",
+      "size_bytes": 6177650,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "processor_config",
+      "kind": "other",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/processor_config.json",
+      "archive_url": null,
+      "filename": "processor_config.json",
+      "description": "HF processor_config.json — native multimodal preprocessing",
+      "sha256": "aae38374c94b08cc9b0547c6e64f05b951bd9735cea571c6988f5ed552bed3ed",
+      "size_bytes": 909,
+      "fetched_at": "2026-08-27"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://z.ai/blog/glm-5.3-flash",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Z.ai blog post for GLM-5.3-Flash",
+      "sha256": "cc0004aa6f3773f44bd8c04eaa1a4b6d8f1fefd8c2233588066f391c1b41352f",
+      "size_bytes": 604,
+      "fetched_at": "2026-08-27"
+    }
+  ]
+}
