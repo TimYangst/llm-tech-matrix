@@ -12,14 +12,16 @@ Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./do
 
 ## Where to find things
 
-| If you want to …                                      | Read                                           |
-| ----------------------------------------------------- | ---------------------------------------------- |
-| Understand why this project exists                    | [`docs/vision.md`](./docs/vision.md)           |
-| Know exactly what fields get extracted                | [`docs/schema.md`](./docs/schema.md)           |
-| Understand the sourcing → extraction → synthesis flow | [`docs/pipeline.md`](./docs/pipeline.md)       |
-| Follow naming, file layout, schema-versioning rules   | [`docs/conventions.md`](./docs/conventions.md) |
-| See the strategic roadmap (milestones, scope)         | [`docs/roadmap.md`](./docs/roadmap.md)         |
-| See which models are queued / extracted / reviewed    | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)       |
+| If you want to …                                      | Read                                                                   |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| Understand why this project exists                    | [`docs/vision.md`](./docs/vision.md)                                   |
+| Know exactly what fields get extracted                | [`docs/schema.md`](./docs/schema.md)                                   |
+| Understand the sourcing → extraction → synthesis flow | [`docs/pipeline.md`](./docs/pipeline.md)                               |
+| Follow naming, file layout, schema-versioning rules   | [`docs/conventions.md`](./docs/conventions.md)                         |
+| See the strategic roadmap (milestones, scope)         | [`docs/roadmap.md`](./docs/roadmap.md)                                 |
+| See which models are queued / extracted / reviewed    | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)                               |
+| Browse every extracted model in one table             | [`data/extracted/README.md`](./data/extracted/README.md)               |
+| See which models use which technique                  | [`data/reports/technique-index.md`](./data/reports/technique-index.md) |
 
 ## Repository layout
 
@@ -31,14 +33,15 @@ src/llm_tech_matrix/   Python package
   sourcing/            Layer 1 — fetch HF configs, papers, blogs; manifest + sha256
   extraction/          Layer 2 — render.py (JSON → bilingual Markdown). Extraction itself
                        is driven by the .claude/skills/extract-model skill, not by code.
-  synthesis/           Layer 3 — empty package; not started (see docs/roadmap.md)
-scripts/               validate_extractions.py (the CI schema gate) + schema migrations
+  synthesis/           Layer 3 — registry.py + index.py generate the browse surfaces
+scripts/               validate_extractions.py + validate_registry.py (CI gates) + migrations
 data/
   sources/<model>/     manifest.json (committed) + cached raw files (gitignored)
   extracted/<model>.json  Schema-validated extraction output (committed)
   extracted/<model>.md    Rendered English summary (committed, generated from the .json)
   extracted/<model>.zh.md Rendered Chinese summary (committed, generated from the .json)
-  reports/             Generated synthesis reports — not created yet
+  extracted/README.md     Generated model index (do not hand-edit)
+  reports/             Generated: technique-index.md (technique↔model matrix), coverage.md
 tasks/
   ROADMAP.md           Per-model status table + Current focus
   models/<model>.md    Per-model notes, sources, open questions

@@ -31,5 +31,6 @@ repos:
           - mdformat-gfm==1.0.0
           - mdformat-tables==1.0.0
           - mdformat-frontmatter==2.0.10
-        # data/extracted/*.md are pipeline-rendered outputs — formatter must not touch them.
-        exclude: ^data/extracted/.*\.md$
+        # Pipeline-rendered outputs — the formatter must not touch them, or the
+        # generator's output and the formatter's output fight and CI can never be green.
+        exclude: ^(data/extracted/.*\.md|data/reports/.*\.md)$

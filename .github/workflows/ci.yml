@@ -1,10 +1,12 @@
 # Lightweight presubmit CI.
 #
-# Runs on every pull request and on pushes to main. Two checks:
+# Runs on every pull request and on pushes to main. Three checks:
 #   1. pre-commit (ruff lint + format, mdformat, hygiene hooks) — same config
 #      developers run locally, so CI cannot disagree with local hooks.
 #   2. Schema validation of data/extracted/*.json — enforces the "schema
 #      strictness" cardinal rule from CLAUDE.md.
+#   3. Technique-registry validation — catches controlled-vocabulary drift and a
+#      stale generated index (data/reports/, data/extracted/README.md).
 #
 # GitHub Actions is free for public repositories with no minute limit.
 
@@ -50,3 +52,6 @@ jobs:
 
       - name: Validate extractions against schema
         run: uv run python scripts/validate_extractions.py
+
+      - name: Validate technique registry + generated index
+        run: uv run python scripts/validate_registry.py

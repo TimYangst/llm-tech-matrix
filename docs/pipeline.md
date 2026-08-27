@@ -80,12 +80,26 @@ What lives here:
 
 This layer is intentionally last: it cannot work until enough extractions exist. **Don't over-build it early.** Start with one or two reports driven by real questions, not infrastructure-first.
 
-**Status: not started.** `src/llm_tech_matrix/synthesis/` is an empty package and
-`data/reports/` does not exist yet. The "enough extractions" bar M1 set (≥10) has been
-met — see [`roadmap.md`](./roadmap.md) — so this layer is now unblocked rather than
-premature. The glossary "Used by" tables are currently doing the cross-model comparison
-job by hand, and they are the natural first thing a synthesis tool should generate
-instead.
+**Status: started, deliberately narrow.** The first synthesis output is an *index*, not a
+report: `synthesis/registry.py` + `synthesis/index.py` turn the typed fields of every
+extracted record into technique↔model edges and generate three browse surfaces —
+`data/extracted/README.md`, `data/reports/technique-index.md`, `data/reports/coverage.md`.
+
+The load-bearing design rule is **assertions, not mentions**. A typed slot
+(`sparse_attention.kind = "dsa"`) is the model asserting it uses a technique. Prose is
+often the opposite — *"unlike MLA…"*, *"the family report documents Muon but 5.2 does not
+restate it"*. A naive keyword index over the extraction text yields ~39% more edges than
+the hand-maintained tables, and a large share of them are mentions, not uses. Publishing
+those would violate the no-hallucination rule from the inside. So only typed slots
+produce edges; everything else lands in `coverage.md` as a review queue.
+
+The consequence worth knowing: the schema types the *architecture* axis, so optimizer,
+RL method and MoE-routing techniques have no typed slot and their "Used by" tables stay
+hand-maintained. `registry.json`'s `prose_only` block lists them, and promoting one to a
+typed slot is a schema change, not a registry change.
+
+Interpretive reports (trend narratives, "optimizer evolution Adam → Muon") are still
+unwritten — and still should be driven by a real question, not by infrastructure.
 
 Code: `src/llm_tech_matrix/synthesis/`
 

@@ -5,7 +5,7 @@ Read this when you (or a fresh Claude Code agent) need to pick up where we left 
 ## Three-step orientation
 
 1. **Read [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)** — `Current focus` at top + per-model status table.
-2. **Skim [`data/extracted/`](../data/extracted/)** — every extracted model has both `<slug>.json` (canonical data) and `<slug>.md` (readable summary).
+2. **Skim [`data/extracted/README.md`](../data/extracted/README.md)** — the generated model index (family, date, size, techniques). Every model has `<slug>.json` (canonical data), `<slug>.md` and `<slug>.zh.md` (readable summaries). For the cross-model view start at [`data/reports/technique-index.md`](../data/reports/technique-index.md).
 3. **Pick a task** — if `Current focus` recommends a next model, do that. Otherwise see *How to pick a next task* below.
 
 ## The 60-second project description
@@ -44,6 +44,8 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 | `src/llm_tech_matrix/sourcing/`            | Fetch CLI, manifest schema, pdf_to_text.                                 |
 | `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer.                                                |
 | `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                 |
+| `docs/glossary/registry.json`              | Controlled vocabulary: typed field values → glossary entries.            |
+| `src/llm_tech_matrix/synthesis/index.py`   | Generates the model index, technique matrix and coverage report.         |
 | `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.            |
 | `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump.                         |
 

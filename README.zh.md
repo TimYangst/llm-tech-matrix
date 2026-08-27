@@ -12,14 +12,16 @@
 
 ## 文档导航
 
-| 你想了解                                   | 请看                                           |
-| ------------------------------------------ | ---------------------------------------------- |
-| 项目为什么存在                             | [`docs/vision.md`](./docs/vision.md)           |
-| 抽取的字段到底是什么                       | [`docs/schema.md`](./docs/schema.md)           |
-| 数据获取 → 信息抽取 → 综合分析的流程       | [`docs/pipeline.md`](./docs/pipeline.md)       |
-| 命名、文件布局、Schema 版本管理规则        | [`docs/conventions.md`](./docs/conventions.md) |
-| 战略路线图（里程碑、范围）                 | [`docs/roadmap.md`](./docs/roadmap.md)         |
-| 每个模型的进度（待抽取 / 已抽取 / 已审阅） | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)       |
+| 你想了解                                   | 请看                                                                   |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
+| 项目为什么存在                             | [`docs/vision.md`](./docs/vision.md)                                   |
+| 抽取的字段到底是什么                       | [`docs/schema.md`](./docs/schema.md)                                   |
+| 数据获取 → 信息抽取 → 综合分析的流程       | [`docs/pipeline.md`](./docs/pipeline.md)                               |
+| 命名、文件布局、Schema 版本管理规则        | [`docs/conventions.md`](./docs/conventions.md)                         |
+| 战略路线图（里程碑、范围）                 | [`docs/roadmap.md`](./docs/roadmap.md)                                 |
+| 每个模型的进度（待抽取 / 已抽取 / 已审阅） | [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)                               |
+| 在一张表里浏览所有已抽取模型               | [`data/extracted/README.md`](./data/extracted/README.md)               |
+| 查看哪些模型用了哪项技术                   | [`data/reports/technique-index.md`](./data/reports/technique-index.md) |
 
 ## 目录结构
 
@@ -31,14 +33,15 @@ src/llm_tech_matrix/   Python 包
   sourcing/            第一层 —— 拉取 HF config、论文、博客；manifest + sha256
   extraction/          第二层 —— render.py（JSON → 双语 Markdown）。抽取本身由
                        .claude/skills/extract-model skill 驱动，不是代码逻辑。
-  synthesis/           第三层 —— 空包，尚未开始（见 docs/roadmap.md）
-scripts/               validate_extractions.py（CI 的 schema 闸门）+ schema 迁移脚本
+  synthesis/           第三层 —— registry.py + index.py，生成各类浏览入口
+scripts/               validate_extractions.py + validate_registry.py（CI 闸门）+ 迁移脚本
 data/
   sources/<model>/     manifest.json（提交进 git）+ 缓存的原始文件（gitignore）
   extracted/<model>.json  通过 Schema 校验的抽取产物（提交进 git）
   extracted/<model>.md    渲染出的英文摘要（提交进 git，由 .json 生成）
   extracted/<model>.zh.md 渲染出的中文摘要（提交进 git，由 .json 生成）
-  reports/             生成的综合分析报告 —— 尚未创建
+  extracted/README.md     生成的模型索引（勿手改）
+  reports/             生成物：technique-index.md（技术↔模型矩阵）、coverage.md
 tasks/
   ROADMAP.md           各模型状态总表 + Current focus
   models/<model>.md    每个模型的笔记、数据源、未决问题
