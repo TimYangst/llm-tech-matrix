@@ -1,0 +1,237 @@
+{
+  "registry_version": 1,
+  "_doc": "Controlled vocabulary linking typed extraction fields to glossary entries. Machine-readable companion to docs/glossary/README.md. 'aliases' are the literal values that have appeared in data/extracted/*.json for that technique; matching is case-insensitive. Values listed under 'taxonomy' are structural classifiers, NOT techniques — they are deliberately unmapped so the validator does not flag them. Any value in a registered slot that is neither an alias nor taxonomy fails scripts/validate_registry.py, which is how vocabulary drift gets caught at PR time.",
+  "slots": [
+    "architecture.attention.variant",
+    "architecture.attention.variants[].name",
+    "architecture.attention.sparse_attention.kind",
+    "architecture.attention.rope.type",
+    "architecture.backbone.context_extension.method",
+    "architecture.residual_connections.kind",
+    "training.quantization.weight_format",
+    "multimodal.fusion",
+    "training.alignment.tool_call_protocol.format",
+    "architecture.auxiliary_modules[].purpose"
+  ],
+  "taxonomy": {
+    "_doc": "Structural classifiers with no glossary entry — a shape, not a named technique.",
+    "architecture.attention.variant": [
+      "hybrid"
+    ],
+    "architecture.attention.variants[].name": [
+      "sliding_window_attention"
+    ],
+    "architecture.attention.rope.type": [
+      "standard",
+      "none",
+      "[Unknown/Not Disclosed]"
+    ],
+    "architecture.backbone.context_extension.method": [
+      "[Unknown/Not Disclosed]"
+    ],
+    "training.quantization.weight_format": [
+      "FP8 (e4m3)"
+    ],
+    "multimodal.fusion": [
+      "native_early",
+      "projection_mlp",
+      "cross_attention",
+      "resampler",
+      "other",
+      "[Unknown/Not Disclosed]"
+    ],
+    "training.alignment.tool_call_protocol.format": [
+      "xml-like",
+      "function-call-token",
+      "json",
+      "other",
+      "[Unknown/Not Disclosed]"
+    ]
+  },
+  "techniques": {
+    "mla": {
+      "title": "Multi-head Latent Attention (MLA)",
+      "aliases": [
+        "mla",
+        "gated_mla"
+      ],
+      "compound": {
+        "MLA + DSA": [
+          "mla",
+          "dsa"
+        ],
+        "mla_with_dsa": [
+          "mla",
+          "dsa"
+        ],
+        "dsa_mla": [
+          "mla",
+          "dsa"
+        ]
+      },
+      "presence": [
+        "architecture.attention.mla"
+      ]
+    },
+    "gqa": {
+      "title": "Grouped Query Attention (GQA)",
+      "aliases": [
+        "gqa",
+        "gated_attention"
+      ]
+    },
+    "gated-deltanet": {
+      "title": "Gated DeltaNet",
+      "aliases": [
+        "gated_deltanet"
+      ]
+    },
+    "kda": {
+      "title": "Kimi Delta Attention (KDA)",
+      "aliases": [
+        "kda",
+        "kda_linear_attention"
+      ]
+    },
+    "dsa": {
+      "title": "DeepSeek Sparse Attention (DSA)",
+      "aliases": [
+        "dsa"
+      ]
+    },
+    "qsa": {
+      "title": "Qwen Sparse Attention (QSA)",
+      "aliases": [
+        "qsa",
+        "qwen_sparse_attention"
+      ]
+    },
+    "csa-hca": {
+      "title": "Compressed Sparse Attention + Heavily Compressed Attention",
+      "aliases": [
+        "csa+hca",
+        "compressed_sparse_attention",
+        "heavily_compressed_attention"
+      ]
+    },
+    "mrope": {
+      "title": "Multimodal RoPE (mRoPE)",
+      "aliases": [
+        "mrope"
+      ]
+    },
+    "yarn-rope": {
+      "title": "YaRN RoPE scaling",
+      "aliases": [
+        "yarn"
+      ],
+      "compound": {
+        "yarn+dca": [
+          "yarn-rope",
+          "dual-chunk-attention"
+        ]
+      }
+    },
+    "dual-chunk-attention": {
+      "title": "Dual Chunk Attention (DCA)",
+      "aliases": [
+        "dca"
+      ]
+    },
+    "mhc": {
+      "title": "Manifold-Constrained Hyper-Connections (mHC)",
+      "aliases": [
+        "mhc",
+        "hyper-connections"
+      ]
+    },
+    "attnres": {
+      "title": "Attention Residuals (AttnRes)",
+      "aliases": [
+        "attnres",
+        "attention-residuals (attnres)",
+        "attention-residuals"
+      ]
+    },
+    "gated-residual": {
+      "title": "Gated Residual (GR)",
+      "aliases": [
+        "gated-residual",
+        "gated_residual"
+      ]
+    },
+    "int4-qat": {
+      "title": "Native INT4 Quantization-Aware Training",
+      "aliases": [
+        "int4"
+      ],
+      "requires": {
+        "training.quantization.method": "qat"
+      }
+    },
+    "fp4-qat": {
+      "title": "FP4 Quantization-Aware Training (MXFP4)",
+      "aliases": [
+        "mxfp4",
+        "fp4"
+      ],
+      "requires": {
+        "training.quantization.method": "qat"
+      }
+    },
+    "mtp": {
+      "title": "Multi-Token Prediction (MTP)",
+      "aliases": [
+        "multi_token_prediction"
+      ],
+      "presence": [
+        "training.objectives.multi_token_prediction"
+      ]
+    },
+    "fim": {
+      "title": "Fill-in-Middle (FIM)",
+      "aliases": [
+        "fill_in_middle"
+      ],
+      "presence": [
+        "training.objectives.fill_in_middle"
+      ]
+    },
+    "speculative-decoding": {
+      "title": "Speculative-decoding modules",
+      "aliases": [
+        "speculative_decoding"
+      ]
+    },
+    "ngram-embedding": {
+      "title": "N-gram Embedding",
+      "aliases": [
+        "capacity_scaling",
+        "ngram_embedding"
+      ]
+    }
+  },
+  "prose_only": {
+    "_doc": "Glossary entries whose adoption is asserted only in free-text fields (optimizer, rl_method, moe.routing, data_mix_notes, stability_notes...). The schema has no typed slot for them, so their 'Used by' tables CANNOT be generated and stay hand-maintained. Listed here so the coverage report can distinguish 'no structured backing by design' from 'drift we should fix'. Promoting any of these to a typed slot is a schema change, not a registry change.",
+    "entries": [
+      "muon",
+      "grpo",
+      "on-policy-distillation",
+      "aux-loss-free-routing",
+      "deepseekmoe",
+      "global-batch-load-balancing",
+      "latentmoe",
+      "dualpipe",
+      "fp8-mixed-precision",
+      "qk-norm",
+      "moonvit",
+      "agent-swarm",
+      "hybrid-thinking",
+      "reasoning-effort",
+      "indexshare"
+    ]
+  },
+  "fuzzy_slots": [
+    "architecture.auxiliary_modules[].purpose"
+  ]
+}
