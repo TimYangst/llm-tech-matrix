@@ -49,14 +49,36 @@ re-sourced from any equivalent public location and the manifest updated.
 ```
 uv run python -m llm_tech_matrix.sourcing add <slug> \
   --name <logical-name> \
-  --kind <hf_config|arxiv_pdf|tech_report|blog_html|model_card|other> \
+  --kind <hf_config|arxiv_pdf|tech_report|blog_html|model_card|repo_file|release_notes|other> \
   --url <public-url> \
   [--filename <local-name>] \
   [--description "<human description>"] \
   [--archive-url <web-archive-url>]
 ```
 
-The CLI downloads the file, computes its sha256, and appends to `manifest.json`.
+The CLI downloads the file, computes its sha256, and appends to `manifest.json`. Engine
+snapshots use the same commands with `--track engines` (root `data/sources/engines/`). Two kinds
+normalize before hashing: `release_notes` stores only the `body` of a GitHub releases API
+response, because the JSON carries mutable counters.
+
+### When `fetch` reports a failure
+
+`fetch` keeps going past a failing asset. It caches everything it can, saves the manifest for
+the assets that succeeded (failed entries are left unchanged), exits non-zero, and prints a
+`FETCH REPORT` with one block per failure. Each block gives the asset, URL, error, expected and
+fetched sha256, and a suggested next step. A mismatching download never overwrites the cached
+file; it is kept beside it as `<filename>.fetched`. The report is written to be handed to a
+person or an agent as-is.
+
+For a sha256 mismatch, first find out what changed by diffing the `.fetched` copy against the
+cached one:
+
+- **Only volatile markup changed** (a JS shell, a cosmetic README edit): pin the URL to the
+  revision the extraction used, as was done for `qwen3.8-flash-next`.
+- **The content really changed:** re-register the asset and re-check every extracted value
+  that cites it.
+
+Never edit a recorded sha256 just to make it pass.
 
 ## Marking unknowns
 

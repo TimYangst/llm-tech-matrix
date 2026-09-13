@@ -23,7 +23,8 @@ What lives here:
   (URL, sha256, filename, kind, optional archive_url).
 - `fetch.py` — CLI for downloading assets and verifying checksums:
   - `add` — register a new asset (downloads, computes sha256, appends to manifest)
-  - `fetch` — re-download every asset listed in a manifest into the cache directory
+  - `fetch` — re-download every asset listed in a manifest into the cache directory; continues past
+    failures and ends with a `FETCH REPORT` (see conventions, "When `fetch` reports a failure")
   - `verify` — compare cached files against recorded sha256 without re-downloading
   - `list` — enumerate all manifests in the repo
 

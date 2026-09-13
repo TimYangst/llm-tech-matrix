@@ -22,8 +22,8 @@ Absence claims (DeepSeek-V4.1-Flash, GLM-5.3-Flash, Qwen3.8-Flash-Next) were ver
 `docs/`. The clone's checkout was not changed. The committed evidence is the registry file plus
 the models tree at the commit.
 
-**Reproducibility caveat:** `release_notes.json` is GitHub API output with mutable counters, so
-its sha256 will drift.
+**Release notes are stored as the body only** (`release_notes.md`), so mutable GitHub API
+counters cannot break the manifest.
 
 ## What E2 was for: stress-testing the engine schema
 

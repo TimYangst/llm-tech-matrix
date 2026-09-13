@@ -160,7 +160,7 @@ _说明：_ List fields are parsed from the pinned code: SpeculativeAlgorithm en
 - Cross-record note for deepseek-v4-flash-0731: SGLang loads a DeepSeek-V4 DSpark-bundled checkpoint's draft as either DSpark or NextN (num_nextn_predict_layers=1) depending on the chosen algorithm, with the comment that such a checkpoint 'may also carry MTP layers'. That is engine-side evidence bearing on the 0731 record's MTP-vs-DSpark question; the model record is not edited from here.
 - Kimi K3 DSpark is evidenced only by an AMD kernel item in the release notes; the draft checkpoint and its activation path are not among the sources (vLLM v0.29.0 likewise recognizes a K3DSparkModel draft).
 - RL-facing serving features (engine sleep/wake, weight refit, partial rollout) are documented in sglang_for_rl.mdx but have no engine schema v1 field; revisit when verl (E3) exercises the rollout-backend integration.
-- Source reproducibility: release_notes.json is GitHub releases API output with mutable counters, so its sha256 will drift. v0.5.19 is an annotated tag (tag object 59f20bf) — commit_sha is the dereferenced commit 0bcd822.
+- Source reproducibility: release notes are stored as the release `body` only (release_notes.md), so mutable GitHub API counters cannot break the manifest. v0.5.19 is an annotated tag (tag object 59f20bf) — commit_sha is the dereferenced commit 0bcd822.
 
 ## 来源
 

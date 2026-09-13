@@ -49,13 +49,18 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
      --description "..."
    uv run python -m llm_tech_matrix.sourcing --track engines add <slug> \
      --kind release_notes --name release_notes \
-     --url https://api.github.com/repos/<org>/<repo>/releases/tags/<tag> --filename release_notes.json
+     --url https://api.github.com/repos/<org>/<repo>/releases/tags/<tag> --filename release_notes.md
    ```
 
    Register specific files, not the repository: model registry, supported-models docs, the
    speculative / quantization / attention / cache / parallel configs, parser registries, and
-   the design docs you will cite. The releases-API JSON carries mutable counters, so its
-   sha256 drifts; record that in the snapshot's task note.
+   the design docs you will cite. For `release_notes`, the fetcher stores and hashes only the
+   release `body`, because the API JSON carries mutable counters.
+
+   If `fetch` or `add` reports failures, work from its `FETCH REPORT` block: each failed asset
+   lists the expected and fetched sha256, keeps the new bytes as `<filename>.fetched` next to
+   the untouched cached copy, and says what to check next. Never edit a recorded sha256 just to
+   make it pass.
 
 3. **Join against the model records.** For every `data/extracted/*.json`, take the HF
    `architectures[0]` from its cached or manifest `config.json`, and check it against the

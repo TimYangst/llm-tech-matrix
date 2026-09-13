@@ -6,11 +6,11 @@
       "kind": "release_notes",
       "url": "https://api.github.com/repos/sgl-project/sglang/releases/tags/v0.5.19",
       "archive_url": null,
-      "filename": "release_notes.json",
-      "description": "GitHub releases API JSON for tag v0.5.19 (annotated tag 59f20bf -> commit 0bcd822)",
-      "sha256": "06835ca6b72b488b0434dfb67232aa7edbaf969d4eca1f7cf933c43d2f462488",
-      "size_bytes": 56267,
-      "fetched_at": "2026-09-12"
+      "filename": "release_notes.md",
+      "description": "Release notes body for v0.5.19 (annotated tag 59f20bf -> commit 0bcd822), extracted from the GitHub releases API JSON; mutable API counters are dropped before hashing",
+      "sha256": "bfe5a2f9e89835a1c8b1f9830dc6427dd354ac6080bedf1611c74becb5e81157",
+      "size_bytes": 53379,
+      "fetched_at": "2026-09-13"
     },
     {
       "name": "model_registry",

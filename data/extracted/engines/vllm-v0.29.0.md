@@ -163,7 +163,7 @@ _Notes:_ List fields are the literal registry contents at the pinned commit: Spe
 - Model-to-parser mappings are stated in the docs for only a few families (Qwen3 series -> qwen3 reasoning parser, GLM-4.7 -> glm47 tool parser). Parsers named deepseek_v4 and kimi_k3 exist in both registries, but no doc in this snapshot maps them to a model, so model_support leaves those fields UNKNOWN.
 - KimiK3: speculative.py recognizes a K3DSparkModel draft architecture and the release notes add K3 DCP with DSpark, but the Kimi K3 model record says its trained draft (EAGLE-3 from the MTP layer) was withheld from the open weights. Where a K3 DSpark draft checkpoint comes from is not stated in these sources.
 - Sequence parallelism is evidenced only by the release-note statement that it still falls back to Model Runner V1; its configuration surface is not among the snapshot's sources.
-- Source reproducibility: release_notes.json is GitHub releases API output and includes mutable fields (asset download counts, updated_at), so its sha256 will drift even though the release-notes body does not. Every other asset is a raw file pinned to the tag commit.
+- Source reproducibility: release notes come from the GitHub releases API, whose JSON carries mutable counters (asset download counts). The sourcing layer stores and hashes only the release `body` (release_notes.md), so the manifest stays reproducible; every other asset is a raw file pinned to the tag commit.
 
 ## Sources
 

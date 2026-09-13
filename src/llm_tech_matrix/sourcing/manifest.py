@@ -18,7 +18,7 @@ AssetKind = Literal[
     "blog_html",  # blog post / release notes (HTML)
     "model_card",  # HuggingFace model card or vendor model card
     "repo_file",  # a file (code or in-repo doc) from a git repository, pinned to a commit
-    "release_notes",  # release notes for a tagged release (e.g. GitHub releases API JSON)
+    "release_notes",  # GitHub releases API JSON for a tag; only its `body` is stored and hashed
     "other",  # everything else; describe in `description`
 ]
 

@@ -35,8 +35,10 @@ Considered but excluded:
 - Model implementation files (`deepseek_v4.py` etc.) are too large for the value they add
   here. The registry and the speculative config already carry the join facts.
 
-**Reproducibility caveat:** `release_notes.json` includes mutable fields (asset download
-counts, `updated_at`), so its sha256 will drift. The release-notes body is what is cited.
+**Release notes are stored as the body only.** The releases API JSON includes mutable counters
+(asset download counts grew by 20 within a day of the snapshot), so the sourcing layer keeps and
+hashes just the release `body` as `release_notes.md`. The first version of this manifest hashed
+the raw JSON and broke `fetch` on a fresh clone; a Codex review caught it.
 
 ## Seed questions from `tasks/ENGINES.md`
 

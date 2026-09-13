@@ -6,11 +6,11 @@
       "kind": "release_notes",
       "url": "https://api.github.com/repos/vllm-project/vllm/releases/tags/v0.29.0",
       "archive_url": null,
-      "filename": "release_notes.json",
-      "description": "GitHub releases API JSON for tag v0.29.0 (body = release notes; target commit 98dff2a)",
-      "sha256": "ebd439ad4b3005fb592e85e9e9c2999539bd31c4287c956c0d804bb772b54288",
-      "size_bytes": 51171,
-      "fetched_at": "2026-09-12"
+      "filename": "release_notes.md",
+      "description": "Release notes body for v0.29.0 (tag commit 98dff2a), extracted from the GitHub releases API JSON; mutable API counters are dropped before hashing",
+      "sha256": "44f0288e181ebf60a23dfd9a28dddb7e7e3d0b29ca04eeb847e16d6a5bd3af0a",
+      "size_bytes": 35353,
+      "fetched_at": "2026-09-13"
     },
     {
       "name": "model_registry",
