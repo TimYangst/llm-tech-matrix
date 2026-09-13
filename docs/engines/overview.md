@@ -1,8 +1,11 @@
 # Engines track: design
 
-Status: **E0 (design)**. No engine schema, code or records exist yet; the schema below is a
-draft that the E1 pilot will turn into `src/llm_tech_matrix/engine_schema.py`. Live status
-is in [`../../tasks/ENGINES.md`](../../tasks/ENGINES.md).
+Status: **E1 (pilot) done.** Engine schema v1 is implemented in
+[`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py), with the
+field spec in [`schema.md`](./schema.md). The first record is
+[`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md). The draft schema section below
+is kept as the E0 design record; where the two differ, `schema.md` wins. Live status is in
+[`../../tasks/ENGINES.md`](../../tasks/ENGINES.md).
 
 ## Why a second record type
 
@@ -17,7 +20,7 @@ post-training systems (verl). The repo already shows the gap:
 - The engine repos document model-specific work that has no home here, for example:
   - verl: `docs/advance/deepseek_v4_integration.rst`
   - VeOmni: `docs/design/deepseek_v4_indexer_loss.md`
-  - vLLM: `docs/design/hisparse.md`
+  - vLLM: `docs/design/hisparse.md` (on `main` since 2026-09-12, so not in the `v0.29.0` snapshot)
 
 So the goal is **not** to summarize engine documentation, which would duplicate upstream
 and go stale. The goal is the **model ↔ technique ↔ engine** triangle, which neither the
@@ -166,8 +169,9 @@ EngineRecord
   sequence parallelism, FSDP2.
 - **Two tables per technique entry.** The existing **Used by (models)** table stays, and a
   second **Implemented by (engines)** table is added. "A model uses DSA" and "vLLM
-  implements DSA" are different claims and must not share rows. The template changes in E1,
-  once the first real row exists.
+  implements DSA" are different claims and must not share rows. Decided in E1: that table is
+  **generated in E4** from `technique_support[]` rows rather than hand-maintained, because
+  engine snapshots accumulate every quarter and a hand-kept table would drift immediately.
 - **Registry.** Engine slots are added to `registry.json` so `technique_support` produces
   engine→technique edges. The coverage report checks both tables.
 - **First synthesis outputs (E4).**

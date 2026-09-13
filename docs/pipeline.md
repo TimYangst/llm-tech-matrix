@@ -118,3 +118,11 @@ contract, in parallel subtrees: `data/sources/engines/<slug>/` and
 `data/extracted/engines/<slug>.json`. It has its own schema and version. Every model-side
 glob is non-recursive, so the two tracks cannot interfere, and model and engine records meet
 only in synthesis. Design: [`engines/overview.md`](./engines/overview.md).
+
+Code per layer:
+
+- **Sourcing:** `sourcing --track engines`, with asset kinds `repo_file` and `release_notes`.
+- **Extraction:** `engine_schema.py`, `extraction/render_engine.py`, `.claude/skills/extract-engine/`,
+  plus the engine branch of `scripts/validate_extractions.py`, which also checks the cross-links
+  to model and glossary slugs.
+- **Synthesis:** planned for E4.

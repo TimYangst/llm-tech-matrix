@@ -1,0 +1,269 @@
+{
+  "slug": "vllm-v0.29.0",
+  "assets": [
+    {
+      "name": "release_notes",
+      "kind": "release_notes",
+      "url": "https://api.github.com/repos/vllm-project/vllm/releases/tags/v0.29.0",
+      "archive_url": null,
+      "filename": "release_notes.json",
+      "description": "GitHub releases API JSON for tag v0.29.0 (body = release notes; target commit 98dff2a)",
+      "sha256": "ebd439ad4b3005fb592e85e9e9c2999539bd31c4287c956c0d804bb772b54288",
+      "size_bytes": 51171,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "model_registry",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py",
+      "archive_url": null,
+      "filename": "vllm/model_executor/models/registry.py",
+      "description": "Native model architecture registry (HF architecture -> implementation module)",
+      "sha256": "fef8293fe19cef01768a4c5bd8adc05e120202f1c1597eb264d090672894fbd7",
+      "size_bytes": 63102,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "supported_models_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md",
+      "archive_url": null,
+      "filename": "docs/models/supported_models.md",
+      "description": "Supported-models documentation with LoRA / PP feature columns",
+      "sha256": "d982e37f455ad3771682904b12991d5728eec737264a9ba1596285c56cc0a0ee",
+      "size_bytes": 59567,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "speculative_config",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py",
+      "archive_url": null,
+      "filename": "vllm/config/speculative.py",
+      "description": "SpeculativeConfig: method literals (MTP types, DFlash, DSpark), per-model MTP mapping",
+      "sha256": "cf8fcd342b6e863bac18415705a0ec2864c12b9def8e23ee84ea3ab4ede19847",
+      "size_bytes": 83085,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "spec_decode_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/README.md",
+      "archive_url": null,
+      "filename": "docs/features/speculative_decoding/README.md",
+      "description": "Speculative decoding methods overview and --speculative-config schema",
+      "sha256": "2dd91f0533fa85afedf606dc9eba05f4225a80faf9d1309c6b39ef3048c9906d",
+      "size_bytes": 13339,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "mtp_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/mtp.md",
+      "archive_url": null,
+      "filename": "docs/features/speculative_decoding/mtp.md",
+      "description": "MTP speculative decoding guide",
+      "sha256": "eae02c10ccb05901415e1e5539feb08e85cc1b714e70c8b4175ab2d37f587b66",
+      "size_bytes": 2532,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "index_cache_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md",
+      "archive_url": null,
+      "filename": "docs/features/index_cache.md",
+      "description": "IndexCache (cross-layer top-k reuse) for DSA models",
+      "sha256": "ce06dcccc93422150760b8ccdb92a74dbaa1f74c31096330475fa786584be92e",
+      "size_bytes": 2555,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "reasoning_parsers",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/reasoning/__init__.py",
+      "archive_url": null,
+      "filename": "vllm/reasoning/__init__.py",
+      "description": "Reasoning parser registry",
+      "sha256": "70f908468213316e99f1d955f003610513b210f16d793487e5fb5160ca5f9180",
+      "size_bytes": 4153,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "reasoning_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md",
+      "archive_url": null,
+      "filename": "docs/features/reasoning_outputs.md",
+      "description": "Reasoning outputs guide with model -> parser table",
+      "sha256": "7431d694e699bf4cc3cf3f83087723882751609980cbbc371348cee4d0b1a7db",
+      "size_bytes": 22095,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "tool_parsers",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/tool_parsers/__init__.py",
+      "archive_url": null,
+      "filename": "vllm/tool_parsers/__init__.py",
+      "description": "Tool-call parser registry",
+      "sha256": "1012080535ff4b10adf0b218a4216899ccff27c008b37c6fb1ecdc9ad6bad04f",
+      "size_bytes": 5232,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "tool_calling_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md",
+      "archive_url": null,
+      "filename": "docs/features/tool_calling.md",
+      "description": "Tool calling guide with per-model parser flags",
+      "sha256": "caa6db0c295aabbfbf5ffa42b490129e8d8f9a78bb067884d79b81533e8a1ff1",
+      "size_bytes": 26886,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "quantization_methods",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/layers/quantization/__init__.py",
+      "archive_url": null,
+      "filename": "vllm/model_executor/layers/quantization/__init__.py",
+      "description": "Quantization method registry",
+      "sha256": "6eac984acff3b895d16166bd02892a6dd5eb3e3cd456164a274e503d8089b4e5",
+      "size_bytes": 6444,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "quantization_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/quantization/README.md",
+      "archive_url": null,
+      "filename": "docs/features/quantization/README.md",
+      "description": "Quantization overview",
+      "sha256": "acc6bb7b2d1e7bda87006987f1630867b8f0021724976a9ce5151614e03ed1d2",
+      "size_bytes": 9347,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "quantized_kvcache_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/quantization/quantized_kvcache.md",
+      "archive_url": null,
+      "filename": "docs/features/quantization/quantized_kvcache.md",
+      "description": "Quantized KV cache guide",
+      "sha256": "5c31da7b20c51dcfab38264632903e70b5b7476a6c3ea673bfa6f3db9ee94c2e",
+      "size_bytes": 6246,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "cache_config",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/cache.py",
+      "archive_url": null,
+      "filename": "vllm/config/cache.py",
+      "description": "CacheConfig: KV cache dtypes, prefix caching options",
+      "sha256": "3ddbd0eae79ba62fd9cbc5131532030133b9b3c038595eb838276369a115810b",
+      "size_bytes": 16565,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "attention_backends",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py",
+      "archive_url": null,
+      "filename": "vllm/v1/attention/backends/registry.py",
+      "description": "Attention backend registry",
+      "sha256": "89134611e7422940052499ea9ff3563d6ea2c28ad79fa0d282f7e2a0d99b5126",
+      "size_bytes": 11190,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "attention_backends_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/attention_backends.md",
+      "archive_url": null,
+      "filename": "docs/design/attention_backends.md",
+      "description": "Attention backend selection design doc",
+      "sha256": "c5b8823545aa43a3e81614e2716099ea2f2bfbb9309b7b45f155cc971ffa7d43",
+      "size_bytes": 6842,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "parallel_config",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py",
+      "archive_url": null,
+      "filename": "vllm/config/parallel.py",
+      "description": "ParallelConfig: TP / PP / DP / EP / PCP / DCP / DBO / elastic EP",
+      "sha256": "b58a49f026a9a748d87c005aea0169d0ed23a24697dd0af438d8c4118112fc46",
+      "size_bytes": 46289,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "arch_overview_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md",
+      "archive_url": null,
+      "filename": "docs/design/arch_overview.md",
+      "description": "Architecture overview (entrypoints, engine core, workers)",
+      "sha256": "75e2f3d93bd28aaec56da4663536e3f65561c29d5a2940dc9e6cbe29fe95f21e",
+      "size_bytes": 14727,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "prefix_caching_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/prefix_caching.md",
+      "archive_url": null,
+      "filename": "docs/design/prefix_caching.md",
+      "description": "Automatic prefix caching design",
+      "sha256": "67ee4e2b7bc23d40e9b366e4a9053ae4ecd0925ddef51f412ac5c16b9dc83a61",
+      "size_bytes": 13916,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "hybrid_kv_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/hybrid_kv_cache_manager.md",
+      "archive_url": null,
+      "filename": "docs/design/hybrid_kv_cache_manager.md",
+      "description": "Hybrid KV cache manager design",
+      "sha256": "5a3138f8d3fddc44d69f7782510c0c97b394ee073bb743cae34bfbf281985b4a",
+      "size_bytes": 15575,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "disagg_prefill_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md",
+      "archive_url": null,
+      "filename": "docs/features/disagg_prefill.md",
+      "description": "Disaggregated prefill guide",
+      "sha256": "71e238d0815d2df4e3bf2508446eab529b8e62443bc27193752c530703262073",
+      "size_bytes": 9299,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "disagg_encoder_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_encoder.md",
+      "archive_url": null,
+      "filename": "docs/features/disagg_encoder.md",
+      "description": "Disaggregated encoder guide",
+      "sha256": "964f03b4a4f13c7461bb36b9c7e4edfe294effcd5d566d1eaeb36abc532af904",
+      "size_bytes": 3273,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "features_doc",
+      "kind": "repo_file",
+      "url": "https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/README.md",
+      "archive_url": null,
+      "filename": "docs/features/README.md",
+      "description": "Feature compatibility matrix",
+      "sha256": "dc7a3717f0670b52e9bc006cadaff7036c2e4b2532716f25455aa6ad718359fa",
+      "size_bytes": 5235,
+      "fetched_at": "2026-09-12"
+    }
+  ]
+}

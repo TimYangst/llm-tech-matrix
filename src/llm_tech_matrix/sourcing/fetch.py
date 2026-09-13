@@ -4,12 +4,15 @@ Reads data/sources/<slug>/manifest.json, downloads the listed assets into the sa
 directory, verifies sha256 checksums, and updates the manifest. All cached files are
 gitignored; only the manifest is committed.
 
+`--track engines` switches the root to data/sources/engines/ (engine snapshots, see
+docs/engines/overview.md). The default track is `models`.
+
 CLI:
-    uv run python -m llm_tech_matrix.sourcing fetch <slug> [--force]
-    uv run python -m llm_tech_matrix.sourcing add <slug> --name N --kind K --url U \\
+    uv run python -m llm_tech_matrix.sourcing [--track T] fetch <slug> [--force]
+    uv run python -m llm_tech_matrix.sourcing [--track T] add <slug> --name N --kind K --url U \\
         [--filename F] [--description D] [--archive-url A]
-    uv run python -m llm_tech_matrix.sourcing verify <slug>
-    uv run python -m llm_tech_matrix.sourcing list
+    uv run python -m llm_tech_matrix.sourcing [--track T] verify <slug>
+    uv run python -m llm_tech_matrix.sourcing [--track T] list
 """
 
 from __future__ import annotations
@@ -29,6 +32,7 @@ from dotenv import load_dotenv
 from llm_tech_matrix.sourcing.manifest import Asset, AssetKind, SourceManifest
 
 DATA_SOURCES_DIR = Path("data/sources")
+TRACK_ROOTS = {"models": DATA_SOURCES_DIR, "engines": DATA_SOURCES_DIR / "engines"}
 LARGE_FILE_WARN_BYTES = 50 * 1024 * 1024  # 50 MiB
 CHUNK_BYTES = 1 << 20  # 1 MiB
 
@@ -36,19 +40,19 @@ CHUNK_BYTES = 1 << 20  # 1 MiB
 # ---------- IO helpers ----------
 
 
-def manifest_path(slug: str) -> Path:
-    return DATA_SOURCES_DIR / slug / "manifest.json"
+def manifest_path(slug: str, root: Path = DATA_SOURCES_DIR) -> Path:
+    return root / slug / "manifest.json"
 
 
-def load_manifest(slug: str) -> SourceManifest:
-    path = manifest_path(slug)
+def load_manifest(slug: str, root: Path = DATA_SOURCES_DIR) -> SourceManifest:
+    path = manifest_path(slug, root)
     if not path.exists():
         raise FileNotFoundError(f"No manifest at {path}. Use `add` to create one.")
     return SourceManifest.model_validate_json(path.read_text())
 
 
-def save_manifest(manifest: SourceManifest) -> None:
-    path = manifest_path(manifest.slug)
+def save_manifest(manifest: SourceManifest, root: Path = DATA_SOURCES_DIR) -> None:
+    path = manifest_path(manifest.slug, root)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(manifest.model_dump_json(indent=2) + "\n")
 
@@ -128,18 +132,20 @@ def fetch_asset(asset: Asset, dest_dir: Path, *, force: bool = False) -> Asset:
 
 
 def cmd_fetch(args: argparse.Namespace) -> int:
-    manifest = load_manifest(args.slug)
-    dest_dir = DATA_SOURCES_DIR / args.slug
+    root = TRACK_ROOTS[args.track]
+    manifest = load_manifest(args.slug, root)
+    dest_dir = root / args.slug
     print(f"Fetching {len(manifest.assets)} asset(s) for '{args.slug}' into {dest_dir}")
     new_assets = [fetch_asset(a, dest_dir, force=args.force) for a in manifest.assets]
-    save_manifest(manifest.model_copy(update={"assets": new_assets}))
-    print(f"Done. Manifest updated: {manifest_path(args.slug)}")
+    save_manifest(manifest.model_copy(update={"assets": new_assets}), root)
+    print(f"Done. Manifest updated: {manifest_path(args.slug, root)}")
     return 0
 
 
 def cmd_add(args: argparse.Namespace) -> int:
-    if manifest_path(args.slug).exists():
-        manifest = load_manifest(args.slug)
+    root = TRACK_ROOTS[args.track]
+    if manifest_path(args.slug, root).exists():
+        manifest = load_manifest(args.slug, root)
         if any(a.name == args.name for a in manifest.assets):
             print(
                 f"Asset name '{args.name}' already in manifest for '{args.slug}'. "
@@ -158,17 +164,18 @@ def cmd_add(args: argparse.Namespace) -> int:
         filename=args.filename or args.name,
         description=args.description or args.name,
     )
-    dest_dir = DATA_SOURCES_DIR / args.slug
+    dest_dir = root / args.slug
     print(f"Adding '{args.name}' to {args.slug} manifest")
     asset = fetch_asset(asset, dest_dir)
-    save_manifest(manifest.model_copy(update={"assets": [*manifest.assets, asset]}))
-    print(f"Done. Manifest: {manifest_path(args.slug)}")
+    save_manifest(manifest.model_copy(update={"assets": [*manifest.assets, asset]}), root)
+    print(f"Done. Manifest: {manifest_path(args.slug, root)}")
     return 0
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
-    manifest = load_manifest(args.slug)
-    dest_dir = DATA_SOURCES_DIR / args.slug
+    root = TRACK_ROOTS[args.track]
+    manifest = load_manifest(args.slug, root)
+    dest_dir = root / args.slug
     failures = 0
     for asset in manifest.assets:
         path = dest_dir / asset.filename
@@ -189,22 +196,24 @@ def cmd_verify(args: argparse.Namespace) -> int:
             failures += 1
     if failures:
         print(
-            f"\n{failures} verification failure(s). Run `fetch {args.slug}` to repair.",
+            f"\n{failures} verification failure(s). "
+            f"Run `--track {args.track} fetch {args.slug}` to repair.",
             file=sys.stderr,
         )
     return 1 if failures else 0
 
 
-def cmd_list(_args: argparse.Namespace) -> int:
-    if not DATA_SOURCES_DIR.exists():
-        print("No data/sources/ directory yet.")
+def cmd_list(args: argparse.Namespace) -> int:
+    root = TRACK_ROOTS[args.track]
+    if not root.exists():
+        print(f"No {root}/ directory yet.")
         return 0
-    slugs = sorted(p.parent.name for p in DATA_SOURCES_DIR.glob("*/manifest.json"))
+    slugs = sorted(p.parent.name for p in root.glob("*/manifest.json"))
     if not slugs:
         print("No manifests found.")
         return 0
     for slug in slugs:
-        manifest = load_manifest(slug)
+        manifest = load_manifest(slug, root)
         print(f"  {slug}  ({len(manifest.assets)} asset(s))")
     return 0
 
@@ -215,7 +224,13 @@ def cmd_list(_args: argparse.Namespace) -> int:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m llm_tech_matrix.sourcing",
-        description="Fetch and verify public source assets backing model extractions.",
+        description="Fetch and verify public source assets backing model and engine extractions.",
+    )
+    parser.add_argument(
+        "--track",
+        choices=sorted(TRACK_ROOTS),
+        default="models",
+        help="Which source tree to use: data/sources/ (models) or data/sources/engines/",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
