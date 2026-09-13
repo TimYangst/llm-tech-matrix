@@ -48,6 +48,19 @@ Kimi K3 正是这么做的，这也是它 `rope.type` 为 `"none"` 的原因。
 | Kimi K3       | 93 层中有 69 层是 KDA，与 Gated MLA 按 3:1 交错（`config.linear_attn_config.kda_layers` / `full_attn_layers`）。96 头、head_dim 128、`short_conv_kernel_size=4`、`gate_lower_bound=-5.0`、`use_full_rank_gate=true`。K3 相对 Kimi Linear 的两项改动都在这里：下界化的 scaled-sigmoid 衰减（消掉 position-pair 对角路径）与全秩输出门。它使整个模型得以采用 NoPE。部署侧需要专门工作 —— 融合 kernel、支撑 1M token 训练的 KDA Context Parallelism，以及 KDA 感知的 prefix cache 管理（K3 论文 §5.1.1 / §5.1.2 / §5.4.1）。 |
 | GLM-5.3-Flash | **KDA 首次出现在月之暗面之外的模型上。** `linear_attn_config` = 64 头、head_dim 128、短因果卷积 4、`gate_lower_bound=-5.0`（给衰减门设下界，限制循环状态遗忘的速度）。config 里的层列表直接就叫 `kda_layers`：45 层中占 34 层，与 DSA-MLA 层按 3:1 交错。Z.AI 把它与 **NoPE** MLA 搭配，和 Kimi K3 是同一组合——位置信息由线性层承载，所以 softmax 层不需要旋转位置编码。                                                                                                                                                  |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                           | 角色      | 实现方式                                                                                                                                            | 参数                                                                           | 证据                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`sglang-v0.5.19`](../../data/extracted/engines/sglang-v0.5.19.md) | inference | Linear-attention kernel backends include flashkda, nvidia_kda and ptx_kda; v0.5.19 adds a fused-accept state advance for FlashInfer KDA MTP verify. | `--linear-attn-kernel-backend (choices include flashkda, nvidia_kda, ptx_kda)` | [server_args.py#L341](https://github.com/sgl-project/sglang/blob/0bcd822377da7b5718e674eaf9c870d349424dd1/python/sglang/srt/server_args.py#L341), [release notes](https://github.com/sgl-project/sglang/releases/tag/v0.5.19) |
+| [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md)     | inference | Fused KDA decode kernel on AMD MI325X (ROCm), per the release notes.                                                                                | —                                                                              | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)                                                                                                                                                    |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [Gated DeltaNet](./gated-deltanet.zh.md) —— 最接近的同类。Qwen3.5/3.6 以**相同的** 3:1 比例交错 Gated DeltaNet 与 Gated Attention；两者主要差别在门控参数化，以及混合搭档是否保留 RoPE（Qwen 保留，K3 不保留）。

@@ -34,6 +34,18 @@ FP4（4-bit 浮点，可为 E2M1 / MXFP4 / NVFP4 形式）相比 FP8 减半权�
 | DeepSeek-V4-Flash-0731 | 与预览版一致（`expert_dtype='fp4'`，`quantization_config` 逐字节相同）。部署侧可佐证该配方：vLLM `--kv-cache-dtype fp8` 搭配 `use_fp4_indexer_cache: true`，SGLang `--moe-runner-backend flashinfer_mxfp4`。                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | DeepSeek-V4.1-Flash    | **从权重 / indexer 扩展到 main KV 缓存。** 路由专家权重仍为 FP4（`expert_dtype='fp4'`）。新增：main（全局）KV 以 **E2M1 + 每 16 个通道一个 E4M3 scale** 存储——即 NVFP4 风格但去掉了第二级全局 scale；报告认为这一 scale 不必要，因为 RMSNorm + RoPE 把 512 通道的 KV 限定在约 √512 ≈ 22.6 以内。量化在 **RoPE 之后**进行，通过后训练阶段引入的 QAT 实现。缓存值在注意力之前反量化，所以 FP4 省的是存储而非计算，也不需要原生 FP4 矩阵乘法支持。SWA KV 因「对量化敏感」仍保持 FP8。main KV 存储相比 V4 的 FP8 几乎减半。                                                                                                                                           |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                           | 角色     | 实现方式                                                                                                                                                                  | 参数                               | 证据                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`veomni-v0.1.12`](../../data/extracted/engines/veomni-v0.1.12.md) | training | DeepSeek-V4 QAT recipe (qat_implementation=fp8_blockwise): block-wise FP8 fake quantization, with routed experts in FP4 groups when the checkpoint's expert dtype is FP4. | `qat_implementation=fp8_blockwise` | [arguments.md#L196](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md#L196), [arguments_types.py#L1224](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L1224) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [FP8 mixed precision（DeepSeek-V3 变体）](./fp8-mixed-precision.zh.md) — V4 继承的预训练框架；FP4 QAT 在其之上、在后训练阶段叠加。

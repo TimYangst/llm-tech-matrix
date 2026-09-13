@@ -36,6 +36,19 @@ Gated DeltaNet 结合了两个想法：
 | Qwen3.8-2.4T-A95B   | Gated DeltaNet 首次用到万亿规模——92 层里有 69 层。**V 头数随模型宽度扩张**（hidden 5120 时 48 → hidden 8192 时 **128**，V 状态 16384 维），而 **QK 头数固定在 16**（K 状态 2048 维），与所有小尺寸兄弟完全一致。conv kernel 4、swish 输出门控、3:1 配比均未变。                                                                                                                                                                                                                                                                                                                  |
 | Qwen3.8-Flash-Next  | head 几何与 27B 相同（V 48×128，K 16×128，conv kernel 4），但技术报告记录了两处公式变更：输出门改为**有界 sigmoid** 而非 SiLU（`output_gate_type=sigmoid`，此前每个 Qwen 3.x config 都是 swish）——「在我们的实验中带来一致的提升」——以及全模型统一使用 **zero-centered RMSNorm** 来抑制 norm 权重增长。48 层中占 36 层。报告的消融第一次用数字为这个混合结构给出依据：25B-A3B 规模下，GDN 混合在 9 个基准里 8 个胜过全注意力 Transformer、7 个胜过 SWA-128 混合（均分 53.81 / 49.87 / 51.15）。kernel 为 **FlashQLA**（TileLang），相比 FLA Triton kernel 前向 2–3×、反向约 2×。 |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                           | 角色      | 实现方式                                                                                           | 参数 | 证据                                                                                                                                                                                                                           |
+| ------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md)     | inference | GDN_ATTN backend in MambaAttentionBackendEnum; fused GDN MTP kernels for Qwen models.              | —    | [registry.py#L190](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L190), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [`veomni-v0.1.12`](../../data/extracted/engines/veomni-v0.1.12.md) | training  | Qwen3.5 GatedDeltaNet with varlen flash-linear-attention forward and Ulysses sequence parallelism. | —    | [qwen3_5_gpu_patch_gen_config.py#L21](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/qwen3_5_gpu_patch_gen_config.py#L21)                           |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [GQA](./gqa.md) — Qwen3.5 混合堆叠中的 softmax 注意力配套（每 4 层 1 层）

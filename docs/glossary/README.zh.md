@@ -15,6 +15,8 @@
 
 "Used by" 表目前手工维护。未来一个综合分析工具可以扫 `data/extracted/*.json` 中提到的技术，自动建议补充。
 
+**"实现此技术的引擎"** 小节则不同：它由 `uv run python -m llm_tech_matrix.synthesis.index` 根据引擎快照的 `technique_support[]` 自动生成，位于 `<!-- BEGIN GENERATED ... -->` / `<!-- END GENERATED ... -->` 标记之间。不要手工修改标记内的内容；过期时 CI 会失败。
+
 ## 索引
 
 ### 注意力（Attention）

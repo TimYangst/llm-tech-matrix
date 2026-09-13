@@ -32,6 +32,18 @@ DeepSeek-V3 的混合精度食谱是公开报告中第一个在前沿规模（67
 | DeepSeek-V4-Pro   | 预训练沿用 V3 的 FP8 框架（E4M3，细粒度 1×128 / 128×128 缩放，每 Nc=128 个元素在 FP32 寄存器中累加）。后训练在其上叠加 FP4 QAT（MXFP4）：MoE 专家权重（config.expert_dtype='fp4'）和 CSA Lightning Indexer 的 QK 路径走 FP4，并能无损反量化回 FP8；KV cache 把 RoPE 维度存成 BF16，其余维度走 FP8（比纯 BF16 节省约一半）。推理使用原生 FP4 权重。 |
 | DeepSeek-V4-Flash | 与 V4-Pro 相同的预训练 FP8 + 后训练 FP4 QAT 配方（同 config.quantization_config）。                                                                                                                                                                                                                                                                |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                     | 角色                       | 实现方式                                                                                  | 参数 | 证据                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------ | -------------------------- | ----------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`verl-v0.9.0`](../../data/extracted/engines/verl-v0.9.0.md) | training, rl_post_training | FP8 end-to-end: FP8 training in Megatron via Transformer Engine plus FP8 rollout in vLLM. | —    | [fp8.md#L10](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L10), [fp8.md#L163](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L163) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - _Block-wise INT8 量化（LLM.int8、GPTQ）_ — 推理期的对应方法

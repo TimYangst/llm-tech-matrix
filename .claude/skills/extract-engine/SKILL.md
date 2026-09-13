@@ -94,8 +94,13 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    ```bash
    uv run python scripts/validate_extractions.py          # schema + cross-links (model slugs, glossary slugs, filename, SHA)
    uv run python -m llm_tech_matrix.extraction.render_engine <slug>
+   uv run python -m llm_tech_matrix.synthesis.index      # support matrix, adoption report, glossary "Implemented by" sections
+   uv run python scripts/validate_registry.py             # CI fails if the generated files are stale
    uv run pre-commit run --all-files
    ```
+
+   Never hand-edit the "Implemented by (engines)" glossary sections or the `engine-*.md`
+   reports; change the record and regenerate.
 
 6. **Update tasks.** Status in `tasks/ENGINES.md`; notes, resolved seed questions and open
    questions in `tasks/engines/<slug>.md`. If a model record carries an open question the

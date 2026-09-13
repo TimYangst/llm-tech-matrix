@@ -34,6 +34,18 @@
 | DeepSeek-V3.2-Exp   | GRPO 以**单一混合 RL 阶段**运行 —— 不同于以往采用多阶段 RL 的 DeepSeek 模型，推理、智能体与人类对齐训练被合并为一个阶段，从而「在多样领域间平衡性能，同时规避多阶段训练范式常见的灾难性遗忘问题」。奖励设计：推理/智能体任务用规则化结果奖励 + 长度惩罚 + 语言一致性奖励；通用任务用逐 prompt rubric 的生成式奖励模型；整体明确在「长度 vs 准确率」与「语言一致性 vs 准确率」两组权衡上取平衡。这一阶段正是 DeepSeek-V4 后来用多教师 On-Policy Distillation **取代**的对象，使 V3.2-Exp → V4 构成一条清晰的两步演进轨迹。                                                                                                                                                                                                                                |
 | DeepSeek-V4.1-Flash | GRPO **完全异步**运行，rollout 与训练同机共置、分时执行。**样本级派发**——新完成的样本数凑够下一个 prompt 的 group 大小时就派发该 prompt（批级派发会导致指标振荡，prompt 级派发会卡在长尾样本上）。跨多个 checkpoint 的样本使用**拼接式路由回放（concatenated routing replay）**；限制 off-policy 比例并对过旧 token 做 loss 屏蔽；按数据集设并发上限以缓解长度偏置；支持 token 级中断，并持久化 KV 与路由状态。按强度条件化的 RL 在（prompt, 强度）子组内计算优势；相继的 RL 运行通过合并不同 scaffold 的 checkpoint 来重新初始化。                                                                                                                                                                                                                      |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                     | 角色                       | 实现方式                                                                                                | 参数                           | 证据                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`verl-v0.9.0`](../../data/extracted/engines/verl-v0.9.0.md) | training, rl_post_training | AdvantageEstimator 'grpo' (plus grpo_passk and grpo_vectorized); selected with algorithm.adv_estimator. | `algorithm.adv_estimator=grpo` | [core_algos.py#L98](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py#L98), [ppo_trainer.yaml#L74](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L74) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - _PPO、DPO_ — 相关但不同的对齐阶段算法（待补条目占位）

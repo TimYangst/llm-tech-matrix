@@ -22,6 +22,11 @@ by collecting cross-model adoption in one place.
 The "Used by" tables are maintained by hand for now. A future synthesis tool can scan
 `data/extracted/*.json` for technique mentions and propose additions.
 
+The **"Implemented by (engines)"** sections are different: they are generated from engine
+snapshots' `technique_support[]` rows by `uv run python -m llm_tech_matrix.synthesis.index`,
+between `<!-- BEGIN GENERATED ... -->` / `<!-- END GENERATED ... -->` markers. Do not edit
+inside the markers; CI fails when they are stale.
+
 ## Index
 
 ### Attention

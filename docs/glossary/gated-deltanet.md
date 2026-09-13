@@ -48,6 +48,19 @@ Attention layer, repeated 16 times across a 64-layer stack.
 | Qwen3.8-2.4T-A95B  | First Gated DeltaNet deployment at trillion scale — 69 of 92 layers. The **V-head count scales with model width** (48 at hidden 5120 → **128** at hidden 8192, a 16384-dim V state) while the **QK-head count stays pinned at 16** (2048-dim K state) exactly as in every smaller sibling. Same conv kernel 4, same swish output gate, same 3:1 cadence.                                                                                                                                                                                                                                                                                                                                                                                             |
 | Qwen3.8-Flash-Next | Same head geometry as the 27B (V 48×128, K 16×128, conv kernel 4), but the tech report documents two formulation changes: the output gate becomes a **bounded sigmoid** instead of SiLU (`output_gate_type=sigmoid`, vs swish in every earlier Qwen 3.x config) — 'consistent improvements across our experiments' — and **zero-centered RMSNorm** is applied throughout to constrain norm-weight growth. 36 of 48 layers. The report's own ablation justifies the hybrid for the first time with numbers: at 25B-A3B the GDN hybrid beats a full-attention Transformer on 8 of 9 benchmarks and an SWA-128 hybrid on 7 of 9 (avg 53.81 / 49.87 / 51.15). Kernel: **FlashQLA** (TileLang), 2–3× forward and ~2× backward over the FLA Triton kernel. |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## Implemented by (engines)
+
+Generated from `technique_support[]` in the engine snapshots under [`data/extracted/engines/`](../../data/extracted/engines/) — do not edit. "Used by" above records models adopting the technique; this table records engines implementing it.
+
+| Engine snapshot                                                    | Roles     | Implementation                                                                                     | Flags | Evidence                                                                                                                                                                                                                       |
+| ------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md)     | inference | GDN_ATTN backend in MambaAttentionBackendEnum; fused GDN MTP kernels for Qwen models.              | —     | [registry.py#L190](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L190), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [`veomni-v0.1.12`](../../data/extracted/engines/veomni-v0.1.12.md) | training  | Qwen3.5 GatedDeltaNet with varlen flash-linear-attention forward and Ulysses sequence parallelism. | —     | [qwen3_5_gpu_patch_gen_config.py#L21](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/qwen3_5_gpu_patch_gen_config.py#L21)                           |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## Related techniques
 
 - [GQA](./gqa.md) — the softmax-attention companion in Qwen3.5's hybrid stack (1 in every 4 layers)

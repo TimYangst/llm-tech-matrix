@@ -5,7 +5,7 @@ Read this when you (or a fresh Claude Code agent) need to pick up where we left 
 ## Three-step orientation
 
 1. **Read [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)** — `Current focus` at top + per-model status table.
-2. **Skim [`data/extracted/README.md`](../data/extracted/README.md)** — the generated model index (family, date, size, techniques). Every model has `<slug>.json` (canonical data), `<slug>.md` and `<slug>.zh.md` (readable summaries). For the cross-model view start at [`data/reports/technique-index.md`](../data/reports/technique-index.md).
+2. **Skim [`data/extracted/README.md`](../data/extracted/README.md)** — the generated model index (family, date, size, techniques). Every model has `<slug>.json` (canonical data), `<slug>.md` and `<slug>.zh.md` (readable summaries). For the cross-model view start at [`data/reports/technique-index.md`](../data/reports/technique-index.md); for which engines serve or train each model, [`data/reports/engine-support-matrix.md`](../data/reports/engine-support-matrix.md).
 3. **Pick a task** — if `Current focus` recommends a next model, do that. Otherwise see *How to pick a next task* below.
 
 ## The 60-second project description

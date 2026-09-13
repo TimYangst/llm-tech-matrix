@@ -41,6 +41,18 @@ The reported relative loss error vs. BF16 is consistently below 0.25%.
 | DeepSeek-V4-Pro   | Pre-training inherits V3's FP8 framework (E4M3, fine-grained 1×128 / 128×128 scaling, FP32 register accumulation every Nc=128 elements). Post-training adds **FP4 QAT** (MXFP4) on top: MoE expert weights (config.expert_dtype='fp4') and the CSA lightning-indexer QK path go to FP4 with lossless dequant to FP8; KV cache stores RoPE dims in BF16 + remaining dims in FP8 (~half size vs pure BF16). Inference uses native FP4 weights. |
 | DeepSeek-V4-Flash | Identical pre-train FP8 + post-train FP4 QAT recipe to V4-Pro (same config.quantization_config).                                                                                                                                                                                                                                                                                                                                             |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## Implemented by (engines)
+
+Generated from `technique_support[]` in the engine snapshots under [`data/extracted/engines/`](../../data/extracted/engines/) — do not edit. "Used by" above records models adopting the technique; this table records engines implementing it.
+
+| Engine snapshot                                              | Roles                      | Implementation                                                                            | Flags | Evidence                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------ | -------------------------- | ----------------------------------------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`verl-v0.9.0`](../../data/extracted/engines/verl-v0.9.0.md) | training, rl_post_training | FP8 end-to-end: FP8 training in Megatron via Transformer Engine plus FP8 rollout in vLLM. | —     | [fp8.md#L10](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L10), [fp8.md#L163](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L163) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## Related techniques
 
 - _Block-wise INT8 quantization (LLM.int8, GPTQ)_ — inference-time analogues

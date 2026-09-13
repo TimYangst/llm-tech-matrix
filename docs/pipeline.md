@@ -126,4 +126,10 @@ Code per layer:
 - **Extraction:** `engine_schema.py`, `extraction/render_engine.py`, `.claude/skills/extract-engine/`,
   plus the engine branch of `scripts/validate_extractions.py`, which also checks the cross-links
   to model and glossary slugs.
-- **Synthesis:** planned for E4.
+- **Synthesis:** `synthesis/engines.py`, called from `synthesis.index` and covered by the same
+  staleness check in `scripts/validate_registry.py`. It generates
+  `data/reports/engine-support-matrix.md` (models × snapshots, techniques × snapshots,
+  per-model details, integration version constraints), `data/reports/engine-adoption.md`
+  (month-precision lag from model release to engine support) and the "Implemented by
+  (engines)" glossary sections. Engine rows name glossary slugs directly, so no registry
+  slots are needed.
