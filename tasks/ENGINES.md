@@ -6,12 +6,13 @@ Model status stays in [`ROADMAP.md`](./ROADMAP.md).
 
 ## Current focus
 
-**Phase:** **E2 done** (`sglang-v0.5.19`; engine schema v2). **Next: E3**, `verl-v0.9.0`
+**Phase:** **E2 done** (`sglang-v0.5.19`). **Next: E3**, `verl-v0.9.0`
 (RL post-training role), then `veomni-v0.1.12` (training role), which add the first non-inference
 role subobjects.
 
-E2 surfaced one schema break and fixed it in **engine schema v2**: parsers and `since_version`
-are per model, not per architecture (models sharing an architecture differ). First
+E2 surfaced one schema break before engine schema v1 was merged, so the fix went straight into
+v1: parsers and `since_version` are per model, not per architecture (models sharing an
+architecture differ). First
 cross-engine findings, detailed in [`engines/sglang-v0.5.19.md`](./engines/sglang-v0.5.19.md):
 
 - **First adoption split.** Qwen3.8-Flash-Next is native in vLLM v0.29.0 but absent from

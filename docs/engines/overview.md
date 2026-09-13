@@ -1,6 +1,6 @@
 # Engines track: design
 
-Status: **E2 done** (`sglang-v0.5.19`; engine schema v2). E1 (pilot) done: engine schema is implemented in
+Status: **E2 done** (`vllm-v0.29.0` pilot and `sglang-v0.5.19`). Engine schema v1 is implemented in
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py), with the
 field spec in [`schema.md`](./schema.md). The first record is
 [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md). The draft schema section below
@@ -181,13 +181,13 @@ EngineRecord
 
 ## Phases
 
-| Phase | Deliverable                                                                                                         | Exit criteria                                  |
-| ----- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| E0    | This design; vision / roadmap / session-start / conventions updated; `tasks/ENGINES.md`                             | Merged                                         |
-| E1    | Pilot `vllm-v0.29.0`: engine schema v1, `extract-engine` skill, sourcing `engines/` target, renderer, CI validation | One record validates in CI; schema gaps listed |
-| E2    | `sglang-v0.5.19`, the same role as a cross-engine stress test                                                       | No schema field is vLLM-shaped                 |
-| E3    | `verl-v0.9.0` (rl role, integrations), then `veomni-v0.1.12` (training role)                                        | All three role subobjects exercised            |
-| E4    | Registry engine slots, "Implemented by" tables, support matrix, first adoption-lag report                           | Matrix covers all extracted models             |
+| Phase | Deliverable                                                                                                      | Exit criteria                                  |
+| ----- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| E0    | This design; vision / roadmap / session-start / conventions updated; `tasks/ENGINES.md`                          | Merged                                         |
+| E1    | Pilot `vllm-v0.29.0`: engine schema, `extract-engine` skill, sourcing `engines/` target, renderer, CI validation | One record validates in CI; schema gaps listed |
+| E2    | `sglang-v0.5.19`, the same role as a cross-engine stress test                                                    | No schema field is vLLM-shaped                 |
+| E3    | `verl-v0.9.0` (rl role, integrations), then `veomni-v0.1.12` (training role)                                     | All three role subobjects exercised            |
+| E4    | Registry engine slots, "Implemented by" tables, support matrix, first adoption-lag report                        | Matrix covers all extracted models             |
 
 vLLM goes first because its `docs/design/` is the most complete. The pilot is where the
 schema gets tested against real material, just as DeepSeek-V3 was for models.

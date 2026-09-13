@@ -2,7 +2,7 @@
 
 > English: [vllm-v0.29.0.md](./vllm-v0.29.0.md)
 
-*引擎 schema 版本： 2*
+*引擎 schema 版本： 1*
 
 ## 概览
 

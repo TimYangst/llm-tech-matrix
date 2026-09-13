@@ -2,7 +2,7 @@
 
 > 中文版：[vllm-v0.29.0.zh.md](./vllm-v0.29.0.zh.md)
 
-*Engine schema version: 2*
+*Engine schema version: 1*
 
 ## Overview
 

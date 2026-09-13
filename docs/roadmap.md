@@ -49,7 +49,8 @@ status and snapshot calendar: [`../tasks/ENGINES.md`](../tasks/ENGINES.md).
    sourcing, renderer, CI validation. First record: 15 architecture rows (2 absent), 8 technique
    rows.
 3. ✅ **E2: `sglang-v0.5.19`.** Same role, used as a cross-engine stress test. It broke one v1
-   assumption, since parsers and `since_version` are per model; the fix is engine schema v2.
+   assumption before landing (parsers and `since_version` are per model), folded into engine
+   schema v1.
 4. ⬜ **E3: `verl-v0.9.0`, then `veomni-v0.1.12`.** Exercises the RL and training roles and
    integrations.
 5. ⬜ **E4: first engine synthesis.** Models × engines support matrix and one adoption-lag

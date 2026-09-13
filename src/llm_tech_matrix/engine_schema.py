@@ -1,4 +1,4 @@
-"""Pydantic models for the engine snapshot schema (engine schema v2).
+"""Pydantic models for the engine snapshot schema (engine schema v1).
 
 Engines (vLLM, SGLang, verl, VeOmni) are a second record type, parallel to the model
 records validated by `schema.py`. Records live at `data/extracted/engines/<slug>.json`.
@@ -14,7 +14,7 @@ Cardinal rules carried over from the model track, tightened for engines:
   URLs with `#L` line anchors where possible) or the tag's release notes. `EngineRecord`
   enforces that populated serving fields, parallelism entries, model rows and technique rows
   all cite something.
-- v2 implements only the `inference` role. `training` and `rl_post_training` are part of the
+- v1 implements only the `inference` role. `training` and `rl_post_training` are part of the
   vocabulary but their subobjects arrive with the first snapshot that needs them (E3), so a
   record claiming those roles fails validation for now instead of silently carrying nothing.
 """
@@ -23,7 +23,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ENGINE_SCHEMA_VERSION = 2
+ENGINE_SCHEMA_VERSION = 1
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 EngineRole = Literal["inference", "training", "rl_post_training"]
@@ -142,7 +142,7 @@ class Integration(_Strict):
 
 
 class ModelDetail(_Strict):
-    """Facts about one model record that do not follow from its architecture (added in v2).
+    """Facts about one model record that do not follow from its architecture.
 
     Two models can share an HF architecture yet differ here: SGLang v0.5.19 maps Kimi K2
     Thinking (DeepseekV3ForCausalLM) to the `kimi_k2` parsers while DeepSeek-V3 gets none, and
@@ -200,7 +200,7 @@ class ModelSupport(_Strict):
     )
     model_details: list[ModelDetail] = Field(
         default_factory=list,
-        description="Per-model facts: since_version and doc-stated parser mappings (v2)",
+        description="Per-model facts: since_version and doc-stated parser mappings",
     )
     notes: str = ""
     evidence: list[str] = Field(min_length=1)
@@ -238,7 +238,7 @@ class EngineRecord(_Strict):
         unimplemented = roles - IMPLEMENTED_ROLES
         if unimplemented:
             raise ValueError(
-                f"roles {sorted(unimplemented)} have no subobject in engine schema v2 "
+                f"roles {sorted(unimplemented)} have no subobject in engine schema v1 "
                 "(training / rl subobjects land with the first snapshot that needs them)"
             )
         if ("inference" in roles) != (self.serving is not None):

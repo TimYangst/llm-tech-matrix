@@ -25,16 +25,17 @@ the models tree at the commit.
 **Reproducibility caveat:** `release_notes.json` is GitHub API output with mutable counters, so
 its sha256 will drift.
 
-## What E2 was for: stress-testing engine schema v1
+## What E2 was for: stress-testing the engine schema
 
-The first cross-engine record broke one v1 assumption, now fixed in **engine schema v2**:
+The first cross-engine record broke one assumption of the pilot schema. E1 and E2 landed together,
+so the fix is part of **engine schema v1** rather than a version bump:
 
 - **Parsers and `since_version` are per model, not per architecture.** SGLang's docs map Kimi
   K2 Thinking to the `kimi_k2` reasoning and tool parsers, while DeepSeek-V3 (same
   `DeepseekV3ForCausalLM`) gets none. The release notes list Qwen3.8-27B as new in v0.5.19,
   although `Qwen3_5ForConditionalGeneration` was already supported for Qwen3.5-27B and 3.6-27B.
-  v2 moves those three fields into `model_support[].model_details[]`
-  (`scripts/migrate_engine_v1_to_v2.py` migrated `vllm-v0.29.0`).
+  Those three fields therefore live in `model_support[].model_details[]`; the vLLM record was
+  reshaped to match.
 
 Held without change:
 
