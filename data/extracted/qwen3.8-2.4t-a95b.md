@@ -2,7 +2,7 @@
 
 > 中文版：[qwen3.8-2.4t-a95b.zh.md](./qwen3.8-2.4t-a95b.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 
@@ -153,6 +153,26 @@ _Shared modules:_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_ded
     - Kwargs: `reasoning_effort=low`
 - **`preserved thinking (default ON)`**
     - Kwargs: `preserve_thinking=true`
+
+**Reasoning effort:**
+
+| | |
+|---|---|
+| API parameter | `reasoning_effort` |
+| Delivery | `system_message_instruction` |
+| Scale | `discrete` |
+
+| Level | Numeric value | Default | Rendering | Notes |
+|---|---|---|---|---|
+| `xhigh` | — | ✓ | 'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message) | — |
+| `medium` | — |  | none — the template leaves reasoning_instructions empty for this level | The middle level is the bare prompt; only xhigh and low add text. |
+| `low` | — |  | 'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message) | — |
+
+**Applies when:** Unconditional — the open checkpoint is thinking-only (the template raises on enable_thinking=false).
+
+**Unrecognized value:** The chat template raises an exception for any value outside {xhigh, medium, low}.
+
+_Notes:_ If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions).
 
 **Tool-call protocol:**
 

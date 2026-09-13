@@ -2,7 +2,7 @@
 
 > 中文版：[glm-5.3-flash.zh.md](./glm-5.3-flash.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 
@@ -191,6 +191,24 @@ _Shared modules:_ `num_nextn_predict_layers=1`, parameter-shared, as in the GLM-
     - Kwargs: `reasoning_effort=low`
 - **`preserved thinking (default ON)`**
     - Kwargs: `clear_thinking=false`
+
+**Reasoning effort:**
+
+| | |
+|---|---|
+| API parameter | `reasoning_effort` |
+| Delivery | `prompt_prefix` |
+| Scale | `discrete` |
+
+| Level | Numeric value | Default | Rendering | Notes |
+|---|---|---|---|---|
+| `max` | — | ✓ | '<\|system\|>Reasoning Effort: Max' as the prompt prefix | — |
+| `high` | — |  | [Unknown/Not Disclosed] | — |
+| `low` | — |  | [Unknown/Not Disclosed] | New in 5.3-Flash; GLM-5.2 accepted only {high, max}. |
+
+**Applies when:** Unconditional — resolved before any thinking check; there is no enable_thinking in this template.
+
+**Unrecognized value:** Accepts 'low' and 'high'; anything else silently falls back to 'max'.
 
 **Tool-call protocol:**
 

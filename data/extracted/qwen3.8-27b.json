@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "Qwen3.8-27B",
     "family": "Qwen",
@@ -179,6 +179,39 @@
         "arguments_schema": "Per-arg <parameter=name>VALUE</parameter> blocks nested inside a <function=NAME></function> wrapper, unchanged from Qwen3.5/3.6. Tool schemas are declared in the system message as `<tools>` with one `tool | tojson` line per tool. One template-level hardening vs 3.6: the argument loop now skips arguments whose value is the empty string (`tool_call.arguments is defined and tool_call.arguments != ''`), where 3.6 only checked for definedness.",
         "parser_flags": {},
         "notes": "The wire format is identical to Qwen3.6, but the DISCLOSURE changed: the Qwen3.8 README no longer prints `--tool-call-parser qwen3_coder` / `--reasoning-parser qwen3` serving snippets, replacing them with links to per-framework cookbooks (SGLang, vLLM, TokenSpeed). parser_flags is therefore left empty rather than carried over from 3.6 — see open_questions."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "system_message_instruction",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "xhigh",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message)",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "medium",
+            "numeric_value": null,
+            "rendering": "none — the template leaves reasoning_instructions empty for this level",
+            "is_default": false,
+            "notes": "The middle level is the bare prompt; only xhigh and low add text."
+          },
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message)",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Thinking mode only — with enable_thinking=false the template skips effort resolution entirely.",
+        "invalid_value_behavior": "The chat template raises an exception for any value outside {xhigh, medium, low}.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions)."
       }
     },
     "advanced": {

@@ -100,6 +100,10 @@ LABELS: dict[str, dict[str, str]] = {
         "sa_kv_compression_ratio": "KV compression ratio",
         "sa_selection": "Selection rule",
         "sa_training_recipe": "Training recipe",
+        # Cross-layer sharing
+        "cross_layer_sharing": "Cross-layer sharing",
+        "cls_table_header": "| Kind | Shared state | Source layers | Consumer layers |",
+        "cls_effect": "Effect",
         # FFN rows
         "dense_intermediate_size": "Dense intermediate size",
         "moe": "MoE",
@@ -163,6 +167,25 @@ LABELS: dict[str, dict[str, str]] = {
         "am_architecture": "Architecture",
         "am_shipped": "Shipped in checkpoint",
         "am_activation": "How to enable",
+        # Memory modules
+        "memory_modules": "Memory modules",
+        "mm_kind": "Kind",
+        "mm_params": "Parameters",
+        "mm_layers": "Injected at layers",
+        "mm_addressing": "Addressing",
+        "mm_table_config": "Table configuration",
+        "mm_storage": "Storage",
+        "mm_optimizer": "Optimizer",
+        # Reasoning effort
+        "reasoning_effort": "Reasoning effort",
+        "re_api_parameter": "API parameter",
+        "re_delivery": "Delivery",
+        "re_scale": "Scale",
+        "re_range": "Range",
+        "re_applies_when": "Applies when",
+        "re_invalid_value": "Unrecognized value",
+        "re_training_method": "Training method",
+        "re_levels_header": "| Level | Numeric value | Default | Rendering | Notes |",
         # Residual connections
         "rc_kind": "Kind",
         "rc_expansion_factor": "Expansion factor (n_hc)",
@@ -262,6 +285,10 @@ LABELS: dict[str, dict[str, str]] = {
         "sa_kv_compression_ratio": "KV 压缩比",
         "sa_selection": "选择规则",
         "sa_training_recipe": "训练配方",
+        # Cross-layer sharing
+        "cross_layer_sharing": "跨层共享",
+        "cls_table_header": "| 类型 | 共享内容 | 来源层 | 复用层 |",
+        "cls_effect": "效果",
         # FFN rows
         "dense_intermediate_size": "Dense 中间维度",
         "moe": "MoE",
@@ -325,6 +352,25 @@ LABELS: dict[str, dict[str, str]] = {
         "am_architecture": "结构",
         "am_shipped": "是否随权重发布",
         "am_activation": "启用方式",
+        # Memory modules
+        "memory_modules": "记忆模块",
+        "mm_kind": "类型",
+        "mm_params": "参数量",
+        "mm_layers": "注入层",
+        "mm_addressing": "寻址方式",
+        "mm_table_config": "表配置",
+        "mm_storage": "存储位置",
+        "mm_optimizer": "优化器",
+        # Reasoning effort
+        "reasoning_effort": "推理强度（reasoning effort）",
+        "re_api_parameter": "API 参数",
+        "re_delivery": "注入方式",
+        "re_scale": "刻度",
+        "re_range": "取值范围",
+        "re_applies_when": "生效条件",
+        "re_invalid_value": "非法取值的处理",
+        "re_training_method": "训练方法",
+        "re_levels_header": "| 档位 | 数值 | 默认 | 注入内容 | 说明 |",
         # Residual connections
         "rc_kind": "类型",
         "rc_expansion_factor": "扩展因子（n_hc）",
@@ -397,6 +443,13 @@ def _row(label: str, value: Any) -> str:
 def _table(rows: list[tuple[str, Any]]) -> str:
     body = "\n".join(_row(k, v) for k, v in rows)
     return f"| | |\n|---|---|\n{body}"
+
+
+def _labeled(labels: dict[str, str], key: str, value: Any, lang: str, italic: bool = False) -> str:
+    """A `**Label:** value` paragraph, with the full-width colon in Chinese."""
+    colon = "：" if lang == "zh" else ":"
+    mark = "_" if italic else "**"
+    return f"{mark}{labels[key]}{colon}{mark} {value}"
 
 
 def _bullets(items: list[str], none_marker: str) -> str:
@@ -649,6 +702,30 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
             )
             parts.append("")
 
+    if att.cross_layer_sharing:
+        parts.append(_labeled(labels, "cross_layer_sharing", "", lang).rstrip())
+        parts.append("")
+        parts.append(labels["cls_table_header"])
+        parts.append("|---|---|---|---|")
+        for cls in att.cross_layer_sharing:
+            state = ", ".join(f"`{s}`" for s in cls.shared_state) or "—"
+            src = _escape_table_pipes(str(cls.source_layers))
+            dst = _escape_table_pipes(str(cls.consumer_layers))
+            parts.append(f"| `{cls.kind}` | {state} | {src} | {dst} |")
+        parts.append("")
+        for cls in att.cross_layer_sharing:
+            details = []
+            if cls.effect != UNKNOWN:
+                details.append(_labeled(labels, "cls_effect", cls.effect, lang))
+            if cls.training_recipe:
+                details.append(_labeled(labels, "sa_training_recipe", cls.training_recipe, lang))
+            if cls.notes:
+                details.append(_labeled(labels, "notes", cls.notes, lang, italic=True))
+            if details:
+                parts.append(f"- **`{cls.kind}`** ({', '.join(cls.shared_state)})")
+                parts.extend(f"    - {d}" for d in details)
+        parts.append("")
+
     parts.append(
         f"### {labels['ffn']}（{arch.ffn.ffn_type}）"
         if lang == "zh"
@@ -773,6 +850,35 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
                     if lang == "zh"
                     else f"_{labels['notes']}:_ {am.notes}"
                 )
+                parts.append("")
+
+    if arch.memory_modules:
+        parts.append(f"### {labels['memory_modules']}")
+        parts.append("")
+        for mm in arch.memory_modules:
+            parts.append(f"**{mm.name}**")
+            parts.append("")
+            parts.append(
+                _table(
+                    [
+                        (labels["mm_kind"], f"`{mm.kind}`"),
+                        (labels["mm_params"], mm.params),
+                        (labels["mm_layers"], mm.layers),
+                    ]
+                )
+            )
+            parts.append("")
+            for key, value in (
+                ("mm_addressing", mm.addressing),
+                ("mm_table_config", mm.table_config),
+                ("mm_storage", mm.storage),
+                ("mm_optimizer", mm.optimizer),
+            ):
+                if value and value != UNKNOWN:
+                    parts.append(_labeled(labels, key, value, lang))
+                    parts.append("")
+            if mm.notes:
+                parts.append(_labeled(labels, "notes", mm.notes, lang, italic=True))
                 parts.append("")
 
     parts.append(f"### {labels['parallelism']}")
@@ -932,6 +1038,41 @@ def render(model: ExtractedModel, lang: str = "en", slug: str | None = None) -> 
                     else f"    - {labels['im_sampling']}: {kv}"
                 )
         if modes_with_struct:
+            parts.append("")
+
+    if al.reasoning_effort is not None:
+        re_ = al.reasoning_effort
+        parts.append(_labeled(labels, "reasoning_effort", "", lang).rstrip())
+        parts.append("")
+        re_rows: list[tuple[str, Any]] = [
+            (labels["re_api_parameter"], f"`{re_.api_parameter}`"),
+            (labels["re_delivery"], f"`{re_.delivery}`"),
+            (labels["re_scale"], f"`{re_.scale}`"),
+        ]
+        if re_.range:
+            re_rows.append((labels["re_range"], re_.range))
+        parts.append(_table(re_rows))
+        parts.append("")
+        if re_.levels:
+            parts.append(labels["re_levels_header"])
+            parts.append("|---|---|---|---|---|")
+            for lv in re_.levels:
+                numeric = lv.numeric_value if lv.numeric_value is not None else "—"
+                default = "✓" if lv.is_default else ""
+                rendering = _escape_table_pipes(lv.rendering) or "—"
+                notes = _escape_table_pipes(lv.notes) or "—"
+                parts.append(f"| `{lv.name}` | {numeric} | {default} | {rendering} | {notes} |")
+            parts.append("")
+        for key, value in (
+            ("re_applies_when", re_.applies_when),
+            ("re_invalid_value", re_.invalid_value_behavior),
+            ("re_training_method", re_.training_method),
+        ):
+            if value and value != UNKNOWN:
+                parts.append(_labeled(labels, key, value, lang))
+                parts.append("")
+        if re_.notes:
+            parts.append(_labeled(labels, "notes", re_.notes, lang, italic=True))
             parts.append("")
 
     if al.tool_call_protocol is not None:

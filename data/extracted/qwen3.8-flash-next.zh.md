@@ -2,7 +2,7 @@
 
 > English: [qwen3.8-flash-next.md](./qwen3.8-flash-next.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -141,19 +141,6 @@ _说明：_ n_r = 4 branches, with a **separate GR module for the attention bloc
 
 ### 辅助模块
 
-**N-gram embedding layer**
-
-| | |
-|---|---|
-| 用途 | `capacity_scaling — adds parameters outside the backbone at negligible per-token FLOPs, by conditioning memory retrieval on local context (short n-grams ending at each token) rather than token identity alone` |
-| 是否随权重发布 | `True` |
-
-**结构：** A single layer at **layer 2** holding **51B parameters** in a 20,000,000-entry table (ngram_size=3, i.e. bigrams/trigrams; heads_per_ngram=8; embed dim 2560; a depthwise conv of kernel 4; split into 128 parts). Tables are **held off-accelerator in host memory and asynchronously prefetched** — deterministic addressing is what makes offloading possible. Layer 2 was chosen specifically so the prefetch overlaps the computation of layer 1.
-
-**启用方式：** Always on — part of the forward pass, not an opt-in serving feature. The 51B is reported separately from the 125B backbone total because it does not occupy accelerator memory.
-
-_说明：_ Placement ablation (report Tab. 7, fixed parameter budget): no depth regime dominates, layers 1-2 are strongest, splitting the budget across multiple layers gives no consistent benefit — one layer suffices, and placement is largely insensitive to the attention mechanism. Vocabulary-scaling ablation (Tab. 9, 20V -> 200V where V=250K): **loss decreases monotonically while downstream accuracy saturates or fluctuates** — one of the report's headline loss/benchmark disagreements. Chinese benchmarks (C-Eval, CMMLU) are the exception, improving consistently with vocabulary size. Under a *fixed* total parameter budget traded against MoE experts (Tab. 8), the loss optimum sits at 10x (25% of params) but downstream shows no clear gain over the MoE-only baseline, leading the report to conclude that 'N-gram embeddings and MoE experts play distinct roles in scaling capacity'. Token normalization, non-uniform allocation across n-gram orders and frequency-based slot partitioning were all tried and gave no consistent gain. The n-gram table runs on Adam with weight decay disabled; its key/value projections are on Muon.
-
 **MTP module**
 
 | | |
@@ -166,6 +153,26 @@ _说明：_ Placement ablation (report Tab. 7, fixed parameter budget): no depth
 **启用方式：** [Unknown/Not Disclosed] — the README does not print per-framework speculative-decoding flags; the report evaluates four-step speculative decoding.
 
 _说明：_ Following GLM-5, the MTP module **reuses the QSA top-k indices across speculative-decoding steps** to cut draft-model cost. Report Tab. 4 confirms this is free: mean accepted length under four-step speculative decoding is 4.06 with full attention and 4.07 with QSA (MT-Bench 3.44/3.47, GSM8K 4.19/4.20, MATH 4.29/4.30, HumanEval 4.24/4.26, MBPP 4.12/4.13).
+
+### 记忆模块
+
+**N-gram embedding layer**
+
+| | |
+|---|---|
+| 类型 | `ngram_embedding` |
+| 参数量 | 51B (reported separately from the 125B backbone total) |
+| 注入层 | [2] |
+
+**寻址方式：** Short n-grams ending at each token (ngram_size=3, i.e. bigrams/trigrams), heads_per_ngram=8
+
+**表配置：** 20,000,000-entry table, embed dim 2560, depthwise conv of kernel 4, split into 128 parts
+
+**存储位置：** Held off-accelerator in host memory and asynchronously prefetched; layer 2 chosen so the prefetch overlaps layer 1's computation
+
+**优化器：** Adam with weight decay disabled for the table; its key/value projections are on Muon
+
+_说明：_ Placement ablation (report Tab. 7, fixed parameter budget): no depth regime dominates, layers 1-2 are strongest, splitting the budget across layers gives no consistent benefit. Vocabulary scaling 20V → 200V (Tab. 9, V=250K): loss decreases monotonically while downstream accuracy saturates or fluctuates; Chinese benchmarks (C-Eval, CMMLU) are the exception. Traded against MoE experts at fixed total params (Tab. 8): loss optimum at 10× (25% of params) but no clear downstream gain — 'N-gram embeddings and MoE experts play distinct roles in scaling capacity'. Token normalization, non-uniform allocation across orders and frequency-based slot partitioning gave no consistent gain.
 
 ### 并行 / 基础设施
 
@@ -231,6 +238,26 @@ _共享模块：_ mtp_num_hidden_layers=1, mtp_use_dedicated_embeddings=false (s
 - **`preserved thinking (default ON)`**
     - Kwargs：`preserve_thinking=true`
 
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `system_message_instruction` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `xhigh` | — | ✓ | 'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message) | — |
+| `medium` | — |  | none — the template leaves reasoning_instructions empty for this level | The middle level is the bare prompt; only xhigh and low add text. |
+| `low` | — |  | 'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message) | — |
+
+**生效条件：** Thinking mode only; chat_template.jinja is byte-identical to Qwen3.8-27B's (bar a trailing newline).
+
+**非法取值的处理：** The chat template raises an exception for any value outside {xhigh, medium, low}.
+
+_说明：_ If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions).
+
 **Tool-call 协议：**
 
 | | |
@@ -292,7 +319,7 @@ _说明：_ hidden_act=gelu_pytorch_tanh; num_position_embeddings=2304. preproce
 - Post-training is entirely undisclosed: no SFT description, no RL algorithm, no reward design, no agentic-environment details. The tech report is an *architecture and optimization* report and says so — §4 evaluates the base model, and the post-trained numbers appear only on the model card without method. This is a much better disclosure floor than Qwen3.5/3.6/3.8 (which had no report at all) but the post-training half remains dark.
 - The learning-rate decay schedule is not stated. The report gives the scaling-law-predicted optimum for LR and batch size and states batch warmup was dropped, but not the schedule shape (WSD? cosine?) or the peak/final values at production scale.
 - MTP trained step depth D is still not disclosed — four-step speculative decoding is evaluated, but that is an inference-time configuration, not necessarily the trained depth.
-- How the n-gram embedding fits the schema is unresolved. It is recorded under `architecture.auxiliary_modules` because it is a separately-parameterized, off-accelerator, deterministically-addressed table, but it sits inside the forward pass at layer 2, so it is not 'auxiliary' in the DSpark/draft-head sense the v7 field was added for. If a second vendor ships embedding-table capacity scaling, the schema likely needs a dedicated slot rather than a stretched one.
+- RESOLVED IN v8 — moved to `architecture.memory_modules[]`, added after Engram (deepseek-v4.1-flash) became the second occurrence. Original question: How the n-gram embedding fits the schema is unresolved. It is recorded under `architecture.auxiliary_modules` because it is a separately-parameterized, off-accelerator, deterministically-addressed table, but it sits inside the forward pass at layer 2, so it is not 'auxiliary' in the DSpark/draft-head sense the v7 field was added for. If a second vendor ships embedding-table capacity scaling, the schema likely needs a dedicated slot rather than a stretched one.
 - Parameter accounting is three-way (125B backbone + 51B n-gram + 4B MTP) and the schema's `params_total` is a single string. The value here spells all three out, but cross-model aggregation over `params_total` will not parse it. Worth considering a structured parameter-budget field if off-accelerator or module-external parameters recur.
 - `indexer_budget=2048` is a token budget that maps to 512 micro-blocks at r=4. `sparse_attention.top_k` is recorded as 2048 (tokens) to stay comparable with DSA-family records, but the selection actually operates on 512 block units — the two conventions differ, and a naive cross-model comparison of `top_k` will mis-rank QSA against DSA.
 - GR's relationship to mHC (DeepSeek-V4) and AttnRes (Kimi K3) is documented by the vendor with head-to-head loss numbers, but all comparisons are at 25B-A3B / 28-layer proxy scale. Whether GR's advantage over mHC (which at that scale the report calls 'comparable', with GR winning on efficiency rather than quality) holds at production scale is not shown.

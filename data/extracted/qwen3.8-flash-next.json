@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "Qwen3.8-Flash-Next",
     "family": "Qwen",
@@ -111,14 +111,6 @@
     },
     "auxiliary_modules": [
       {
-        "name": "N-gram embedding layer",
-        "purpose": "capacity_scaling — adds parameters outside the backbone at negligible per-token FLOPs, by conditioning memory retrieval on local context (short n-grams ending at each token) rather than token identity alone",
-        "architecture": "A single layer at **layer 2** holding **51B parameters** in a 20,000,000-entry table (ngram_size=3, i.e. bigrams/trigrams; heads_per_ngram=8; embed dim 2560; a depthwise conv of kernel 4; split into 128 parts). Tables are **held off-accelerator in host memory and asynchronously prefetched** — deterministic addressing is what makes offloading possible. Layer 2 was chosen specifically so the prefetch overlaps the computation of layer 1.",
-        "shipped_in_checkpoint": true,
-        "activation": "Always on — part of the forward pass, not an opt-in serving feature. The 51B is reported separately from the 125B backbone total because it does not occupy accelerator memory.",
-        "notes": "Placement ablation (report Tab. 7, fixed parameter budget): no depth regime dominates, layers 1-2 are strongest, splitting the budget across multiple layers gives no consistent benefit — one layer suffices, and placement is largely insensitive to the attention mechanism. Vocabulary-scaling ablation (Tab. 9, 20V -> 200V where V=250K): **loss decreases monotonically while downstream accuracy saturates or fluctuates** — one of the report's headline loss/benchmark disagreements. Chinese benchmarks (C-Eval, CMMLU) are the exception, improving consistently with vocabulary size. Under a *fixed* total parameter budget traded against MoE experts (Tab. 8), the loss optimum sits at 10x (25% of params) but downstream shows no clear gain over the MoE-only baseline, leading the report to conclude that 'N-gram embeddings and MoE experts play distinct roles in scaling capacity'. Token normalization, non-uniform allocation across n-gram orders and frequency-based slot partitioning were all tried and gave no consistent gain. The n-gram table runs on Adam with weight decay disabled; its key/value projections are on Muon."
-      },
-      {
         "name": "MTP module",
         "purpose": "multi_token_prediction / speculative_decoding",
         "architecture": "1 layer, ~4B parameters, configured as a hybrid module of its own (config.text_config.mtp = {hybrid: true, layer_types: ['full_attention'], num_hidden_layers: 1, rope_theta: 1e7}); mtp_use_dedicated_embeddings=false, so it shares input embeddings with the main model. Its full-attention layer is **also replaced by QSA**.",
@@ -127,7 +119,22 @@
         "notes": "Following GLM-5, the MTP module **reuses the QSA top-k indices across speculative-decoding steps** to cut draft-model cost. Report Tab. 4 confirms this is free: mean accepted length under four-step speculative decoding is 4.06 with full attention and 4.07 with QSA (MT-Bench 3.44/3.47, GSM8K 4.19/4.20, MATH 4.29/4.30, HumanEval 4.24/4.26, MBPP 4.12/4.13)."
       }
     ],
-    "parallelism_notes": "Megatron-LM based (TP + DP with ZeRO-1). Muon forced two infrastructure changes, both described in report §3.1. (1) **Canzona**, a scheduler that decouples logical optimizer assignment from physical parameter layout: Newton-Schulz cost is ~4K*max(A,B)*min(A,B)^2 FLOPs, i.e. cubic in the shorter dimension, so Megatron's equal-element DP partition leaves severe stragglers; an alpha-balanced static partitioner reassigns whole parameters (never cutting inside a tensor) to equalize estimated NS FLOPs across DP ranks, and an asynchronous Micro-Group pipeline reconstructs each Muon-owned matrix via fused All-to-All across TP ranks. ZeRO-1 bucket geometry is preserved so Megatron's Reduce-Scatter/backward overlap still works. (2) After fused-parameter splitting a single layer contributes ~100 sub-matrices, making the optimizer step launch-bound; the whole step is captured in a **CUDA graph**."
+    "parallelism_notes": "Megatron-LM based (TP + DP with ZeRO-1). Muon forced two infrastructure changes, both described in report §3.1. (1) **Canzona**, a scheduler that decouples logical optimizer assignment from physical parameter layout: Newton-Schulz cost is ~4K*max(A,B)*min(A,B)^2 FLOPs, i.e. cubic in the shorter dimension, so Megatron's equal-element DP partition leaves severe stragglers; an alpha-balanced static partitioner reassigns whole parameters (never cutting inside a tensor) to equalize estimated NS FLOPs across DP ranks, and an asynchronous Micro-Group pipeline reconstructs each Muon-owned matrix via fused All-to-All across TP ranks. ZeRO-1 bucket geometry is preserved so Megatron's Reduce-Scatter/backward overlap still works. (2) After fused-parameter splitting a single layer contributes ~100 sub-matrices, making the optimizer step launch-bound; the whole step is captured in a **CUDA graph**.",
+    "memory_modules": [
+      {
+        "name": "N-gram embedding layer",
+        "kind": "ngram_embedding",
+        "params": "51B (reported separately from the 125B backbone total)",
+        "layers": [
+          2
+        ],
+        "addressing": "Short n-grams ending at each token (ngram_size=3, i.e. bigrams/trigrams), heads_per_ngram=8",
+        "table_config": "20,000,000-entry table, embed dim 2560, depthwise conv of kernel 4, split into 128 parts",
+        "storage": "Held off-accelerator in host memory and asynchronously prefetched; layer 2 chosen so the prefetch overlaps layer 1's computation",
+        "optimizer": "Adam with weight decay disabled for the table; its key/value projections are on Muon",
+        "notes": "Placement ablation (report Tab. 7, fixed parameter budget): no depth regime dominates, layers 1-2 are strongest, splitting the budget across layers gives no consistent benefit. Vocabulary scaling 20V → 200V (Tab. 9, V=250K): loss decreases monotonically while downstream accuracy saturates or fluctuates; Chinese benchmarks (C-Eval, CMMLU) are the exception. Traded against MoE experts at fixed total params (Tab. 8): loss optimum at 10× (25% of params) but no clear downstream gain — 'N-gram embeddings and MoE experts play distinct roles in scaling capacity'. Token normalization, non-uniform allocation across orders and frequency-based slot partitioning gave no consistent gain."
+      }
+    ]
   },
   "training": {
     "optimizer": "**Muon** (Newton-Schulz orthogonalization of Nesterov-accelerated momentum, mu=0.95) as the main optimizer, with a deliberate parameter-class split. Muon covers the 2D weights that genuinely act as linear maps: attention q/k/v and output projections, GDN input/output projections, routed and shared expert fc1/fc2, and the n-gram key/value projections. **AdamW keeps**: input embeddings, output head, the MoE router (Muon destabilizes it early and adds nothing late — router dimensions are independent per-expert scores with no shared linear structure to orthogonalize), GR's two low-rank projections (very elongated shapes), the GDN decay/beta projections (per-head scalars, i.e. vectors), and the output gates (attention output gate and GDN z projection, where AdamW was on par or slightly better). The n-gram embedding table runs Adam with weight decay disabled. NS uses the **Polar Express** per-step coefficient schedule (minimax-optimal for a given step budget) at **8 iterations** — more than strictly needed for accuracy, chosen because it reduces both the magnitude and frequency of gradient-norm spikes under stress. Update scaled by 0.2*sqrt(max(A,B)) so update RMS is shape-independent; Frobenius-normalization epsilon 1e-14. **Fused parameters are split before orthogonalization** — qkv and the GDN input projection at per-head granularity, SwiGLU fc1 into gate and up halves — because orthogonalizing a concatenation mixes singular directions across unrelated sub-blocks and computes the shape scale from the wrong dimensions. Per-head qkv splitting improved both loss and benchmarks.",
@@ -231,6 +238,39 @@
         "arguments_schema": "Per-arg <parameter=name>VALUE</parameter> blocks nested inside <function=NAME></function>, tools declared as `<tools>` JSON lines in the system message. Byte-identical to Qwen3.8-27B.",
         "parser_flags": {},
         "notes": "Unchanged wire format. As with the other Qwen3.8 cards, no `--tool-call-parser` / `--reasoning-parser` flags are printed (framework cookbooks are linked instead), so parser_flags is left empty rather than inferred."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "system_message_instruction",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "xhigh",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message)",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "medium",
+            "numeric_value": null,
+            "rendering": "none — the template leaves reasoning_instructions empty for this level",
+            "is_default": false,
+            "notes": "The middle level is the bare prompt; only xhigh and low add text."
+          },
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message)",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Thinking mode only; chat_template.jinja is byte-identical to Qwen3.8-27B's (bar a trailing newline).",
+        "invalid_value_behavior": "The chat template raises an exception for any value outside {xhigh, medium, low}.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions)."
       }
     },
     "advanced": {
@@ -277,7 +317,7 @@
     "Post-training is entirely undisclosed: no SFT description, no RL algorithm, no reward design, no agentic-environment details. The tech report is an *architecture and optimization* report and says so — §4 evaluates the base model, and the post-trained numbers appear only on the model card without method. This is a much better disclosure floor than Qwen3.5/3.6/3.8 (which had no report at all) but the post-training half remains dark.",
     "The learning-rate decay schedule is not stated. The report gives the scaling-law-predicted optimum for LR and batch size and states batch warmup was dropped, but not the schedule shape (WSD? cosine?) or the peak/final values at production scale.",
     "MTP trained step depth D is still not disclosed — four-step speculative decoding is evaluated, but that is an inference-time configuration, not necessarily the trained depth.",
-    "How the n-gram embedding fits the schema is unresolved. It is recorded under `architecture.auxiliary_modules` because it is a separately-parameterized, off-accelerator, deterministically-addressed table, but it sits inside the forward pass at layer 2, so it is not 'auxiliary' in the DSpark/draft-head sense the v7 field was added for. If a second vendor ships embedding-table capacity scaling, the schema likely needs a dedicated slot rather than a stretched one.",
+    "RESOLVED IN v8 — moved to `architecture.memory_modules[]`, added after Engram (deepseek-v4.1-flash) became the second occurrence. Original question: How the n-gram embedding fits the schema is unresolved. It is recorded under `architecture.auxiliary_modules` because it is a separately-parameterized, off-accelerator, deterministically-addressed table, but it sits inside the forward pass at layer 2, so it is not 'auxiliary' in the DSpark/draft-head sense the v7 field was added for. If a second vendor ships embedding-table capacity scaling, the schema likely needs a dedicated slot rather than a stretched one.",
     "Parameter accounting is three-way (125B backbone + 51B n-gram + 4B MTP) and the schema's `params_total` is a single string. The value here spells all three out, but cross-model aggregation over `params_total` will not parse it. Worth considering a structured parameter-budget field if off-accelerator or module-external parameters recur.",
     "`indexer_budget=2048` is a token budget that maps to 512 micro-blocks at r=4. `sparse_attention.top_k` is recorded as 2048 (tokens) to stay comparable with DSA-family records, but the selection actually operates on 512 block units — the two conventions differ, and a naive cross-model comparison of `top_k` will mis-rank QSA against DSA.",
     "GR's relationship to mHC (DeepSeek-V4) and AttnRes (Kimi K3) is documented by the vendor with head-to-head loss numbers, but all comparisons are at 25B-A3B / 28-layer proxy scale. Whether GR's advantage over mHC (which at that scale the report calls 'comparable', with GR winning on efficiency rather than quality) holds at production scale is not shown.",

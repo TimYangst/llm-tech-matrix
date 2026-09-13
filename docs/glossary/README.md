@@ -35,6 +35,8 @@ The "Used by" tables are maintained by hand for now. A future synthesis tool can
 - [Kimi Delta Attention (KDA)](./kda.md)
 - [Qwen Sparse Attention (QSA)](./qsa.md)
 - [IndexShare / IndexCache (cross-layer index reuse)](./indexshare.md)
+- [Compressed Sparse Attention 2 (CSA2) — cross-layer KV + index reuse](./csa2.md)
+- [Causal Encoder-Decoder (CED) + SWA Bounded Replay](./causal-encoder-decoder.md)
 
 ### FFN / MoE
 

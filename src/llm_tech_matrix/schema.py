@@ -1,4 +1,4 @@
-"""Pydantic models for the extraction schema (v7).
+"""Pydantic models for the extraction schema (v8).
 
 This is the executable version of docs/schema.md. If the two diverge, this file wins
 and docs/schema.md must be updated.
@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 Openness = Literal["open_source", "open_weights", "closed"]
@@ -28,6 +28,16 @@ FusionType = Literal[
     "[Unknown/Not Disclosed]",
 ]
 Confidence = Literal["low", "medium", "high"]
+EffortDelivery = Literal[
+    "prompt_prefix",  # text block prepended before/at the start of the system prompt (DeepSeek-V4/V4.1, GLM-5.2/5.3)
+    "system_message_instruction",  # natural-language instruction merged into the system message (Qwen3.8)
+    "typed_option_message",  # a dedicated structured message/option in the template (Kimi K3)
+    "control_token",  # a special vocabulary token selects the level
+    "separate_weights",  # levels are different checkpoints
+    "other",
+    "[Unknown/Not Disclosed]",
+]
+EffortScale = Literal["discrete", "continuous", "[Unknown/Not Disclosed]"]
 
 
 class _Strict(BaseModel):
@@ -166,6 +176,62 @@ class SparseAttentionConfig(_Strict):
     notes: str = ""
 
 
+class CrossLayerSharing(_Strict):
+    """One cross-layer reuse relation: some layers borrow attention state computed elsewhere.
+
+    Added in v8. Distinct from `sparse_attention` (which describes how a layer *selects*
+    entries) and from `variants[]` (which describes what kind of attention a layer runs):
+    this records *where a layer's attention state comes from* when it is not computed from
+    that layer's own hidden state. GLM-5.2's IndexShare (Shared layers reuse a Full layer's
+    top-k indices), DeepSeek-V4.1-Flash's CSA2 (Reindex/Reuse layers reuse main KV, indexer
+    keys and top-k indices) and its Causal Encoder-Decoder (decoder global KV projected from
+    the final encoder hidden state) are the driving records. A model with several distinct
+    relations gets one entry per relation.
+    """
+
+    kind: str = Field(
+        description=(
+            'Mechanism name, e.g. "indexshare", "csa2", "ced" (causal encoder-decoder), "yoco", '
+            '"cla" (cross-layer attention), "other".'
+        )
+    )
+    shared_state: list[str] = Field(
+        default_factory=list,
+        description=(
+            'What is reused. Vocabulary: "kv" (the layer\'s own K/V or main KV entries), '
+            '"indexer_keys", "topk_indices", "kv_from_encoder_output" (K/V projected from '
+            'another layer\'s hidden state rather than copied), "other".'
+        ),
+    )
+    source_layers: list[int] | str = Field(
+        default=UNKNOWN,
+        description=(
+            "Zero-indexed layers that produce the shared state (HF keys like "
+            "kv_source_layer_ids / index_source_layer_ids), or a description when the set is "
+            "pattern-defined."
+        ),
+    )
+    consumer_layers: list[int] | str = Field(
+        default=UNKNOWN,
+        description="Zero-indexed layers that reuse it, or a pattern description.",
+    )
+    effect: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Reported saving, e.g. '2.9x fewer per-token FLOPs at 1M context', 'global KV "
+            "890 bytes/token (~1/4 of predecessor)'. UNKNOWN when not reported."
+        ),
+    )
+    training_recipe: str = Field(
+        default="",
+        description=(
+            "How reuse was trained in (training-aware distillation, from-scratch, training-free "
+            "layer search). Empty when not disclosed."
+        ),
+    )
+    notes: str = ""
+
+
 class Attention(_Strict):
     variant: str = Field(description='e.g. "MHA", "GQA", "MLA", "sliding_window", "hybrid"')
     num_heads: int | str = UNKNOWN
@@ -202,6 +268,13 @@ class Attention(_Strict):
         description=(
             "Content-dependent sparsification / KV-compression modifier layered on the variant "
             "above (DSA, CSA, HCA, NSA). None for dense attention."
+        ),
+    )
+    cross_layer_sharing: list[CrossLayerSharing] = Field(
+        default_factory=list,
+        description=(
+            "Cross-layer reuse of KV / indexer keys / top-k selections (IndexShare, CSA2, "
+            "causal encoder-decoder). Empty when every layer computes its own attention state."
         ),
     )
     notes: str = Field(
@@ -394,6 +467,55 @@ class AuxiliaryModule(_Strict):
     notes: str = ""
 
 
+class MemoryModule(_Strict):
+    """A lookup-addressed parameter table inside the forward pass (added in v8).
+
+    Embedding-table capacity scaling: parameters that are read by deterministic,
+    input-token-derived addressing (n-gram hashing) rather than by matmul, so they add
+    capacity at negligible per-token FLOPs and can live off-accelerator. Qwen3.8-Flash-Next's
+    n-gram embedding (51B, layer 2) and DeepSeek-V4.1-Flash's Engram (196B, layers 1 and 14)
+    are the driving records; before v8 both sat in `auxiliary_modules`, which is meant for
+    attachments outside the forward pass. The ordinary token embedding is NOT a memory module.
+    """
+
+    name: str = Field(description='e.g. "Engram conditional memory", "N-gram embedding layer"')
+    kind: str = Field(description='e.g. "engram", "ngram_embedding", "other"')
+    params: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Parameters held in the module, reported separately from the backbone total "
+            "(e.g. '196B across two modules'). This is the accounting that `metadata.params_total` "
+            "cannot express on its own."
+        ),
+    )
+    layers: list[int] | str = Field(
+        default=UNKNOWN, description="Zero-indexed layers where retrieved vectors are injected."
+    )
+    addressing: str = Field(
+        default=UNKNOWN,
+        description=(
+            "How an entry is looked up, e.g. 'hash of the n-gram ending at each token, orders "
+            "{2,3,4}, 8 hash heads per order'."
+        ),
+    )
+    table_config: str = Field(
+        default=UNKNOWN,
+        description="Entries per table, embedding dims, vocabulary compression, conv/gating.",
+    )
+    storage: str = Field(
+        default=UNKNOWN,
+        description=(
+            "Where the table lives and in what precision at training / inference, e.g. "
+            "'FP8; host memory with RDMA prefetch at inference; GPU memory during RL rollouts'."
+        ),
+    )
+    optimizer: str = Field(
+        default=UNKNOWN,
+        description="Optimizer and learning-rate treatment of the table if it differs from the backbone.",
+    )
+    notes: str = ""
+
+
 class Architecture(_Strict):
     backbone: Backbone
     attention: Attention
@@ -412,6 +534,13 @@ class Architecture(_Strict):
             "Trained, weight-bearing modules outside the main backbone stack "
             "(speculative-decoding drafts, MTP heads as shipped weights). Empty for models "
             "that ship only the backbone."
+        ),
+    )
+    memory_modules: list[MemoryModule] = Field(
+        default_factory=list,
+        description=(
+            "Lookup-addressed parameter tables inside the forward pass (Engram, n-gram "
+            "embeddings). Empty for models without embedding-table capacity scaling."
         ),
     )
     parallelism_notes: str
@@ -507,6 +636,67 @@ class InferenceMode(_Strict):
     )
 
 
+class ReasoningEffortLevel(_Strict):
+    """One named or numeric point on a reasoning-effort axis (added in v8)."""
+
+    name: str = Field(description='API value, e.g. "max", "xhigh", "think-max"')
+    numeric_value: int | None = Field(
+        default=None,
+        description="Underlying scalar when the vendor maps named levels onto a numeric scale (DeepSeek-V4.1: max=100). None for purely named levels.",
+    )
+    rendering: str = Field(
+        default="",
+        description=(
+            "Exactly what the level injects into the prompt (quote the text), or 'none' when the "
+            "level adds nothing. Empty when undisclosed."
+        ),
+    )
+    is_default: bool = False
+    notes: str = ""
+
+
+class ReasoningEffortConfig(_Strict):
+    """Structured reasoning-effort axis (added in v8).
+
+    Four vendors ship the same `reasoning_effort` API surface through four different
+    mechanisms (DeepSeek prompt prefix, Kimi K3 typed option message, Qwen3.8 system-message
+    instruction, DeepSeek-V4.1 continuous numeric scalar). `inference_modes[]` still carries
+    one entry per level for back-compat readers; this subobject is the comparable view.
+    None when the model has no effort axis beyond a thinking on/off switch.
+    """
+
+    api_parameter: str = Field(
+        default=UNKNOWN,
+        description='Request field / template kwarg, e.g. "reasoning_effort". UNKNOWN when the levels have no named parameter.',
+    )
+    delivery: EffortDelivery
+    scale: EffortScale
+    range: str = Field(
+        default="",
+        description='Numeric range for continuous scales, e.g. "1-100". Empty for discrete scales.',
+    )
+    levels: list[ReasoningEffortLevel] = Field(default_factory=list)
+    applies_when: str = Field(
+        default="",
+        description=(
+            "Preconditions and placement, e.g. 'thinking mode only; rendered once at "
+            "conversation index 0'. Empty when undisclosed."
+        ),
+    )
+    invalid_value_behavior: str = Field(
+        default=UNKNOWN,
+        description="What the template does with an unrecognized level (raise, fall back to max, ...).",
+    )
+    training_method: str = Field(
+        default=UNKNOWN,
+        description=(
+            "How the levels were trained, e.g. 'length penalty whose coefficient decays "
+            "exponentially with effort', 'per-effort RL experts consolidated by MOPD'."
+        ),
+    )
+    notes: str = ""
+
+
 class ToolCallProtocol(_Strict):
     """Wire format the model emits for tool calls, plus the serving-stack parsers that decode it.
 
@@ -581,6 +771,13 @@ class Alignment(_Strict):
         description=(
             "Runtime-switchable modes the user can toggle at inference. "
             "Empty list when the model has a single mode of operation."
+        ),
+    )
+    reasoning_effort: ReasoningEffortConfig | None = Field(
+        default=None,
+        description=(
+            "Structured reasoning-effort axis. None when the model exposes no effort levels "
+            "(a plain thinking on/off switch stays in inference_modes only)."
         ),
     )
     tool_call_protocol: ToolCallProtocol | None = Field(

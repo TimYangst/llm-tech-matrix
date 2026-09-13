@@ -2,7 +2,7 @@
 
 > 中文版：[glm-5.zh.md](./glm-5.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 

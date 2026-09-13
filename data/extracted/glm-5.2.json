@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "GLM-5.2",
     "family": "GLM-5",
@@ -53,7 +53,20 @@
         "training_recipe": "The IndexShare paper offers two routes and GLM-5.2 ships the **training-aware** one: a multi-layer distillation loss trains each retained indexer against the *averaged* attention distributions of all the layers it serves, which the paper shows lets even a simple uniform interleaved pattern match full-indexer accuracy. (The training-free alternative — a greedy search that picks which layers keep indexers by directly minimizing LM loss on a calibration set, no weight updates — is what the paper recommends when retraining is not an option.) The underlying DSA indexer itself is inherited from GLM-5's Continued Pre-Training recipe.",
         "notes": "**The motivation is that DSA's indexer is the residual O(L²) cost.** DSA reduces core attention from O(L²) to O(Lk), but the lightning indexer still runs independently at every layer at O(L²) — even though consecutive layers' top-k selections are highly similar. IndexShare exploits exactly that redundancy. Reported effect: **2.9× fewer per-token FLOPs at 1M context** (model card); the paper measures 75% of indexer computation removed with negligible quality loss on a 30B DSA model (1.82× prefill / 1.48× decode speedup), and ~1.2× end-to-end on production-scale GLM-5 at 50% removal. `index_share_for_mtp_iteration=true` extends the reuse into the MTP module's speculative-decoding iterations. **Cross-vendor note:** this is the same technique Qwen's Qwen3.8-Flash-Next report benchmarks against by name (cited there as 'training-aware IndexShare (Bai et al., 2026)') before choosing within-layer micro-block compression instead — Qwen's argument being that cross-layer index sharing is weakened in hybrid stacks where full-attention layers are separated by linear-attention layers. GLM-5.2 is a pure-MLA stack, where the cross-layer similarity IndexShare depends on is strongest. See [qsa](../../docs/glossary/qsa.md) for the other side of that argument."
       },
-      "notes": "One config key changed meaning rather than value: top-level `head_dim` went 64 → 192. GLM-5.1 reported the RoPE head dim there while GLM-5.2 reports the NoPE head dim; `qk_head_dim` (256), `qk_nope_head_dim` (192) and `qk_rope_head_dim` (64) are all unchanged, so the attention geometry is identical and this is a config-representation change, not an architecture change."
+      "notes": "One config key changed meaning rather than value: top-level `head_dim` went 64 → 192. GLM-5.1 reported the RoPE head dim there while GLM-5.2 reports the NoPE head dim; `qk_head_dim` (256), `qk_nope_head_dim` (192) and `qk_rope_head_dim` (64) are all unchanged, so the attention geometry is identical and this is a config-representation change, not an architecture change.",
+      "cross_layer_sharing": [
+        {
+          "kind": "indexshare",
+          "shared_state": [
+            "topk_indices"
+          ],
+          "source_layers": "21 Full layers (config.indexer_types='full'): layers 0-2, then every fourth layer from layer 3 (index_topk_freq=4, index_skip_topk_offset=3)",
+          "consumer_layers": "57 Shared layers (config.indexer_types='shared'), each reusing the nearest preceding Full layer's top-k indices",
+          "effect": "2.9× fewer per-token FLOPs at 1M context (model card). Paper: 75% of indexer computation removed with negligible quality loss on a 30B DSA model (1.82× prefill / 1.48× decode), ~1.2× end-to-end on production-scale GLM-5 at 50% removal.",
+          "training_recipe": "Training-aware route of IndexShare/IndexCache (arXiv 2603.12201): a multi-layer distillation loss trains each retained indexer against the averaged attention distributions of all the layers it serves. Inferred from the fixed period-4 pattern; Z.AI does not state which variant shipped.",
+          "notes": "Only indexer selections are shared — main KV stays per-layer. index_share_for_mtp_iteration=true extends the reuse into MTP speculative-decoding iterations."
+        }
+      ]
     },
     "ffn": {
       "ffn_type": "hybrid",
@@ -151,6 +164,32 @@
         "arguments_schema": "Inherited from the GLM-4.7 / GLM-5 line — per-arg `<arg_key>` / `<arg_value>` blocks inside a `<tool_call>` wrapper, with tool schemas declared as JSON in a `<tools>` system block. GLM-5.1's `tool_reference` content type for MCP-style lazy tool loading carries over.",
         "parser_flags": {},
         "notes": "The README links per-framework cookbooks (SGLang, vLLM, Transformers, KTransformers, Unsloth, plus Ascend NPU guidance) rather than printing parser flags, so parser_flags is left empty rather than carried over from the GLM-5 record."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "max",
+            "numeric_value": null,
+            "rendering": "'<|system|>Reasoning Effort: Max' as the very first thing in the prompt",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "high",
+            "numeric_value": null,
+            "rendering": "'<|system|>Reasoning Effort: High'",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Only when thinking is enabled — the effort line is guarded by enable_thinking.",
+        "invalid_value_behavior": "Strict two-way branch: anything other than exactly 'high' silently falls back to 'max' (no error).",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "First GLM with an effort axis; GLM-5 / GLM-5.1 had none."
       }
     },
     "advanced": {

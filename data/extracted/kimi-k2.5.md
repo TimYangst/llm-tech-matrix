@@ -2,7 +2,7 @@
 
 > 中文版：[kimi-k2.5.zh.md](./kimi-k2.5.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 

@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v4-pro.zh.md](./deepseek-v4-pro.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 
@@ -195,6 +195,26 @@ _Shared modules:_ MTP configuration is identical to DeepSeek-V3 (paper Section 2
 | `think-high` | Output framed as '<think> thinking tokens </think> summary'. Per Section 5.3.1 evaluation context window 128K. | Conscious logical analysis - slower but more accurate. Targets complex problem-solving, planning, medium-risk decisions. Trained under longer context window than Non-think and a length-penalty schedule that allows more reasoning tokens. |
 | `think-max` | Two ingredients: (1) a special instruction prepended to the system prompt ('Reasoning Effort: Absolute maximum with no shortcuts permitted...' - paper Table 3); (2) <think>...</think> output framing. Per Section 5.3.1 evaluation context window 384K (README also recommends ≥384K when using Think Max). | Reasoning pushed to its fullest extent. Targets exploration of the model's reasoning boundary. Trained with the longest context window and the most-relaxed length penalty during RL. DeepSeek-V4-Pro-Max in benchmarks always denotes V4-Pro under this mode. |
 | `interleaved-thinking (cross-turn reasoning preservation)` | Behavior of all three reasoning modes when a tool-calling context is detected (paper Figure 7a). Conventional conversational scenarios still discard prior reasoning at each new user turn (paper Figure 7b - same as DeepSeek-V3.2). Agent frameworks that simulate tool interactions via plain user messages (e.g. Terminus) may not trigger the tool-calling path; non-think modes are recommended for such architectures. | In tool-calling scenarios all reasoning content is preserved across the entire conversation, including across user message boundaries - the model maintains a coherent cumulative chain of thought over long-horizon agent tasks rather than reconstructing state from scratch each turn. Enabled by the 1M context window. |
+
+**Reasoning effort:**
+
+| | |
+|---|---|
+| API parameter | `[Unknown/Not Disclosed]` |
+| Delivery | `prompt_prefix` |
+| Scale | `discrete` |
+
+| Level | Numeric value | Default | Rendering | Notes |
+|---|---|---|---|---|
+| `non-think` | — | ✓ | none — output begins directly with '</think> summary' | Recorded as the default response mode; trained as a separate specialist mode under a shorter context window and tighter length penalty. |
+| `think-high` | — |  | none — '<think> thinking tokens </think> summary' output framing, no effort prefix | — |
+| `think-max` | — |  | 'Reasoning Effort: Absolute maximum with no shortcuts permitted...' prepended to the system prompt (paper Table 3), plus <think> framing | — |
+
+**Applies when:** Three modes described in the technical report; the preview release documents no named request parameter.
+
+**Training method:** Separate specialist modes trained with per-mode RL context windows (8K / 128K / 384K at evaluation) and length-penalty schedules — the tighter the penalty, the lower the effort.
+
+_Notes:_ Non-think doubles as the thinking-off switch: the preview's effort axis and thinking toggle are one axis.
 
 **Tool-call protocol:**
 

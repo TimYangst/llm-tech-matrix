@@ -124,6 +124,9 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 - **RoPE scaling** is often only partially documented — capture what's there, flag gaps.
 - **Training data mix** (`code/math/text` percentages) is frequently undisclosed. Don't infer; use `data_mix_notes` for qualitative descriptions.
 - **RLAIF.** Set `rlaif: true` ONLY if AI generates the preference labels themselves (e.g. Constitutional AI). A model-based reward model trained on human preferences is RLHF, not RLAIF.
+- **Reasoning effort (v8).** When a model exposes effort levels, fill `training.alignment.reasoning_effort` (delivery, scale, levels with the exact injected text, default, invalid-value behaviour) *and* keep one `inference_modes[]` entry per level. A plain thinking on/off switch is not an effort axis — leave `reasoning_effort` null.
+- **Cross-layer sharing (v8).** If some layers reuse KV, indexer keys or top-k indices computed by another layer (IndexShare, CSA2, YOCO-style encoder-decoder KV), record each relation in `attention.cross_layer_sharing[]` with source/consumer layer ids — not only in `sparse_attention` prose.
+- **Memory tables vs auxiliary modules (v8).** Lookup-addressed tables inside the forward pass (n-gram embeddings, Engram) go in `architecture.memory_modules[]` with their own `params`; `auxiliary_modules[]` is only for attachments outside the forward pass (speculative-decoding drafts, shipped MTP heads).
 - **Closed models.** It's tempting to fill GPT-4 / Claude architecture from leaks. Resist — those go in `inferred_fields`, not the primary fields.
 
 ## When to push back on the user

@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "DeepSeek-V4-Flash",
     "family": "DeepSeek",
@@ -195,6 +195,39 @@
         "arguments_schema": "Per-call <|DSML|invoke name=NAME>...</|DSML|invoke> blocks nested inside the tool_calls wrapper. XML format — paper Table 4 explicitly states it replaces JSON to mitigate string-escape failures (a known weakness of JSON-only tool protocols). Argument-encoding details inside an invoke block are not restated in the README; refer to paper Table 4 for full grammar.",
         "parser_flags": {},
         "notes": "Distinguishes V4 from V3 (no documented tool-call protocol in V3). The HF release ships no Jinja chat template — encoding is done via a Python module (encoding_dsv4) co-located with the model, so serving stacks need either that encoder module or a custom integration. Same |DSML| namespace also hosts the V4 'Quick Instruction' tokens (<|action|>, <|title|>, <|query|>, <|authority|>, <|domain|>, <|extracted_url|>, <|read_url|>) that enable parallel auxiliary tasks reusing the existing KV cache (paper Table 5). Auto-engages interleaved-thinking mode (one of the four runtime inference_modes)."
+      },
+      "reasoning_effort": {
+        "api_parameter": "[Unknown/Not Disclosed]",
+        "delivery": "prompt_prefix",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "non-think",
+            "numeric_value": null,
+            "rendering": "none — output begins directly with '</think> summary'",
+            "is_default": true,
+            "notes": "Recorded as the default response mode; trained as a separate specialist mode under a shorter context window and tighter length penalty."
+          },
+          {
+            "name": "think-high",
+            "numeric_value": null,
+            "rendering": "none — '<think> thinking tokens </think> summary' output framing, no effort prefix",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "think-max",
+            "numeric_value": null,
+            "rendering": "'Reasoning Effort: Absolute maximum with no shortcuts permitted...' prepended to the system prompt (paper Table 3), plus <think> framing",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Three modes described in the technical report; the preview release documents no named request parameter.",
+        "invalid_value_behavior": "[Unknown/Not Disclosed]",
+        "training_method": "Separate specialist modes trained with per-mode RL context windows (8K / 128K / 384K at evaluation) and length-penalty schedules — the tighter the penalty, the lower the effort.",
+        "notes": "Non-think doubles as the thinking-off switch: the preview's effort axis and thinking toggle are one axis."
       }
     },
     "advanced": {
