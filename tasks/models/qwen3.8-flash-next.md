@@ -32,6 +32,25 @@ Considered but excluded:
   schema's `multimodal.vision_encoder` fields.
 - `Qwen/Qwen3.8-Flash-Next-FP8` — not present at extraction time.
 
+### Source drift check (2026-09-12)
+
+Re-fetch found `README.md` no longer matched the manifest sha256. HF commit history shows
+two README edits: `f5d0827` (2026-08-26 12:29 UTC) and `de4b8e4` (2026-08-27 05:03 UTC).
+**The manifest hash is exactly `f5d0827`**, and the diff from there to `de4b8e4` is
+cosmetic: one URL lowercased (`/models/Qwen3.8-Flash` → `/models/qwen3.8-flash`) plus a
+dark-mode `@media` CSS block for the benchmark table. No extracted value is affected. The
+manifest `readme` URL is now pinned to `raw/f5d08274bafd880402bd16f5e3e6c514136ec06c/README.md`,
+so the sha256 reproduces again without editing the recorded hash.
+
+`blog.html` also mismatches on re-fetch, but it is the SPA JS shell (visible text is just
+"Qwen", same 94,358-byte size, as the manifest description already warns). The difference
+is build-hash churn, not content. It was left unpinned: there is no revision-addressable
+URL for it.
+
+There is **no separate "Qwen3.8-Next" model**. As of 2026-09-12 the newest checkpoints in the
+HF `Qwen` org are Qwen3.8-Flash-Next (+ `-FP8`, 2026-08-24) and `Qwen-Drive-1.0-4B`
+(2026-08-27, out of M1 scope).
+
 ## Open questions
 
 See `data/extracted/qwen3.8-flash-next.json` `open_questions`. The three that matter:

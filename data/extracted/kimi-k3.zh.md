@@ -2,7 +2,7 @@
 
 > English: [kimi-k3.md](./kimi-k3.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -187,6 +187,26 @@ _共享模块：_ Paper Table 1 lists 'Number of MTP Layers: 1 layer' for both K
     - Kwargs：`reasoning_effort=high`
 - **`reasoning_effort=low`**
     - Kwargs：`reasoning_effort=low`
+
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `typed_option_message` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `max` | — | ✓ | global option message of type 'thinking-effort', inserted after the tool declaration and before the input messages, stating the level in natural language | All README §3 benchmark numbers are at max. |
+| `high` | — |  | same 'thinking-effort' option message with level high | — |
+| `low` | — |  | same 'thinking-effort' option message with level low | — |
+
+**生效条件：** Always — K3 has no non-thinking mode on the API surface.
+
+**训练方法：** Nine RL experts = 3 domains × 3 effort levels, with per-problem token-budget rewards annealed stage-wise (budget multiplier tau annealed down from the max-budget variant) to carve out the levels; consolidated into one checkpoint by Multi-Teacher On-Policy Distillation, with the teacher chosen by domain and sampled effort.
+
+_说明：_ The XTML schema reserves four levels (low, medium, high, max); K3 documents only three.
 
 **Tool-call 协议：**
 

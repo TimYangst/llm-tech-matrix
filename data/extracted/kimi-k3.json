@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "Kimi K3",
     "family": "Kimi K3",
@@ -192,6 +192,39 @@
         "arguments_schema": "Tool calls live in the `tools` channel of an assistant message. Each call carries `tool` and `index` attributes; `index` numbers parallel calls within a message, and each tool-result message repeats the same tool/index pair and follows the order of its call, so results are unambiguously bound to calls. Arguments are TYPED: string arguments appear as raw text, values of other JSON types are compactly serialized — so free-form text such as code is a first-class citizen rather than an escaped JSON string. A pure-JSON fallback block covers inputs whose arguments cannot be decomposed into typed argument blocks; it occurs only in input tokens, never in model outputs, and its loss is masked during training.",
         "parser_flags": {},
         "notes": "XTML (eXtensible Token Markup Language, paper §F) — XML-like markup where the angle-bracket syntax is replaced by three reserved special tokens: an element is `[open]tag attr=\"value\"[sep] ... [close]tag[sep]`, isomorphic to its XML counterpart but with every structural boundary an explicit special token, which removes tokenization ambiguity at element boundaries and simplifies constrained decoding. `[end_of_msg]` is the generation stop marker. Assistant message bodies are organized into CHANNELS (inspired by OpenAI's Harmony format): `think` (reasoning trace), `response` (user-visible answer), `tools` (tool calls). The template is designed for extensibility (new capabilities arrive as backward-compatible message formats, not template revisions), low alignment tax, and decoding friendliness. Request options are not special syntax — `tool_choice`, `response_format` and `thinking-effort` are each translated into a short natural-language instruction placed in context. Global options (tool declaration, reasoning effort) precede all input messages since changing them invalidates the KV cache anyway; one-shot options (tool_choice, response_format) are appended after the input messages so per-request changes leave the history KV cache intact. A third kind, the INPUT OPTION MESSAGE, is interleaved mid-session to supplement or override a global option — this is the mechanism behind DYNAMICALLY LOADED TOOLS: tools retrieved during a conversation are announced via an additional tool-declare message, expanding the available toolset without rebuilding the preceding context. Serving: vLLM, SGLang and TokenSpeed publish K3 recipes; no `--tool-call-parser` flag is documented, and no chat_template.jinja is published in the HF repo (the template lives in the vendor's encoder, encoding_k3.py)."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "typed_option_message",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "max",
+            "numeric_value": null,
+            "rendering": "global option message of type 'thinking-effort', inserted after the tool declaration and before the input messages, stating the level in natural language",
+            "is_default": true,
+            "notes": "All README §3 benchmark numbers are at max."
+          },
+          {
+            "name": "high",
+            "numeric_value": null,
+            "rendering": "same 'thinking-effort' option message with level high",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "same 'thinking-effort' option message with level low",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Always — K3 has no non-thinking mode on the API surface.",
+        "invalid_value_behavior": "[Unknown/Not Disclosed]",
+        "training_method": "Nine RL experts = 3 domains × 3 effort levels, with per-problem token-budget rewards annealed stage-wise (budget multiplier tau annealed down from the max-budget variant) to carve out the levels; consolidated into one checkpoint by Multi-Teacher On-Policy Distillation, with the teacher chosen by domain and sampled effort.",
+        "notes": "The XTML schema reserves four levels (low, medium, high, max); K3 documents only three."
       }
     },
     "advanced": {

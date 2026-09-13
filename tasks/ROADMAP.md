@@ -4,7 +4,66 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**Phase:** M1 — **August catch-up: the Qwen3.8 line, a Qwen4 preview, and the GLM line
+**Phase:** M1 — **September: DeepSeek-V4.1-Flash, a new DeepSeek architecture family.**
+One slug added (`deepseek-v4.1-flash`, 2026-09-10, MIT), taking the repo to **24
+extractions across 4 vendors**, and **schema v8** landed with it. Despite the point-version name, this
+is not a V4 refresh. It has a new HF class (`DeepseekV41ForCausalLM`), and the API note
+calls it "the smallest model in our new architecture family". It's a 552B-backbone
+(+196B Engram) native image+text MoE, and four load-bearing changes are new:
+
+- **Causal Encoder-Decoder (CED).** A 20-layer encoder and a 20-layer decoder, where the
+  decoder's global KV is projected from the final encoder hidden state. Prefill stops at the
+  encoder, so it activates **8B per prompt token vs 16B per generated token**.
+- **CSA2 replaces V4's CSA/HCA alternation.** Each layer is statically Full, Reindex or Reuse,
+  sharing main KV and indexer K across layers separately from top-k index reuse. 30 of 40
+  layers compute neither KV nor an index. A decoder **Hierarchical Sparse Indexer** bounds
+  deeper indexers to a 16,384-position candidate pool.
+- **FP4 main KV cache.** Combined with CSA2, the global KV comes to **890 bytes/token, ~1/4 of
+  V4-Flash**. SWA Bounded Replay drops SWA KV from the persistent cache, which falls to ~1/8.
+- **Engram** conditional memory (DeepSeek's own arXiv:2601.07372) at layers 1 and 14,
+  trained with a new **Sinkhorn-balanced momentum update** in place of Adam.
+
+It also ships **Single-Pass mHC**, a from-scratch **DeepSeek-ViT** (vision enters the DeepSeek
+main line), **head-wise Muon**, and **no MTP in pre-training**, with DSpark trained separately
+on a frozen backbone. Post-training is deliberately algorithm-free: SFT → async GRPO → OPD
+from more than 40 teachers, with the gains attributed to task and environment synthesis.
+
+**The cross-vendor thread keeps tightening.** Every one of V4.1's new ideas has a named
+counterpart elsewhere in the repo:
+
+- Engram is the same capacity axis as Qwen3.8-Flash-Next's n-gram embedding, placed early for
+  the same prefetch reason.
+- Head-wise Muon is explicitly credited to GLM-5 and Kimi K3.
+- CSA2's index reuse cites IndexCache, which is GLM-5.2's IndexShare.
+- The Hierarchical Sparse Indexer attacks the indexer-cost term Qwen's QSA targets.
+- The native from-scratch ViT mirrors Kimi K3's MoonViT-V2.
+
+**Schema v8 landed in the same batch.** V4.1 fired three schema-gap triggers at once, and all
+three are now structured. Every addition is backwards-compatible; the migration is
+`scripts/migrate_v7_to_v8.py`.
+
+1. **`attention.cross_layer_sharing[]`** records layers that borrow KV, indexer keys or top-k
+   indices from other layers. Backfilled: GLM-5.2 (IndexShare) and V4.1 (CED plus two CSA2
+   relations).
+2. **`architecture.memory_modules[]`** holds lookup-addressed tables inside the forward pass,
+   with their own `params`. Qwen3.8-Flash-Next's n-gram layer and V4.1's Engram moved here out
+   of `auxiliary_modules`.
+3. **`alignment.reasoning_effort`** structures delivery (enum), scale
+   (discrete/continuous) and per-level injected text. Backfilled for 10 records across the
+   four vendors: DeepSeek-V4 ×4, GLM-5.2/5.3-Flash, Kimi K3 and Qwen3.8 ×3. The four
+   mechanisms can now be queried side by side.
+
+`indexshare`, `causal-encoder-decoder` and `reasoning-effort` moved from prose-only to typed
+in the registry, so their "Used by" rows are now backed by structured edges. Deferred:
+phase-dependent `params_active`, which has only one occurrence so far.
+
+**Source-drift fix in this batch.** Re-verifying `qwen3.8-flash-next` found its README
+sha256 changed upstream. The manifest hash matches HF commit `f5d0827`, and the later edit is
+cosmetic (one URL case change plus dark-mode CSS), so the manifest URL is now pinned to that
+revision. New manifests (`deepseek-v4.1-flash`) pin HF revisions from the start. There is no
+separate "Qwen3.8-Next" release; Qwen3.8-Flash-Next is the latest Qwen checkpoint.
+
+**Previous phase (August catch-up): the Qwen3.8 line, a Qwen4 preview, and the GLM line
 brought current.** Five slugs added (`qwen3.8-27b`, `qwen3.8-2.4t-a95b`,
 `qwen3.8-flash-next`, `glm-5.2`, `glm-5.3-flash`), taking the repo to **23 extractions
 across 4 vendors**, all on schema v7 with **no schema bump required**.
@@ -191,25 +250,46 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 
 **In progress (sourcing → extracting):**
 
+- ✅ `deepseek-v4.1-flash` — **new DeepSeek architecture family** under a point-version name (Sep 2026, 552B backbone + 196B Engram; 8B prefill / 16B decode active; native image+text; MIT) — **extracted** (`DeepseekV41ForCausalLM`; Causal Encoder-Decoder 20+20; pure CSA2 with Full/Reindex/Reuse cross-layer KV + index sharing and a decoder Hierarchical Sparse Indexer; FP4 main KV cache, 890 B/token; Single-Pass mHC; Engram at layers 1 & 14 with Sinkhorn-balanced updates; head-wise Muon; no MTP pre-training, DSpark trained separately; 45T multimodal tokens; continuous 1–100 reasoning effort)
+
 - ✅ `glm-5.3-flash` — **new GLM architecture line** under a Flash name (Aug 2026, 320B / 18B active, native multimodal) — **extracted** (`Glm5NextForConditionalGeneration`; 3:1 KDA + NoPE-MLA/DSA hybrid; mHC with Sinkhorn-20; key-pooled DSA indexer; SwiGLU clamp; 288 experts; FP8-primary distribution; first natively multimodal GLM-5-series model; 30T-token multimodal corpus)
+
 - ✅ `glm-5.2` — GLM-5.2 (Jun 2026, 78L / 256 experts, MIT) — **extracted** (first GLM with a reasoning-effort axis; **IndexShare** cross-layer indexer reuse, 21 Full / 57 Shared layers, 2.9× fewer per-token FLOPs at 1M; context 202,752 → 1,048,576; MTP acceptance length +20%)
+
 - ✅ `qwen3.8-flash-next` — **Qwen4 architecture preview** shipped under a 3.8 name (Aug 2026, 125B / 6B active + 51B off-accelerator n-gram embeddings) — **extracted** (HF class `Qwen4ExpForConditionalGeneration`; first Qwen record with a real tech report; QSA micro-block sparse attention, Gated Residual, n-gram embedding tables in host memory, Muon/AdamW split recipe; third vendor on DSA-lineage sparse attention)
+
 - ✅ `qwen3.8-27b` — Qwen3.8 dense (Aug 2026, 27B, native VL) — **extracted** (config byte-identical to Qwen3.6-27B except `transformers_version` — a frozen backbone across 3.5 → 3.6 → 3.8; adds `reasoning_effort` xhigh/medium/low as system-message injection; `preserve_thinking` default flips OFF → ON)
+
 - ✅ `qwen3.8-2.4t-a95b` — Qwen3.8 Max-class MoE (Aug 2026, 2.4T / 95B active) — **extracted** (first open-weight Qwen-Max; largest record in the repo; text-only unlike every prior Qwen 3.x open checkpoint; first model in the repo with no non-thinking mode; 512 experts top-10 + 1 shared under classic aux-loss; custom `qwen3.8-max` licence)
+
 - ✅ `kimi-k3` — Kimi K3 (Jul 2026, 2.8T / 104B active, native multimodal, 1M ctx) — **extracted** (full architecture rewrite: KDA + Gated MLA 3:1 with NoPE; Block AttnRes at 12-layer blocks; Stable LatentMoE 896/16 in a 3584-wide latent space with SiTU-GLU + Quantile Balancing; Per-Head Muon; MXFP4 weights + MXFP8 activations QAT from SFT through RL; MoonViT-V2 trained from scratch; nine domain×effort RL experts consolidated by MOPD; XTML chat template; schema-v7 driver)
+
 - ✅ `deepseek-v4-flash-0731` — DeepSeek-V4-Flash official (Jul 2026) — **extracted** (architecturally frozen vs the April preview; re-post-trained with large agentic gains; ships the DSpark semi-autoregressive speculative-decoding module in-checkpoint; `encoding/README.md` pins the full `｜DSML｜` wire format; reasoning-effort levels shifted — the preview's top prefix is now `high`)
+
 - ✅ `deepseek-v3.2-exp` — DeepSeek-V3.2-Exp (Sep 2025, 671B / 37B) — **extracted** (the DSA origin the glossary had been citing without a record; config diff vs V3 is exactly three indexer keys; two-stage bolt-on recipe with the indexer trained by KL against the model's own attention distribution and detached from the graph; single mixed RL stage)
+
 - ✅ `glm-5` — GLM-5 (Feb 2026, 744B / 40B active MoE, MLA + DSA) — **extracted** (first non-DeepSeek vendor to ship DSA; `GlmMoeDsaForCausalLM`; Muon Split adaptation that closes MLA-vs-GQA-8 quality gap and obviates QK-Clip; 28.5T pre-train + staged mid-training to 200K; slime async RL; GRPO+IcePop without KL; deterministic torch.topk in DSA Indexer for RL stability; FP8 rollouts; INT4 QAT during SFT)
+
 - ✅ `glm-5.1` — GLM-5.1 (Apr 2026, post-training-only refresh of GLM-5) — **extracted** (config byte-identical except `transformers_version`; long-horizon agentic optimization "hundreds of rounds, thousands of tool calls"; SWE-Bench Pro 55.1 → 58.4; chat-template adds `defer_loading` filter + OpenAI-format unwrap + `tool_reference` content type for MCP-style lazy tool loading)
+
 - ✅ `glm-4.7` — GLM-4.7 (Jan 2026, 358B MoE, predecessor anchor) — **extracted** (post-training-only refresh of GLM-4.6 on the GLM-4.5 ARC architecture; GQA 12:1 + QK-Norm + partial RoPE 0.5; 160-expert MoE; Muon optimizer; FIM-on-all-source-code; introduces Preserved Thinking + Turn-level Thinking inference modes; XML-like tool-call wire format that GLM-5 inherits unchanged)
+
 - ✅ `kimi-k2-thinking` — Kimi K2-Thinking (text-only, 1T / 32B) — **extracted** (canonical K2-family text-only sibling, native INT4 QAT recipe origin, 200–300 sequential tool calls, Heavy Mode 8-rollout aggregation; `beta_fast=1.0` YaRN delta vs K2.5/K2.6)
+
 - ✅ `kimi-k2.5` — Kimi K2.5 (Jan 2026, native multimodal) — **extracted** (joint text+vision continual-pretrained on K2-base; MoonViT-3D + MLP projector; Agent Swarm / PARL; zero-vision SFT; Toggle token-efficient RL; INT4 QAT inherited from K2-Thinking)
+
 - ✅ `kimi-k2.6` — Kimi K2.6 (post-training-only refresh of K2.5) — **extracted** (same architecture; adds `preserve_thinking` 3rd kwarg-only mode; Agent Swarm scaled to 300 sub-agents × 4000 steps; long-horizon coding focus — clean parallel to Qwen3.5→3.6 post-training-delta pattern)
+
 - ✅ `deepseek-v4-pro` — DeepSeek-V4 Pro (Apr 2026) — **extracted** (first MLA-replacement architecture: hybrid CSA + HCA with KV compression; mHC residuals; Muon optimizer; FP4 QAT; multi-teacher OPD; 3-mode reasoning; schema v5 driven by this extraction)
+
 - ✅ `deepseek-v4-flash` — DeepSeek-V4 Flash (Apr 2026) — **extracted** (smaller V4 sibling, second-pass schema v5 validation; layers 0-1 use pure SWA instead of pure HCA, otherwise architectural shape identical)
+
 - ✅ `qwen3.5-27b` — Qwen3.5 dense (Feb 2026) — **extracted** (first hybrid-backbone validation; schema v4 holds)
+
 - ✅ `qwen3.5-35b-a3b` — Qwen3.5 MoE smaller (Feb 2026) — **extracted** (hybrid attention + MoE-FFN combo; shared-expert reintroduction; reverts to classic aux-loss)
+
 - ✅ `qwen3.6-27b` — Qwen3.6 dense (Apr 2026) — **extracted** (post-training-only refresh of 3.5-27B; adds `preserve_thinking` 3rd inference mode + agentic-coding focus)
+
 - ✅ `qwen3.6-35b-a3b` — Qwen3.6 MoE smaller (Apr 2026) — **extracted** (post-training-only refresh of 3.5-35B-A3B; same `preserve_thinking` + agentic-coding deltas as 3.6-27B)
 
 **Schema gaps — resolved by v6 (2026-05):**
@@ -231,13 +311,21 @@ backwards-compatible — all 7 prior v4 records migrated cleanly with a one-line
 - Qwen3.5 also drops the `/think` soft switch — both 3.5 and 3.6 use `enable_thinking` chat-template kwarg.
 - Qwen3.5 already has MTP (README: "MTP: trained with multi-steps"; config: `mtp_num_hidden_layers=1`). The 3.6 delta is `preserve_thinking` (multi-turn reasoning carryover), not MTP.
 
-**Recommended next (after this batch):** 23 extractions, 4 vendors, schema v7 holding.
-Highest-value next work, in order:
+**Recommended next (after the V4.1-Flash batch + schema v8):** 24 extractions, 4 vendors,
+schema v8. One new item goes ahead of the standing queue:
+
+- **Finish the DeepSeek-V4 generation.** Two releases are unextracted and both were
+  verified on the HF org listing: `deepseek-v4-pro-0813` (V4-Pro GA, 2026-08-13) and
+  `deepseek-v4-flash-vision-exp` (2026-08-21, now API-retired). The preview manifests still
+  carry the 404 tech-report URL noted below.
+
+Standing queue:
 
 1. **Close the DeepSeek lineage.** `deepseek-v3.1` / `v3.1-terminus` is now the most
    conspicuous hole — it is the dense checkpoint DSA was retrofitted onto, so every
    V3.2-Exp benchmark row currently compares against a model with no record. Then
    `deepseek-v3.2` (the non-Exp 2025-12 release) and `deepseek-r1`.
+
 2. **A closed model — and `qwen3.7-max` is now the cheapest way in.** `inferred_fields`
    is *still* empty across all 23 open-weight extractions, so the mechanism the schema was
    designed around has never been exercised. Qwen3.7-Max / 3.7-Plus (API-only, 2026-05/06)
@@ -245,12 +333,15 @@ Highest-value next work, in order:
    fully-extracted Qwen lineage, and same-family architectural priors make the inferences
    both cheap to justify and easy to bound. `gpt-4o` / `claude-sonnet-4` remain the
    cross-vendor alternatives.
+
 3. **A reference dense GQA model** (`llama-3.1-70b` / `mistral-large-2`) — the first
    non-MoE extraction since Qwen3-32B / Qwen3.5-27B.
+
 4. **Kimi Linear (`kimi-linear-48b-a3b`)** — newly load-bearing, since it is the KDA origin
    that Kimi K3 builds on. Previously deferred as an off-backbone sibling; K3 changes that
    calculus, and it would give the KDA glossary entry its "first introduced in" record the
    same way `deepseek-v3.2-exp` just did for DSA.
+
 5. **GLM-V / GLM-OCR** to add Z.AI's multimodal axis, or `kimi-k1.5` / the original
    `kimi-k2` for the Kimi family root.
 
@@ -322,6 +413,18 @@ Two candidates added by the Qwen3.8 batch, both deliberately **not** acted on ye
 > deferred, but **Kimi-Linear-48B-A3B has been promoted to a recommended next**: it is the
 > KDA origin K3 builds on, so it now anchors a glossary entry the way DeepSeek-V3.2-Exp
 > anchors DSA.
+
+**Recently completed (2026-09-12, DeepSeek-V4.1-Flash):**
+
+- `deepseek-v4.1-flash` (2026-09-10) is the first DeepSeek main-line model with vision, and a
+  new architecture family: CED + pure CSA2 + FP4 main KV + Engram + Single-Pass mHC.
+  **No schema bump**, but three v8 triggers are recorded (see Recommended next).
+- 2 new bilingual glossary entries: **csa2**, **causal-encoder-decoder**. "Used by" rows were
+  added to csa-hca, dsa, indexshare, mhc, muon, ngram-embedding (whose origin line now names
+  Engram), speculative-decoding, reasoning-effort, fp4-qat, aux-loss-free-routing,
+  deepseekmoe, on-policy-distillation, grpo and yarn-rope. `registry.json` gained the `csa2`
+  technique, with `causal-encoder-decoder` listed as prose-only.
+- Source-drift fix: `qwen3.8-flash-next` README pinned to the extracted HF revision.
 
 **Recently completed (2026-08-27, GLM catch-up):**
 

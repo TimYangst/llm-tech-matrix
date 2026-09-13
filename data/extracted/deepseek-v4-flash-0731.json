@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "DeepSeek-V4-Flash-0731",
     "family": "DeepSeek",
@@ -245,6 +245,39 @@
         "arguments_schema": "Inside the wrapper, one `<｜DSML｜invoke name=\"$TOOL_NAME\">` block per call, containing one `<｜DSML｜parameter name=\"$PARAMETER_NAME\" string=\"true|false\">$PARAMETER_VALUE</｜DSML｜parameter>` block per argument. The `string` attribute is the type discriminator: `string=\"true\"` means the value is a raw, unescaped string; `string=\"false\"` means the value is JSON-encoded (numbers, booleans, arrays, objects). This is the mechanism behind the paper's claim that XML replaces JSON to mitigate string-escape failures — free-form string arguments never get JSON-escaped. Multiple `invoke` blocks may appear in a single `tool_calls` wrapper for parallel calls. Tool results come back inside `<tool_result>{result_json}</tool_result>` within a user message, and when several results are present they are sorted by the order of the corresponding tool_calls in the preceding assistant message.",
         "parser_flags": {},
         "notes": "Fully pinned by encoding/README.md in this release (the preview extraction had to record end_token as UNKNOWN and defer argument encoding to the paper). Tools are declared OpenAI-style on the system or developer message; the encoder then injects a '## Tools' schema block with the literal grammar plus the tool definitions JSON into the prompt. The prompt block also carries the ordering rule: with thinking enabled, complete reasoning must be emitted inside `<think>…</think>` BEFORE any tool calls or final response. Declaring tools additionally force-disables `drop_thinking` (see inference modes). Still no Jinja chat template — the reference implementation is `encoding/encoding_dsv4.py` (`encode_messages`, `parse_message_from_completion_text`), and the README warns that the parser handles only well-formed output and does no error recovery. No `--tool-call-parser` flag is published; vLLM's V4-Flash recipe advertises tool_calling + reasoning support."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "none — the bare thinking-mode prompt",
+            "is_default": true,
+            "notes": "The preview's unprefixed 'Think High' mode, renamed."
+          },
+          {
+            "name": "high",
+            "numeric_value": null,
+            "rendering": "'Reasoning Effort: Absolute maximum with no shortcuts permitted. …' at the very start of the prompt, before the system message",
+            "is_default": false,
+            "notes": "Exactly the preview's 'Think Max' prefix, demoted."
+          },
+          {
+            "name": "max",
+            "numeric_value": null,
+            "rendering": "'Reasoning Effort: Beyond maximum — exhaustive, relentless, and uncompromising. …' at the very start of the prompt",
+            "is_default": false,
+            "notes": "New top level in this release."
+          }
+        ],
+        "applies_when": "thinking_mode='thinking' only; reasoning_effort has no effect with thinking_mode='chat'.",
+        "invalid_value_behavior": "[Unknown/Not Disclosed]",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "Level names shifted against the preview, so cross-version 'max' comparisons are not the same prompt condition."
       }
     },
     "advanced": {

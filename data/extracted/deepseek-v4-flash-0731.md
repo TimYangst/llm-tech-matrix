@@ -2,7 +2,7 @@
 
 > 中文版：[deepseek-v4-flash-0731.zh.md](./deepseek-v4-flash-0731.zh.md)
 
-*Schema version: 7*
+*Schema version: 8*
 
 ## Overview
 
@@ -231,6 +231,24 @@ _Shared modules:_ config.num_nextn_predict_layers=1 is unchanged in the 0731 con
     - Recommended sampling: `temperature=1.0`, `top_p=0.95 for agentic scenarios; 1.0 otherwise`
 - **`interleaved thinking (drop_thinking)`**
     - Kwargs: `drop_thinking=true`
+
+**Reasoning effort:**
+
+| | |
+|---|---|
+| API parameter | `reasoning_effort` |
+| Delivery | `prompt_prefix` |
+| Scale | `discrete` |
+
+| Level | Numeric value | Default | Rendering | Notes |
+|---|---|---|---|---|
+| `low` | — | ✓ | none — the bare thinking-mode prompt | The preview's unprefixed 'Think High' mode, renamed. |
+| `high` | — |  | 'Reasoning Effort: Absolute maximum with no shortcuts permitted. …' at the very start of the prompt, before the system message | Exactly the preview's 'Think Max' prefix, demoted. |
+| `max` | — |  | 'Reasoning Effort: Beyond maximum — exhaustive, relentless, and uncompromising. …' at the very start of the prompt | New top level in this release. |
+
+**Applies when:** thinking_mode='thinking' only; reasoning_effort has no effect with thinking_mode='chat'.
+
+_Notes:_ Level names shifted against the preview, so cross-version 'max' comparisons are not the same prompt condition.
 
 **Tool-call protocol:**
 

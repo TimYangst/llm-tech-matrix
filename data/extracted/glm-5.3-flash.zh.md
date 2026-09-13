@@ -2,7 +2,7 @@
 
 > English: [glm-5.3-flash.md](./glm-5.3-flash.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -193,6 +193,24 @@ _共享模块：_ `num_nextn_predict_layers=1`, parameter-shared, as in the GLM-
     - Kwargs：`reasoning_effort=low`
 - **`preserved thinking (default ON)`**
     - Kwargs：`clear_thinking=false`
+
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `prompt_prefix` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `max` | — | ✓ | '<\|system\|>Reasoning Effort: Max' as the prompt prefix | — |
+| `high` | — |  | [Unknown/Not Disclosed] | — |
+| `low` | — |  | [Unknown/Not Disclosed] | New in 5.3-Flash; GLM-5.2 accepted only {high, max}. |
+
+**生效条件：** Unconditional — resolved before any thinking check; there is no enable_thinking in this template.
+
+**非法取值的处理：** Accepts 'low' and 'high'; anything else silently falls back to 'max'.
 
 **Tool-call 协议：**
 

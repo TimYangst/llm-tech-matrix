@@ -1,0 +1,93 @@
+{
+  "slug": "deepseek-v4.1-flash",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V4.1-Flash HuggingFace config.json (pinned revision)",
+      "sha256": "8be45ce0476004a3f529fd896115a4a2e800a129ad2d3ec05b16050f52e21879",
+      "size_bytes": 3311,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "HF model card — architecture summary, base/instruct benchmarks, sampling",
+      "sha256": "347c9db4e5506acb531cbc3b724407ab88e9af8781679152f0823d7bac16d251",
+      "size_bytes": 13110,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "HF tokenizer_config.json",
+      "sha256": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547",
+      "size_bytes": 801,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "encoding_readme",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/encoding/README.md",
+      "archive_url": null,
+      "filename": "encoding_README.md",
+      "description": "encoding/README.md — prompt wire format incl. numeric reasoning effort (no Jinja template)",
+      "sha256": "a2f0fc3baea318c9cfbceca68cbfe50d37cf7da6605ace887f33148bcff7e3ae",
+      "size_bytes": 12120,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "inference_readme",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/inference/README.md",
+      "archive_url": null,
+      "filename": "inference_README.md",
+      "description": "inference/README.md — weight conversion and local inference",
+      "sha256": "2834402823199ee24e9a42bdf36a0fc6daf94448f444cb062c042a057a798f1c",
+      "size_bytes": 2029,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "inference_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/inference/config.json",
+      "archive_url": null,
+      "filename": "inference_config.json",
+      "description": "inference/config.json — reference-implementation model config",
+      "sha256": "2e84f45cf1dac8c7fcbb200e96667d4b913275690668ed496f24c7747207a809",
+      "size_bytes": 1982,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "tech_report",
+      "kind": "tech_report",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/dba1be0a40aa45a94ad051997016db3960a90277/DeepSeek_V41_Tech_Report.pdf",
+      "archive_url": null,
+      "filename": "tech_report.pdf",
+      "description": "DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression (technical report)",
+      "sha256": "ba68e2e40408125ae6d2f63a9a241b61c73910691c74ec1a2a7023c851eac08d",
+      "size_bytes": 1809802,
+      "fetched_at": "2026-09-12"
+    },
+    {
+      "name": "api_news",
+      "kind": "blog_html",
+      "url": "https://api-docs.deepseek.com/news/news260910/",
+      "archive_url": null,
+      "filename": "api_news.html",
+      "description": "DeepSeek API docs release note 2026-09-10",
+      "sha256": "420cbb7b5e8e97632fa45cb49cd2b5f22b57c8f9e125d1c34a22bd67bbc33705",
+      "size_bytes": 27838,
+      "fetched_at": "2026-09-12"
+    }
+  ]
+}

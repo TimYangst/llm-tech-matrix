@@ -28,6 +28,8 @@
 - [Kimi Delta Attention (KDA)](./kda.zh.md)
 - [Qwen 稀疏注意力（QSA）](./qsa.zh.md)
 - [IndexShare / IndexCache（跨层索引复用）](./indexshare.zh.md)
+- [压缩稀疏注意力 2（CSA2）—— 跨层 KV + 索引复用](./csa2.zh.md)
+- [因果编码器-解码器（CED）+ SWA 有界重放](./causal-encoder-decoder.zh.md)
 
 ### FFN / MoE
 

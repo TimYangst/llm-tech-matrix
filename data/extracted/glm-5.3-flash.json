@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "GLM-5.3-Flash",
     "family": "GLM-5",
@@ -181,6 +181,39 @@
         "arguments_schema": "GLM-line XML-like format with per-arg key/value blocks and tool schemas declared as JSON in a `<tools>` system block. The template adds a `tool_references_to_response` macro that expands a `tool_reference` back into a full `<tool_response><tools>…</tools></tool_response>` payload — the MCP-style lazy tool-loading mechanism introduced in GLM-5.1, now with an explicit rehydration path.",
         "parser_flags": {},
         "notes": "The README links SGLang / vLLM / TokenSpeed / KTransformers cookbooks rather than printing parser flags."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "max",
+            "numeric_value": null,
+            "rendering": "'<|system|>Reasoning Effort: Max' as the prompt prefix",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "high",
+            "numeric_value": null,
+            "rendering": "[Unknown/Not Disclosed]",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "[Unknown/Not Disclosed]",
+            "is_default": false,
+            "notes": "New in 5.3-Flash; GLM-5.2 accepted only {high, max}."
+          }
+        ],
+        "applies_when": "Unconditional — resolved before any thinking check; there is no enable_thinking in this template.",
+        "invalid_value_behavior": "Accepts 'low' and 'high'; anything else silently falls back to 'max'.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": ""
       }
     },
     "advanced": {

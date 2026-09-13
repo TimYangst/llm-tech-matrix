@@ -2,7 +2,7 @@
 
 > English: [glm-5.2.md](./glm-5.2.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -77,6 +77,17 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 **训练配方：** The IndexShare paper offers two routes and GLM-5.2 ships the **training-aware** one: a multi-layer distillation loss trains each retained indexer against the *averaged* attention distributions of all the layers it serves, which the paper shows lets even a simple uniform interleaved pattern match full-indexer accuracy. (The training-free alternative — a greedy search that picks which layers keep indexers by directly minimizing LM loss on a calibration set, no weight updates — is what the paper recommends when retraining is not an option.) The underlying DSA indexer itself is inherited from GLM-5's Continued Pre-Training recipe.
 
 _说明：_ **The motivation is that DSA's indexer is the residual O(L²) cost.** DSA reduces core attention from O(L²) to O(Lk), but the lightning indexer still runs independently at every layer at O(L²) — even though consecutive layers' top-k selections are highly similar. IndexShare exploits exactly that redundancy. Reported effect: **2.9× fewer per-token FLOPs at 1M context** (model card); the paper measures 75% of indexer computation removed with negligible quality loss on a 30B DSA model (1.82× prefill / 1.48× decode speedup), and ~1.2× end-to-end on production-scale GLM-5 at 50% removal. `index_share_for_mtp_iteration=true` extends the reuse into the MTP module's speculative-decoding iterations. **Cross-vendor note:** this is the same technique Qwen's Qwen3.8-Flash-Next report benchmarks against by name (cited there as 'training-aware IndexShare (Bai et al., 2026)') before choosing within-layer micro-block compression instead — Qwen's argument being that cross-layer index sharing is weakened in hybrid stacks where full-attention layers are separated by linear-attention layers. GLM-5.2 is a pure-MLA stack, where the cross-layer similarity IndexShare depends on is strongest. See [qsa](../../docs/glossary/qsa.md) for the other side of that argument.
+
+**跨层共享：**
+
+| 类型 | 共享内容 | 来源层 | 复用层 |
+|---|---|---|---|
+| `indexshare` | `topk_indices` | 21 Full layers (config.indexer_types='full'): layers 0-2, then every fourth layer from layer 3 (index_topk_freq=4, index_skip_topk_offset=3) | 57 Shared layers (config.indexer_types='shared'), each reusing the nearest preceding Full layer's top-k indices |
+
+- **`indexshare`** (topk_indices)
+    - **效果：** 2.9× fewer per-token FLOPs at 1M context (model card). Paper: 75% of indexer computation removed with negligible quality loss on a 30B DSA model (1.82× prefill / 1.48× decode), ~1.2× end-to-end on production-scale GLM-5 at 50% removal.
+    - **训练配方：** Training-aware route of IndexShare/IndexCache (arXiv 2603.12201): a multi-layer distillation loss trains each retained indexer against the averaged attention distributions of all the layers it serves. Inferred from the fixed period-4 pattern; Z.AI does not state which variant shipped.
+    - _说明：_ Only indexer selections are shared — main KV stays per-layer. index_share_for_mtp_iteration=true extends the reuse into MTP speculative-decoding iterations.
 
 ### FFN（hybrid）
 
@@ -170,6 +181,25 @@ _共享模块：_ `num_nextn_predict_layers=1`, parameter-shared MTP as in the G
     - Kwargs：`enable_thinking=false`
 - **`preserved thinking (clear_thinking=false)`**
     - Kwargs：`clear_thinking=false`
+
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `prompt_prefix` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `max` | — | ✓ | '<\|system\|>Reasoning Effort: Max' as the very first thing in the prompt | — |
+| `high` | — |  | '<\|system\|>Reasoning Effort: High' | — |
+
+**生效条件：** Only when thinking is enabled — the effort line is guarded by enable_thinking.
+
+**非法取值的处理：** Strict two-way branch: anything other than exactly 'high' silently falls back to 'max' (no error).
+
+_说明：_ First GLM with an effort axis; GLM-5 / GLM-5.1 had none.
 
 **Tool-call 协议：**
 

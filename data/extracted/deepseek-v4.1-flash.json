@@ -1,0 +1,449 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "DeepSeek-V4.1-Flash",
+    "family": "DeepSeek",
+    "release_date": "2026-09",
+    "openness": "open_weights",
+    "params_total": "552B backbone (plus 196B Engram conditional-memory parameters, reported separately)",
+    "params_active": "8B per token during prefill / 16B per token during decode (Causal Encoder-Decoder: prefill only runs the 20-layer encoder)",
+    "sources": [
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/tokenizer_config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/encoding/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/inference/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/inference/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/dba1be0a40aa45a94ad051997016db3960a90277/DeepSeek_V41_Tech_Report.pdf",
+      "https://api-docs.deepseek.com/news/news260910/"
+    ],
+    "variant_policy": "A NEW ARCHITECTURE FAMILY shipped under a point-version name. The API release note calls it 'the smallest model in our new architecture family, with native visual understanding', and the model has a new HF class (`DeepseekV41ForCausalLM`, model_type `deepseek_v41`) with a text_config + vision_config split — it shares the V4 lineage (MoE, mHC, DSpark, DSML) but not the V4 attention stack or layer topology. Three policy changes vs V4. (1) VISION IS FOLDED INTO THE MAIN CHECKPOINT: one unified image+text model, trained multimodally from the start of pre-training; the API retires both `deepseek-v4-flash` and the separate `deepseek-v4-flash-vision-exp` (released 2026-08-21) and temporarily routes both names to V4.1-Flash. (2) A FLASH MODEL REPLACES THE PRO TIER: the release note says V4-Pro is being phased out and, from 2026-09-14 04:00 UTC, all `deepseek-v4-pro` requests route to V4.1-Flash 'until V4.1-Pro launches' — the vendor has announced but not released a larger sibling. The API model name is now the generation-free `deepseek-flash`. (3) REASONING EFFORT BECOMES A CONTINUOUS SCALAR: one checkpoint exposes an integer effort 1–100, with the public API's `low` / `high` / `max` tiers mapped to 50 / 75 / 100 (tech report Table 2), and `thinking_mode` ∈ {thinking, chat} still switches reasoning off entirely. The DSpark speculative-decoding module continues to ship inside the checkpoint (as in V4-Flash-0731). Still no separate Math / Coder / Reasoner siblings, and no Base checkpoint in the release (the README reports DeepSeek-V4.1-Flash-Base benchmark numbers but lists no Base repo)."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 40,
+      "hidden_dim": 5120,
+      "context_window": 1048576,
+      "context_window_notes": "1M-token context (config.text_config.max_position_embeddings=1048576; tokenizer_config.model_max_length=1048576; README 'support for contexts of up to one million tokens'). The 40 layers are split into a 20-layer CAUSAL ENCODER (layers 0–19) and a 20-layer DECODER (layers 20–39) — see attention.notes. README recommends `context_window` 1M and `max_tokens` ≥ 256K. Visual agent benchmarks were run at a 512K context window; code-agent benchmarks at 1M.",
+      "context_extension": {
+        "method": "yarn",
+        "trained_max": 1048576,
+        "extended_max": 1048576,
+        "factor": 16,
+        "original_max": 65536,
+        "notes": "config.text_config.rope_scaling = {rope_type: yarn, factor: 16, original_max_position_embeddings: 65536, beta_fast: 32, beta_slow: 1}, rope_theta=10000; compressed-KV branches use compress_rope_theta=160000 — numerically identical to V4-Flash (the key was renamed `type` → `rope_type`). The pre-training curriculum is SIMPLER than V4's 4K → 16K → 64K → 1M: tech report §4.2.2 'We train the model from scratch with sparse attention at a sequence length of 64K and extend the sequence length to 1M at 34T tokens' (of 45T), 'without any dense attention warmup stages'. Post-training RL also scales context to 1M (Figure 7: extending maximal context from 512K to 1M 'continues to improve performance on extremely long-horizon tasks')."
+      }
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 64,
+      "num_kv_heads": 1,
+      "head_dim": 512,
+      "rope": {
+        "type": "yarn",
+        "base": 10000,
+        "scaling": {
+          "type": "yarn",
+          "factor": 16,
+          "original_max_position_embeddings": 65536,
+          "beta_fast": 32,
+          "beta_slow": 1,
+          "compress_rope_theta": 160000,
+          "partial_rotary_factor": "64/512 = 0.125 (config.text_config.qk_rope_head_dim=64 of head_dim=512)"
+        }
+      },
+      "mla": null,
+      "variants": [
+        {
+          "name": "sliding_window_attention",
+          "family": "sliding_window",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "Partial RoPE on the last 64 dims (qk_rope_head_dim=64).",
+          "notes": "Pure SWA at layers 0–1 only (config.compress_ratios[0..1]=0; report §4.2.1 'For the first two layers, we use pure sliding window attention'), window n_win=128 (config.sliding_window=128). EVERY other layer also carries a layer-local n_win=128 SWA branch alongside its global CSA2 attention (report §2.1: 'Each layer incorporates both global attention and sliding window attention (SWA), except for the first two layers, which use SWA only'). SWA KV is always computed from the layer's OWN hidden state, including in the decoder — this is what CED deliberately does not share. SWA KV cache stays FP8 ('due to its sensitivity to quantization', §2.4.4)."
+        },
+        {
+          "name": "csa2_full",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "Partial RoPE on the last 64 dims; compressed branches use compress_rope_theta=160000.",
+          "notes": "CSA2 Full Mode (report §2.3.1): the layer computes its own main KV and indexer Q, projects indexer K FROM that main KV (CSA2 replaces CSA's separate indexer-compression path from hidden states), and runs the indexer to produce fresh top-512 indices. Query latent 1280 (config.q_lora_rank=1280); outputs in 8 groups (o_groups=8) of 1024 (o_lora_rank=1024); indexer 32 heads × 128 dim (index_n_heads=32, halved from V4-Flash's 64). Full-Mode layers are exactly config.kv_source_layer_ids = [2, 8, 14, 20]. In the decoder (layer 20) the Full-Mode layer derives its global KV from the final ENCODER hidden state H_{L/2}, not its own hidden state, and also builds the Hierarchical Sparse Indexer candidate pool (config.candidate_source_layer_id=20)."
+        },
+        {
+          "name": "csa2_reindex",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "As csa2_full.",
+          "notes": "CSA2 Reindex Mode (report §2.3.1): reuses main KV and indexer K from the most recent Full-Mode layer, computes its OWN indexer Q, rescores the shared keys and selects fresh top-512 indices — so selection changes across layers while cache storage is shared. Used only in the decoder, at layers 24, 28, 32, 36 (config.index_source_layer_ids = [2, 8, 14, 20, 24, 28, 32, 36] = Full ∪ Reindex). Under the Hierarchical Sparse Indexer, Reindex layers score only the candidate pool built by layer 20 (up to 2,048 blocks × 8 positions = 16,384 candidates), not the full context."
+        },
+        {
+          "name": "csa2_reuse",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "As csa2_full.",
+          "notes": "CSA2 Reuse Mode (report §2.3.1): reuses both main KV AND the latest top-K indices from the most recent Full/Reindex layer, computing no indexer Q and no index scores — it only computes its own main Q and SWA KV and runs sparse attention. The large majority of layers (30 of 40) are Reuse layers; report §3.2 says each executes with only 15 kernels in prefill and 11 in decode."
+        }
+      ],
+      "layer_pattern": "40 layers = 20-layer causal encoder + 20-layer decoder (report §4.2.1, Figure 3). ENCODER: layers 0–1 pure SWA; layers 2–19 CSA2 with compression ratio m=2, in three identical groups of six — [Full, Reuse×5] at 2–7, 8–13, 14–19. DECODER: layers 20–39 CSA2 with compression ratio m=1 (uncompressed main KV — 'CSA2 also includes the uncompressed main KV setting as a special case with a compression ratio of 1'), in five groups of four — [Full, Reuse×3] at 20–23, then [Reindex, Reuse×3] at 24–27, 28–31, 32–35, 36–39. Totals: 2 SWA-only, 4 Full, 4 Reindex, 30 Reuse. Matches config.compress_ratios = [0,0, 2×18, 1×20, 0,0,0]; the three trailing zeros are 43 − 40 = 3 entries beyond the backbone, matching the 3-block DSpark drafter (config.num_nextn_predict_layers=3). Unlike V4's CSA/HCA alternation, there is NO heavily-compressed layer type: 'DeepSeek-V4.1-Flash uses pure CSA2'.",
+      "sparse_attention": {
+        "kind": "csa2",
+        "selection": "Top-k by lightning indexer (indexer K projected from the shared main KV) in Full and Reindex layers; Reuse layers inherit the previous indexing layer's top-k indices without scoring. In the DECODER a Hierarchical Sparse Indexer applies: the first Full-Mode layer (20) scores all causally visible positions, assigns each block of 8 positions (config.candidate_block_size=8) its maximum index score, and keeps the top 2,048 blocks (config.candidate_topk_blocks=2048) as a shared candidate pool of up to 16,384 positions; later Reindex layers select their own top-512 only within that pool, so their per-query indexing cost is bounded independently of context length.",
+        "top_k": 512,
+        "indexer_heads": 32,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "2 (encoder CSA2 layers) / 1 = uncompressed (decoder CSA2 layers)",
+        "training_recipe": "No retrofit: sparse attention trained from scratch at 64K 'without any dense attention warmup stages' (V4 used 1T dense tokens first). The Hierarchical Sparse Indexer is added later and is 'training-aware and introduced in post-training: the candidate restriction is applied identically during training and inference'. Cross-layer sharing across pipeline stages needed dedicated infrastructure (report §3.1.2): shadow indexers (executable replicas with a single logical owner of the shared parameters), pipeline payload extensions carrying shared states and sparse routing across stage boundaries, and micro-batch-level shared-state lifetime management.",
+        "notes": "CSA2 simplifies CSA: it removes the overlapping 2m-entry compression windows and the absolute positional embedding inside the compressor, and derives indexer K by projecting main KV. It is framed as attacking all three multiplicative KV dimensions at once — entry size (single KV head), sequence (compression), and LAYER (cross-layer cache + index reuse) — and explicitly cites IndexCache (arXiv:2603.12201, index reuse only), YOIO, HySparse and cross-layer attention (Brandon et al., 2024) as partial precedents. Global KV cache footprint: 890 bytes per token, ~1/4 of V4-Flash (with FP4 main KV). Report §6 flags 'potential selection errors in CSA2' as an uncharacterized robustness boundary."
+      },
+      "notes": "CAUSAL ENCODER-DECODER (CED), report §2.2 — inspired by YOCO. For GLOBAL attention, decoder layers (l > L/2) do not derive KV from their own hidden states; their KV entries C_l and compression weights Z_l are projected from the final encoder hidden state H_{L/2} with layer-dependent weights: C_l = H_{L/2} W^KV_l, Z_l = H_{L/2} W^Z_l. Combined with CSA2, only the decoder's Full-Mode layer (20) actually materializes decoder global KV. So prefill can stop at the encoder, which is why only 8B parameters are active per prompt token versus 16B per generated token, and prefill complexity drops from O(NL) to ≈ O(NL/2). For SLIDING-WINDOW attention, every layer keeps layer-wise KV from its own hidden state (increasing 'computational depth of local KV generation'), which would force replaying n_win × L/2 prompt tokens through the decoder; DECODER SWA BOUNDED REPLAY instead replays only the last n_win=128 prompt tokens through the decoder with SWA truncated to the replay segment, accepting approximate SWA states ('negligible impact on response quality'), and the same replay is simulated during post-training for train-aware adaptation. ENCODER SWA BOUNDED REPLAY does the same for prefix-cache hits whose SWA KV was evicted, which lets SWA KV be removed from the persistent (SSD) KV cache entirely. FP4 MAIN KV CACHE (§2.4.4): main KV stored as E2M1 with one E4M3 scale per 16 channels (NVFP4-style minus the second-level global scale), quantized after RoPE, trained via QAT in post-training; SWA KV stays FP8. Normalization: config.rms_norm_eps=1e-20 (V4-Flash: 1e-6). DSpark draft targets the last three backbone layers, config.dspark_target_layer_ids=[37, 38, 39].",
+      "cross_layer_sharing": [
+        {
+          "kind": "ced",
+          "shared_state": [
+            "kv_from_encoder_output"
+          ],
+          "source_layers": "hidden state of the final encoder layer (H_{L/2} in the report; zero-indexed layer 19)",
+          "consumer_layers": "decoder layers 20-39 — global KV entries C_l and compression weights Z_l are projected from H_{L/2} with layer-dependent weights; under CSA2 only the decoder Full-Mode layer 20 materializes its own",
+          "effect": "Prefill stops at the encoder: 8B active parameters per prompt token vs 16B per generated token; prefill complexity O(NL) → ≈ O(NL/2).",
+          "training_recipe": "Trained from scratch in the architecture. Decoder SWA Bounded Replay (only the last n_win=128 prompt tokens replayed through the decoder for SWA KV) is simulated during post-training for train-aware adaptation.",
+          "notes": "Global attention only. Sliding-window KV remains layer-local in every layer — CED deliberately does not share it."
+        },
+        {
+          "kind": "csa2",
+          "shared_state": [
+            "kv",
+            "indexer_keys"
+          ],
+          "source_layers": [
+            2,
+            8,
+            14,
+            20
+          ],
+          "consumer_layers": "every other CSA2 layer: Reindex layers 24, 28, 32, 36 and all 30 Reuse layers, each reading the most recent Full-Mode layer's main KV and indexer K",
+          "effect": "Global KV cache 890 bytes/token with FP4 main KV, ~1/4 of DeepSeek-V4-Flash.",
+          "training_recipe": "From scratch at 64K with no dense warm-up; cross-stage sharing trained with shadow indexers, pipeline payload extensions and micro-batch shared-state management.",
+          "notes": "config.kv_source_layer_ids. Full-Mode layers compute their own main KV and project indexer K from it."
+        },
+        {
+          "kind": "csa2",
+          "shared_state": [
+            "topk_indices"
+          ],
+          "source_layers": [
+            2,
+            8,
+            14,
+            20,
+            24,
+            28,
+            32,
+            36
+          ],
+          "consumer_layers": "the 30 Reuse-Mode layers, each reusing the latest top-k computed against the main KV it reads",
+          "effect": "Reuse layers compute no indexer Q and no scores; each runs in 15 kernels (prefill) / 11 (decode).",
+          "training_recipe": "",
+          "notes": "config.index_source_layer_ids = Full ∪ Reindex. Decoupled from KV sharing: Reindex layers share KV but select afresh. In the decoder, the Hierarchical Sparse Indexer additionally restricts Reindex layers to layer 20's candidate pool (2,048 blocks × 8 positions) — a restriction of the search domain, recorded in sparse_attention.selection."
+        }
+      ]
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 384,
+        "num_active_experts": 6,
+        "shared_experts": 1,
+        "expert_intermediate_size": 2304,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "DeepSeekMoE with auxiliary-loss-free routing (config.topk_method='noaux_tc'), SqrtSoftplus affinity scoring (scoring_func='sqrtsoftplus'), top-6 routed + 1 shared expert, routed_scaling_factor=1.5, norm_topk_prob=true. NEW: MULTIMODAL AUX-LOSS-FREE LOAD BALANCING (report §2.1.1) — separate expert-wise correction biases for text and image tokens; each token selects experts using its own modality's biases while the original scores weight the outputs, and the two bias sets are updated independently from their own expert loads (bias update speed 0.001 for both). A small sequence-level balance loss (weight 0.0001) is retained 'to avoid extreme imbalance within single sequences'."
+      },
+      "layer_partition": "All 40 layers use MoE FFN (report §4.2.1 'We employ MoE layers in all Transformer blocks'; Figure 3 'All feed-forward layers use standard DeepSeekMoE'). V4-Flash's hash routing for the first 3 layers appears to be dropped: config key `num_hash_layers` (=3 in V4-Flash-0731) is absent from the V4.1 config, and the report describes no hash-routed layers. The DSpark drafter carries its own smaller MoE: 128 routed experts, top-3 (config.dspark_n_routed_experts=128, dspark_num_experts_per_tok=3). Routed-expert weights in FP4 (config.quantization_config.expert_dtype='fp4')."
+    },
+    "components": {
+      "activation": "SwiGLU (config.hidden_act='silu') with clamping at threshold 10 (config.swiglu_limit=10.0; report §4.2.1 cites OpenAI, 2025 for the clamp). The DeepSeek-ViT vision encoder also uses SwiGLU.",
+      "normalization": "RMSNorm (config.rms_norm_eps=1e-20, down from 1e-6 in V4-Flash). Report §2.4.4 bounds the main-KV magnitude through it: the largest trained RMSNorm weight is ≈1, so after RMS normalization and norm-preserving RoPE the 512-channel KV latent has per-channel magnitude ≤ √512 ≈ 22.6 (observed max ≈ 10 in training), which is why the FP4 KV format can drop its global scale. Single-Pass mHC folds the coefficient predictor's normalization weights into the projection offline and applies the RMS division after projection.",
+      "embedding_notes": "Vocab 129,280 (config.vocab_size), tie_word_embeddings=false, PreTrainedTokenizerFast with <｜begin▁of▁sentence｜> (bos, id 0) and <｜end▁of▁sentence｜> (eos, id 1; tokenizer pad token) — config.pad_token_id=2 is also the Engram pad id (engram_pad_token_id=2). Image placeholder <｜deepseek_image｜>, config.image_token_id=129264. NEW special token <｜System｜> for mid-conversation system messages. ENGRAM conditional memory is attached at layers 1 and 14 (see memory_modules); its tokenizer compression maps the 129,280-token vocab to 99,092 ids (config.engram_compressed_vocab_size). The token embedding and prediction head are trained with the Sinkhorn-balanced momentum update rather than AdamW (see training.optimizer). dspark_noise_token_id=128799 carries over from V4-Flash-0731."
+    },
+    "residual_connections": {
+      "kind": "mhc",
+      "expansion_factor": 4,
+      "constraint": "Residual mapping B constrained to doubly stochastic matrices via 20 Sinkhorn-Knopp iterations (config.hc_sinkhorn_iters=20, hc_eps=1e-6) — the mHC constraint carried from V4.",
+      "iterations": 20,
+      "dynamic_parameterization": true,
+      "notes": "SINGLE-PASS mHC (report §2.4.1). Standard mHC computes X_{l+1} = B_l X_l + C_l F_l(A_l X_l) with (A_l, B_l, C_l) = H(X_l); because A_l is only available after a full reduction over the hidden dimension, V4's implementation needs three sequential kernels and (4n+4)d activation memory traffic — twice the (2n+2)d lower bound. Single-Pass mHC SHIFTS THE INPUT-MIXING COEFFICIENTS BY ONE BLOCK: X_{l+1} = B_l X_l + C_l F_l(A_{l-1} X_l), removing the dependency so each hidden-dimension tile of X_l can be used immediately for both input mixing and coefficient prediction. 'Empirically, this shift incurs negligible performance degradation.' Pre-training keeps the multi-kernel implementation; deployment fuses residual update, input mixing, coefficient prediction, input pre-norm and FP8 conversion into one Mega-mHC kernel reaching the ideal (n+1)d reads + (n+1)d writes, halving activation memory traffic vs the original. config.hc_mult=4."
+    },
+    "auxiliary_modules": [
+      {
+        "name": "DSpark speculative-decoding module",
+        "purpose": "speculative_decoding",
+        "architecture": "Semi-autoregressive drafter (report §2.4.3; Cheng et al., 2026, arXiv:2607.05147): three Transformer blocks with a 128-token sliding attention window compute base logits for FIVE draft positions in one forward pass (config.dspark_block_size=5), plus a lightweight Markov head modeling dependencies among draft tokens (dspark_markov_rank=256) and a confidence head predicting per-position conditional acceptance probabilities. Conditioned on target layers [37, 38, 39] (dspark_target_layer_ids — the last three backbone layers). NEW vs V4-Flash-0731's drafter: the draft MoE is config-declared at 128 routed experts, top-3 (dspark_n_routed_experts=128, dspark_num_experts_per_tok=3). config.num_nextn_predict_layers=3 and inference/config.json n_mtp_layers=3 match the three drafter blocks.",
+        "shipped_in_checkpoint": true,
+        "activation": "[Unknown/Not Disclosed] — the README gives no vLLM/SGLang serving command for this release (unlike V4-Flash-0731); the minimal inference implementation covers 'the DSpark forward path' but runs 'plain autoregressive sampling'. Report §2.4.3: a scheduler combines prefix-survival estimates with profiled engine throughput curves to choose each request's verification length under current load.",
+        "notes": "Training schedule is new and explicit: 'Unlike the MTP module in DeepSeek-V3 ... DSpark is introduced in a dedicated stage after pre-training. In this stage, we train only DSpark while keeping the backbone frozen. During post-training, we continue to train DSpark alongside the backbone, without propagating gradients from the DSpark objective into the backbone.' Keeping it aligned with the evolving policy lets it accelerate RL and OPD rollout generation as well as online serving. No MTP objective is used in backbone pre-training."
+      }
+    ],
+    "parallelism_notes": "TRAINING (report §3.1): disaggregated vision encoder replicated outside the LLM parameter tree, with each step split into vision-encoder forward → LLM forward/backward → vision-encoder backward so the LLM phase keeps its text-only parallel strategy; communication–computation overlap in the ViT's contrastive phase (each modality's all-gather hidden behind the other modality's forward/backward); balanced image sharding across context-parallel ranks for ultra-long image-dense sequences (each image loaded exactly once) and incremental image transfer to the RL inference engine; CSA2 cross-stage sharing via shadow indexers, pipeline payload extensions and micro-batch shared-state management; Engram row-partitioned engram-parallel groups. Training runs on sequences up to 1M tokens with a large share at ultra-long lengths in both pre- and post-training. INFERENCE (§3.2): Encoder–Prefill–Decode (EPD) disaggregation so vision encoding, prefill and decode scale independently; fused kernels — fused RoPE-attention-RoPE-cast in FlashMLA; Mega-Gate, Mega-mHC and Mega-MoE in DeepGEMM; TileKernels; the TopK kernel in DeepSelect — so a Reuse-Mode layer runs in 15 kernels (prefill) / 11 (decode). PERSISTENT KV CACHE (§3.2.1): ~1/8 of V4's, from two multiplicative factors — SWA KV no longer persisted (≈ halves it) and global KV at ~1/4 of V4 (CSA2 + FP4). Global KV lives on SSD with a guaranteed ≥72h lifetime; SWA KV moves to a distributed memory pool built from 10% of each machine's host DRAM with a minutes-scale TTL, and misses fall back to Encoder SWA Bounded Replay. Single-token decode FLOPs rise only ~1/4 from 4K to 1M context (Figure 2, precision-weighted BF16:FP8:FP4 = 1:0.5:0.25). Post-training infrastructure: see training.alignment.",
+    "memory_modules": [
+      {
+        "name": "Engram conditional memory",
+        "kind": "engram",
+        "params": "196B, split evenly across two modules (reported separately from the 552B backbone)",
+        "layers": [
+          1,
+          14
+        ],
+        "addressing": "Multi-head hashing of token n-grams, orders {2, 3, 4} (engram_max_ngram_size=4), 8 hash heads per order (engram_n_heads=8), over a compressed tokenizer vocabulary of 99,092 ids (engram_compressed_vocab_size); context-aware gating and multi-branch integration as in the original Engram design (arXiv:2601.07372)",
+        "table_config": "Each head indexes a ≈16M-entry table (engram_vocab_size=16,000,000) sized to a distinct prime; 256 dims per head (engram_head_dim=256) = 2,048 per order; engram_num_embeddings = [384,006,168, 384,016,682] per module. The original design's short causal convolution is removed.",
+        "storage": "Tables and key/value projections in FP8. Training: row-partitioned across engram-parallel process groups with sharded optimizer states and whole-batch prefetch. Inference: prefetched from host memory via background RDMA, the first module's prefetch overlapping the first Transformer block; tables sharded. RL rollouts: tables kept resident in GPU memory.",
+        "optimizer": "Sinkhorn-balanced momentum update (K=11 alternating row/column normalizations, τ=1e-3, γ=0.18, momentum 0.95, no weight decay) instead of Adam, to avoid Adam optimizer-state memory; Engram learning rate scaled 5×. Engram projection layers are on Muon.",
+        "notes": "Placed at layers 1 and 14 to balance memory usage across training pipeline stages. Arithmetic check (not a vendor statement): 384.0M entries × 256 dims ≈ 98.3B per module, ≈ 196.6B for two, consistent with the reported 196B."
+      }
+    ]
+  },
+  "training": {
+    "optimizer": "Four-way parameter partition (report §2.5, §4.2.2). (1) MUON for linear-transformation weight matrices in the LM backbone, the Engram projection layers and the vision-language projector — with HEAD-WISE MUON for Query and Key weights (weights split by head before the update, giving each head its own preconditioner; the report says it 'outperforms vanilla Muon' and cites GLM-5 and Kimi-K3 as independent validation). Momentum 0.95, weight decay 0.1, Nesterov, update RMS rescaled to 0.18 to reuse the AdamW learning rate. (2) ADAMW for RMSNorm weights and other non-matrix parameters (biases, scaling factors): β1=0.9, β2=0.95, ε=1e-20, weight_decay=0.1; normalization weights are decayed, biases and scaling factors are not. (3) NEW — SINKHORN-BALANCED MOMENTUM UPDATE for the Engram embedding tables, the token embedding and the prediction head (Algorithm 1): Muon's workflow with Sinkhorn balancing in place of Newton–Schulz — K=11 alternating row/column ℓ2 normalizations of the Nesterov momentum (odd K ends on rows), near-zero rows masked (τ=1e-3), ε=1e-20, scaled by √n to unit row RMS, learning-rate correction γ=0.18, momentum 0.95, NO weight decay. Motivation: Adam on 196B Engram parameters would blow up optimizer-state memory; this needs only a momentum buffer and 'empirically outperform[s] Adam'. Engram learning rate is scaled 5×. (4) VISION ENCODER frozen during pre-training until the LR-decay stage (its final norm layer and the projector stay trainable), then unfrozen and trained jointly at a smaller learning rate.",
+    "lr_schedule": "Linear warmup over the first 2,000 steps to 2.6e-4, held constant until 28T tokens, cosine decay to 2.6e-5 between 28T and 40T, then held at 2.6e-5 from 40T to 45T. Batch size FIXED at 100.6M tokens throughout (V4 ramped its batch size). Sequence length 64K from scratch, extended to 1M at 34T tokens. Sample-level attention masking in pre-training, as in V4. 'We train DeepSeek-V4.1-Flash on 45T tokens of multimodal data with no instability.'",
+    "data_total_tokens": "45T (multimodal)",
+    "data_mix": {
+      "text-only": "87.5% (7:1 text-only : multimodal token ratio, report §4.1)",
+      "multimodal": "12.5%"
+    },
+    "data_mix_notes": "Report §4.1. TEXT: a systematic, standardized pipeline guided by a scaling ladder over model parameters and training data; filters out model-generated content with limited information gain (outputs of less capable models, low-quality machine translation) as 'implicit duplication'; more domain-expert quality dimensions; more recent code from newly released open-source repositories, commits, libraries and frameworks. MULTIMODAL: image-text pairs, interleaved image-text data (predominantly webpages and PDFs) and domain-specific data; deliberately little large-scale synthesis ('prioritized cleaning and utilizing the data in its native form'); crawler re-bootstrapped from Common Crawl after it proved biased toward text-centric pages; interleaved data built through progressively more expensive filtering stages with SmolVLM quality scoring; domain data for grounding/pointing, OCR and long-tail knowledge; image-code pairs and computer-use trajectories. INTEGRATION: union of the two pipelines, with text-only duplicates replaced by their multimodal counterparts (taking the larger epoch count); ultra-long documents deterministically pre-split; best-fit packing with padding rate ≤ 1e-4. VISION ENCODER pre-stage: ~47B image-text pairs (SigLIP contrastive) plus 236B tokens of autoregressive fine-tuning — whether these count toward the 45T is not stated. Numeric percentages are pure arithmetic from the stated 7:1 ratio; no finer breakdown (code / math / languages) is disclosed.",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": [
+        "No MTP objective in backbone pre-training — report §2.1: 'We omit the MTP module during backbone pre-training and use DSpark for speculative decoding.' This departs from DeepSeek-V3 and DeepSeek-V4, both of which trained an MTP head jointly with the backbone.",
+        "DSpark drafter objective (arXiv:2607.05147), trained in a dedicated post-pre-training stage with the backbone frozen, then co-trained through post-training with a stop-gradient into the backbone.",
+        "Vision encoder pre-stage (report §4.2.2): SigLIP sigmoid contrastive loss on ~47B alt-text image-text pairs at ≤224×224, then next-token-prediction fine-tuning attached to a 4B MoE LLM on 236B tokens (captions, alt text, charts, OCR) at 544×544–1344×1344; the 4B LLM is then discarded.",
+        "Fill-in-Middle is not mentioned in the V4.1 technical report (V4 inherited PSM FIM from V3); left unset rather than assumed."
+      ]
+    },
+    "alignment": {
+      "sft": "SFT is the first stage of a standard SFT → RL → OPD recipe that the report stresses is algorithmically unchanged from DeepSeek-V4: 'our post-training introduces no algorithmic innovation ... All substantive changes lie instead in the data pipeline.' SFT data specifics are not disclosed.",
+      "rl_method": "GRPO, run fully asynchronously (report §5.2 refers to GRPO group size in dispatch; §5.1.4 computes group-relative advantages within effort subgroups). The report's central post-training claim: 'under a fixed and unremarkable optimization procedure, systematic improvements in the scale, diversity, and verifiability of synthesized data and environments account for essentially all of the observed gains.'",
+      "rlaif": false,
+      "stages": [
+        {
+          "name": "Large-scale agent task synthesis",
+          "method": "rl",
+          "description": "Report §5.1.1. Tasks are triplets (problem, environment, verification system) scored on difficulty and correctness, and those two scores are used as REWARDS to iteratively train the model itself to construct better tasks; tasks are re-audited from fresh trajectories each time they are reused. GENERAL AGENTS: mocked tools reproducing real SaaS / enterprise / back-end interfaces, reconstructed from interaction data voluntarily returned by employees and partners, plus failure cases replayed as single- and multi-turn environments. CODING AGENTS: hard or poorly-solved coding-agent sessions plus public GitHub repos above a star threshold, built into environments by a chain of specialized agents — feasibility and task design, containerized setup with leak removal, multiple solver agents, an independent quality-inspection agent (environment issues, factual errors, hackability), and a repair agent."
+        },
+        {
+          "name": "Asynchronous RL in synthesized tasks",
+          "method": "rl",
+          "description": "Report §5.1.2, §5.2. Scaled along two axes — RL compute and number of scaffolds: single scaffold, multiple Claude Code versions, and heterogeneous scaffolds (OpenCode, Pi, DeepSeek Harness Standard/PTC); performance keeps rising with cumulative RL steps. Rollout runs in an agent sandbox plus a scaffold-agnostic worker container on DSec (a custom sandbox platform scaled to millions of concurrent containers, ≥2,500 live containers per node, AppArmor + eBPF containment; crashing the environment is a failed trajectory with a 'repercussion' signal). MODEL MERGING of checkpoints from different scaffolds/configs reinitializes successive RL runs. Async infrastructure: rollout and training colocated and time-shared; sample-level dispatch (batch- and prompt-level dispatch were tried and rejected); concatenated routing-replay for samples spanning checkpoints; per-dataset concurrency caps and discarding early short samples against length bias; a bounded off-policy ratio plus loss masking of overly stale tokens; token-level interruption with token-granular persistence of KV cache and expert routing so interrupted rollouts resume without re-prefill."
+        },
+        {
+          "name": "Controllable reasoning-effort RL",
+          "method": "rl",
+          "description": "Report §5.1.4, Appendix C. A scalar effort b ∈ {1..100} is prepended to the system prompt; for each prompt, M_b responses are sampled at each training effort level b ∈ B, and advantages are mean-centered WITHIN each (prompt, b) subgroup so different effort levels are never compared directly. Effort-dependent behaviour comes from a length penalty r_len = −min(C_max, k(b)·ℓ/L_norm) whose coefficient decays exponentially with effort: k(b) = k0·exp(−(b − b_min)/τ), τ = λΔb. Training uses only a finite set of effort levels (values not disclosed); intermediate values interpolate at deployment. Applied to both single-turn reasoning and multi-turn agentic tasks."
+        },
+        {
+          "name": "Agent Team (multi-agent) RL",
+          "method": "rl",
+          "description": "Report §5.3.5, described as preliminary. DeepSeek Harness Agent Team mode: a lead agent spawns persistent teammates (fresh or forked from the lead's history) sharing one repository checkout, coordinated through a durable peer mailbox and a shared task board. Reward = task performance + a collaboration bonus for delegation and communication − a derived-latency penalty equal to the critical-path length of a DAG of execution events (tokens at fixed prefill/decode rates plus measured tool time). Multi-agent beats single-agent at every wall-clock deadline: ProgramBench golden subset Almost@1 30.04% vs 20.39% at best; FrontierSWE v2 (no-GPU) Mean@5 32.90% vs 28.20% at 20h."
+        },
+        {
+          "name": "Hierarchical Sparse Indexer and inference-path adaptation",
+          "method": "other",
+          "description": "Post-training also trains the model under its deployment approximations so train and inference match: the decoder's Hierarchical Sparse Indexer candidate restriction is 'introduced in post-training' and applied identically in training and inference; Decoder SWA Bounded Replay is simulated during post-training 'for train-aware adaptation'. The report does not say which post-training sub-stage (SFT, RL or OPD) these are introduced in, so the method is recorded as `other`."
+        },
+        {
+          "name": "FP4 main-KV-cache QAT",
+          "method": "quantization_aware_training",
+          "description": "Report §2.4.4: 'To enable FP4 main KV cache storage in DeepSeek-V4.1-Flash, we introduce QAT during post-training.' Main KV (RoPE and non-RoPE components alike) quantized after RoPE to E2M1 with one E4M3 scale per 16 channels; quantizing before RoPE gave only marginal accuracy gains at extra decode overhead. SWA KV stays FP8."
+        },
+        {
+          "name": "DSpark co-training",
+          "method": "distillation",
+          "description": "Report §2.4.3. After pre-training, a dedicated stage trains only DSpark with the backbone frozen; during post-training DSpark keeps training alongside the backbone with no gradient from its objective into the backbone, so it tracks the evolving policy and speeds up RL/OPD rollouts as well as serving."
+        },
+        {
+          "name": "Large-scale On-Policy Distillation (final stage)",
+          "method": "distillation",
+          "description": "Report §5.2.4. The last post-training stage is full-vocabulary OPD over datasets from all domains using OVER 40 teacher models (V4 used >10), which may come from different development stages and may differ architecturally from each other and from the student; run asynchronously with dynamic reconfiguration of dataset mixture, per-dataset concurrency and active teachers mid-training."
+        }
+      ],
+      "inference_modes": [
+        {
+          "name": "thinking / reasoning_effort=high (75, default)",
+          "trigger": "`thinking_mode=\"thinking\"` with `reasoning_effort` unset, `\"high\"` or `75`. encoding/README.md: the effort is rendered once, at conversation index 0, as a `<｜System｜>` block before the system prompt: `<｜System｜>Reasoning Effort: 75 (range 1-100, the higher the value, the more thorough the reasoning)`.",
+          "description": "Default operating point. NOTE the default moved: in V4-Flash-0731 the default was `low` (no prefix at all); in V4.1 the default is `high` = 75 and every thinking-mode prompt carries a numeric prefix. API tier `high` maps to b=75 (tech report Table 2).",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "high"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 or 1.0"
+          }
+        },
+        {
+          "name": "thinking / reasoning_effort=max (100)",
+          "trigger": "`thinking_mode=\"thinking\"` with `reasoning_effort=\"max\"` or `100`; rendered as `Reasoning Effort: 100 (range 1-100, ...)`.",
+          "description": "Maximum effort. All instruct benchmark results in the README and report are at `reasoning_effort=100`, temperature 1.0, top_p 0.95. Report §5.3.2: the last step from 60–80 to 100 lengthens agent trajectories 1.6–1.8× for marginal gains, so 'the maximum tier is thus best reserved for the most challenging tasks'.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "max"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95"
+          }
+        },
+        {
+          "name": "thinking / reasoning_effort=low (50)",
+          "trigger": "`thinking_mode=\"thinking\"` with `reasoning_effort=\"low\"` or `50`; rendered as `Reasoning Effort: 50 (range 1-100, ...)`.",
+          "description": "Lowest named API tier (b=50). Not the unprefixed mode it was in V4-Flash-0731 — cross-version 'low' comparisons are not the same prompt condition.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "low"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 or 1.0"
+          }
+        },
+        {
+          "name": "thinking / numeric reasoning_effort (1–100)",
+          "trigger": "`thinking_mode=\"thinking\"` with an integer `reasoning_effort` in [1, 100]. Only rendered in thinking mode and only at conversation index 0.",
+          "description": "The underlying control: a continuous scalar, trained on a finite set of levels with an exponentially decaying length penalty and interpolated in between ('Intermediate values may be used to elicit interpolated reasoning behavior'). Report Figure 9: raising effort 25 → 100 lifts the 8-benchmark reasoning average 67.1% → 76.3%, DeepSWE v1.1 66.0% → 74.2% and Terminal-Bench 2.1 82.4% → 90.6% at ≈2.5× output tokens, with the 60–80 range recovering most of the accuracy at under half the token budget of 100.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "<integer 1-100>"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "chat (non-thinking)",
+          "trigger": "`thinking_mode=\"chat\"`: `</think>` is placed immediately after `<｜Assistant｜>`, so the model answers directly. No effort prefix is rendered.",
+          "description": "Reasoning disabled. Unchanged mechanism from V4-Flash-0731.",
+          "kwargs": {
+            "thinking_mode": "chat"
+          },
+          "sampling_recommended": {}
+        },
+        {
+          "name": "interleaved thinking (drop_thinking)",
+          "trigger": "Encoder parameter `drop_thinking` (default true), automatically disabled when tools are declared on the system message.",
+          "description": "Without tools, reasoning from assistant turns before the last user message is stripped; with tools every turn keeps its `<think>` block 'because tool-calling conversations require full context'. Unchanged from V4-Flash-0731.",
+          "kwargs": {
+            "drop_thinking": "true"
+          },
+          "sampling_recommended": {}
+        }
+      ],
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<｜DSML｜ calls>",
+        "end_token": "</｜DSML｜ calls>",
+        "arguments_schema": "One `<｜DSML｜ invoke name=\"$TOOL_NAME\">` block per call (several allowed per wrapper), each containing `<｜DSML｜ parameter name=\"$PARAMETER_NAME\" string=\"true|false\">$VALUE</｜DSML｜ parameter>` per argument; `string=\"true\"` = raw unescaped string, `string=\"false\"` = JSON value (number, boolean, array, object). Tools may carry a `namespace` (string or {name, description}); the schema and the DSML invocation then use the qualified name `namespace::tool`, and the parser returns `function.name` and `namespace` separately. Tool results return as `<tool_result>{result_json}</tool_result>` inside a user message, ordered to match the preceding tool_calls.",
+        "parser_flags": {},
+        "notes": "encoding/README.md 'V4.1 changes relative to V4': DSML TAG NAMES NOW HAVE A LEADING SPACE — `<｜DSML｜ calls>`, `<｜DSML｜ invoke>`, `<｜DSML｜ parameter>` — replacing V4's `<｜DSML｜tool_calls>` / `<｜DSML｜invoke>` / `<｜DSML｜parameter>`, so V4 parsers will not match V4.1 output. The wrapper is also renamed tool_calls → calls. Tool namespaces are new. Still no Jinja chat template: the reference is encoding/encoding.py, plus the new deepseek-recipe Rust/Python toolkit that converts Messages / Chat Completions / Responses API requests into V4 and V4.1 prompts and parses streamed output. Roles: system, user, assistant, tool, latest_reminder — the V4-Flash-0731 `developer` role is no longer listed; mid-conversation system messages via `<｜System｜>` are new. No `--tool-call-parser` flag is published."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "continuous",
+        "range": "1-100",
+        "levels": [
+          {
+            "name": "low",
+            "numeric_value": 50,
+            "rendering": "'<｜System｜>Reasoning Effort: 50 (range 1-100, the higher the value, the more thorough the reasoning)'",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "high",
+            "numeric_value": 75,
+            "rendering": "'<｜System｜>Reasoning Effort: 75 (range 1-100, the higher the value, the more thorough the reasoning)'",
+            "is_default": true,
+            "notes": "Default moved from V4-Flash-0731's unprefixed `low` to `high`=75."
+          },
+          {
+            "name": "max",
+            "numeric_value": 100,
+            "rendering": "'<｜System｜>Reasoning Effort: 100 (range 1-100, the higher the value, the more thorough the reasoning)'",
+            "is_default": false,
+            "notes": "All instruct benchmarks are reported at 100."
+          }
+        ],
+        "applies_when": "thinking_mode='thinking' only; rendered once, as a <｜System｜> block before the system prompt, at conversation index 0. Any integer 1–100 is accepted; the names are aliases.",
+        "invalid_value_behavior": "[Unknown/Not Disclosed]",
+        "training_method": "RL conditioned on a scalar effort b prepended to the system prompt: M_b responses sampled per training effort level, advantages mean-centered within each (prompt, b) subgroup, and a length penalty r_len = −min(C_max, k(b)·ℓ/L_norm) with k(b) = k0·exp(−(b − b_min)/τ), τ = λΔb. Trained on a finite, undisclosed set of levels; intermediate values interpolate (tech report §5.1.4, Appendix C).",
+        "notes": "Effort 25 → 100 lifts the 8-benchmark reasoning average 67.1% → 76.3%, DeepSWE v1.1 66.0% → 74.2% and Terminal-Bench 2.1 82.4% → 90.6% at ≈2.5× output tokens (Figure 9). The report's quoted training string differs slightly from the encoder's rendering."
+      }
+    },
+    "advanced": {
+      "self_distillation": "Two layers. (1) Target model: final-stage full-vocabulary On-Policy Distillation from over 40 teachers, which may be architecturally heterogeneous and drawn from different development stages. (2) Drafter: DSpark trained against the frozen, then evolving, backbone with a stop-gradient. The vision encoder pre-stage (a 4B MoE LLM used only to fine-tune DeepSeek-ViT, then discarded) is auxiliary training, not distillation.",
+      "mixed_precision": "Training precision is not restated as a whole. Disclosed pieces: FP4 global (main) KV caches used during training via QAT in post-training ('we use FP4 global KV caches during training with only marginal performance degradation'); Engram embedding tables and key/value projections in FP8, with embeddings stored, fetched and fed to the next GEMM in FP8; the Mega-mHC deployment kernel includes FP8 conversion. V4 carried FP4 QAT for indexer queries/keys, and the V4.1 report describes FP4 main KV as an extension of that. The DeepSeek-ViT was built with a linear patch embedding instead of a convolution specifically 'to ensure compatibility with the Muon optimizer'."
+    },
+    "quantization": {
+      "weight_format": "mxfp4",
+      "activation_format": "fp8 dynamic (config.quantization_config.activation_scheme='dynamic', scale_fmt='ue8m0')",
+      "method": "qat",
+      "scope": "Routed-expert weights in FP4 (config.quantization_config.expert_dtype='fp4'); other quantized weights FP8 (quant_method='fp8'). Engram tables and projections FP8. KV cache: main (global) KV FP4 (E2M1 with one E4M3 scale per 16 channels, stored after RoPE), SWA KV FP8. Lightning-indexer QK path FP4 carried from V4.",
+      "granularity": "FP8 weight blocks 32×32 (config weight_block_size=[32, 32], down from 128×128 in V4-Flash); FP4 main KV with one E4M3 scale per 16 channels and no second-level global scale.",
+      "stage": "FP4 main-KV QAT is introduced during post-training. The report adopts OCP MXFP4 'to support as many hardware platforms as possible, despite the higher accuracy of alternative formats in our experiments'. The V4.1 report does not restate how the FP4 expert weights were trained; V4 used post-training FP4 QAT for them.",
+      "notes": "The main-KV format is deliberately NVFP4-like minus the global scale, and works without native FP4 matmul support because cached values are dequantized before attention — FP4 here saves storage, not compute. It nearly halves main-KV storage vs V4's FP8, in HBM and on SSD. The weight_format value records the vendor-named MXFP4 expert-weight format; the FP4 KV format is a separate, non-MX variant."
+    },
+    "stability_notes": "'We train DeepSeek-V4.1-Flash on 45T tokens of multimodal data with no instability' (report §4.2.2). Disclosed stabilizers: SwiGLU clamping at 10 (config.swiglu_limit=10.0); the retained 0.0001 sequence-level balance loss against extreme within-sequence expert imbalance; per-modality aux-loss-free bias sets ('contributes to stable and efficient multimodal training'); row masking (τ=1e-3) inside the Sinkhorn-balanced update for numerical stability. V4's Anticipatory Routing (a spike-triggered routing fallback) is not mentioned in the V4.1 report. Post-training stability: bounded off-policy ratio and stale-token loss masking in async RL."
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image"
+    ],
+    "fusion": "native_early",
+    "fusion_notes": "Native multimodal from the start of LM pre-training ('multimodal data incorporated from the start of language-model pre-training', report §2.1) — the first DeepSeek main-line checkpoint with vision. Path: DeepSeek-ViT produces a spatial feature grid → 3×3 pixel-unshuffle (9× fewer visual tokens) → 2-layer MLP projector (hidden 5120) → visual embeddings inserted at the `<｜deepseek_image｜>` / image_token_id=129264 positions and processed jointly with text by the shared backbone. MoE routing uses separate text and image balancing biases. Images only — no video or audio in sources. Supports input resolutions up to ≈1344×1344 (vision_config.min_pixels=295,936 = 544², max_image_tokens=1024). Base-model multimodal scores: MMMU-Pro 56.5, CVBench 77.9, DocVQA 95.6, RefCOCO-avg 86.0; visual-agent (w/ tools): Chartography 78.9, BabyVision 89.6, ZeroBench-main Pass@5 49.0. Vision tokens are served via Encoder–Prefill–Decode disaggregation.",
+    "vision_encoder": {
+      "architecture": "DeepSeek-ViT — ViT trained from scratch with 2D-RoPE (vision rope_theta=10000) instead of absolute position embeddings, a LINEAR patch embedding instead of a convolution (for Muon compatibility), RMSNorm and SwiGLU",
+      "depth": 32,
+      "hidden_size": 1024,
+      "intermediate_size": 2816,
+      "num_heads": 16,
+      "patch_size": 14,
+      "in_channels": "[Unknown/Not Disclosed]",
+      "output_dim": 5120,
+      "spatial_merge_size": 3,
+      "temporal_patch_size": "[Unknown/Not Disclosed]",
+      "notes": "HF vision_config: num_hidden_layers=32, hidden_size=1024, num_attention_heads=16, intermediate_size=2816, patch_size=14, downsample_ratio=3 (the 3×3 pixel-unshuffle, recorded as spatial_merge_size), max_image_tokens=1024, min_pixels=295936, max_wh_ratio=null. output_dim = the projector's hidden dim 5120 (= LM hidden). Two-stage pre-training before integration (report §4.2.2): SigLIP sigmoid contrastive loss on ≈47B alt-text pairs at ≤224×224 (higher resolution here 'contribute[s] little to the final model'), then autoregressive fine-tuning connected to a 4B MoE LLM on 236B tokens at 544×544–1344×1344. Frozen during LM pre-training until LR decay, then unfrozen at a smaller learning rate."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 129264,
+      "video_token_id": "[Unknown/Not Disclosed]",
+      "vision_start_token_id": "[Unknown/Not Disclosed]",
+      "vision_end_token_id": "[Unknown/Not Disclosed]"
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": ""
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "RESOLVED IN v8 — `architecture.attention.cross_layer_sharing[]` now carries CED and both CSA2 sharing relations. Original gap: SCHEMA GAP — no home for Causal Encoder-Decoder / cross-layer KV sharing. That decoder global KV is projected from the final encoder hidden state, that 34 of 40 layers borrow another layer's KV (4 Reindex + 30 Reuse; 2 are SWA-only), and that the 30 Reuse layers also borrow another layer's top-k indices, all currently live in `attention.notes`, `variants[].notes` and `layer_pattern` prose. Cross-layer attention-state reuse now has two records (GLM-5.2's IndexShare shares indexer selections; V4.1's CSA2 shares KV, indexer K and selections), which is the repo's usual trigger for a structured slot (e.g. per-variant `kv_source` / `index_source`).",
+    "RESOLVED IN v8 — Engram moved to `architecture.memory_modules[]`, with its own `params`. Original gap: SCHEMA GAP — second occurrence of in-forward-pass embedding memory. Engram (196B, layers 1 and 14) is recorded in `auxiliary_modules` for consistency with qwen3.8-flash-next's n-gram embedding (51B, layer 2), but both are inside the forward pass, and `params_total` has to be a prose string because backbone vs memory-table parameters cannot be expressed separately. Qwen3.8-Flash-Next flagged this at one occurrence; this is the second.",
+    "SCHEMA GAP — phase-dependent active parameters. `params_active` is a single string, but CED makes activated parameters differ by phase (8B prefill / 16B decode). Recorded as prose.",
+    "RESOLVED IN v8 — `training.alignment.reasoning_effort` records delivery, continuous 1-100 scale and the 50/75/100 aliases. Original gap: STRUCTURED REASONING-EFFORT — fourth mechanism. DeepSeek-V4.1 uses a continuous integer scalar (1–100) rendered as a `<｜System｜>` prefix and trained with an exponential length penalty, alongside DeepSeek-V4 (prose prefixes), Kimi K3 (typed option message) and Qwen3.8 (system-message instruction). tasks/ROADMAP.md named a fourth occurrence as the trigger for promoting `mechanism` / `levels` to structured fields. It also fits `inference_modes[].kwargs` poorly: the numeric mode had to use a placeholder value `<integer 1-100>`.",
+    "num_nextn_predict_layers=3 vs 'We omit the MTP module during backbone pre-training'. The config key (and inference/config.json n_mtp_layers=3) equals the DSpark drafter's three blocks, and compress_ratios has exactly 3 entries beyond the 40 backbone layers. That suggests the key counts DSpark blocks rather than MTP heads, which would also settle the analogous deepseek-v4-flash-0731 question (46 = 43 + 3). No source states it explicitly.",
+    "Hash routing removal is inferred from absence only: V4-Flash-0731's config has num_hash_layers=3; V4.1's config has no such key, and the report says all FFN layers use 'standard DeepSeekMoE'. The report never states that hash-routed layers were removed, or why.",
+    "Anticipatory Routing (V4's loss-spike fallback) is not mentioned in the V4.1 report, which reports 'no instability' across 45T tokens. Whether it was removed, kept but never triggered, or simply not described is undisclosed.",
+    "Benchmark discrepancy: NL2Repo-Bench for DS-V4.1-Flash is 64.0 in the HF README table but 65.4 in tech report Table 3. All other shared cells match.",
+    "Reasoning-effort prompt text differs between sources: the tech report (§5.1.4) quotes the training instruction as 'Reasoning Effort: {effort} (range 1–100; higher values request more thorough reasoning)', while encoding/README.md renders 'Reasoning Effort: {budget} (range 1-100, the higher the value, the more thorough the reasoning)'. The encoding file is the wire format used here; whether training used the same string is unclear.",
+    "The set of effort levels B used in RL training, and k0, λ, C_max and L_norm of the length penalty, are not disclosed — only that training uses 'a finite set of effort levels' and that intermediate values interpolate.",
+    "The report's conclusion compares V4.1-Flash to 'Fable-5 and GPT-6 Astra', but its evaluation tables compare against Opus-5 and GPT-5.6 Sol. No numbers are given for the models named in the conclusion.",
+    "Whether the vision-encoder pre-stage tokens (~47B contrastive pairs, 236B autoregressive tokens) count toward the 45T pre-training total is not stated.",
+    "No serving command (vLLM / SGLang) or DSpark activation flag is published for this release, unlike DeepSeek-V4-Flash-0731; the inference README ships only a minimal torchrun reference that uses plain autoregressive sampling and suggests `--temperature 0.6` in its interactive example, versus the recommended 1.0.",
+    "No V4.1-Flash-Base checkpoint is released even though Base benchmark numbers are reported, and the announced V4.1-Pro has no release date.",
+    "Robustness caveats the vendor flags itself (report §6): CSA2 selection errors and approximate SWA state reconstruction under SWA Bounded Replay may cause degradation 'in untested boundary cases'."
+  ]
+}

@@ -11,7 +11,9 @@
     "training.quantization.weight_format",
     "multimodal.fusion",
     "training.alignment.tool_call_protocol.format",
-    "architecture.auxiliary_modules[].purpose"
+    "architecture.auxiliary_modules[].purpose",
+    "architecture.attention.cross_layer_sharing[].kind",
+    "architecture.memory_modules[].kind"
   ],
   "taxonomy": {
     "_doc": "Structural classifiers with no glossary entry — a shape, not a named technique.",
@@ -114,6 +116,15 @@
         "heavily_compressed_attention"
       ]
     },
+    "csa2": {
+      "title": "Compressed Sparse Attention 2 (CSA2)",
+      "aliases": [
+        "csa2",
+        "csa2_full",
+        "csa2_reindex",
+        "csa2_reuse"
+      ]
+    },
     "mrope": {
       "title": "Multimodal RoPE (mRoPE)",
       "aliases": [
@@ -206,8 +217,26 @@
     "ngram-embedding": {
       "title": "N-gram Embedding",
       "aliases": [
-        "capacity_scaling",
-        "ngram_embedding"
+        "ngram_embedding",
+        "engram"
+      ]
+    },
+    "indexshare": {
+      "title": "IndexShare (IndexCache)",
+      "aliases": [
+        "indexshare"
+      ]
+    },
+    "causal-encoder-decoder": {
+      "title": "Causal Encoder-Decoder (CED)",
+      "aliases": [
+        "ced"
+      ]
+    },
+    "reasoning-effort": {
+      "title": "Reasoning effort",
+      "presence": [
+        "training.alignment.reasoning_effort"
       ]
     }
   },
@@ -226,9 +255,7 @@
       "qk-norm",
       "moonvit",
       "agent-swarm",
-      "hybrid-thinking",
-      "reasoning-effort",
-      "indexshare"
+      "hybrid-thinking"
     ]
   },
   "fuzzy_slots": [

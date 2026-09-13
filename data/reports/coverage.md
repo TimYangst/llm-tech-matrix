@@ -16,7 +16,7 @@ training tricks live in free-text fields, so these entries' "Used by" tables can
 be generated and must stay hand-maintained. Promoting any of them to a typed slot
 is a schema change, not a registry change.
 
-[`agent-swarm`](../../docs/glossary/agent-swarm.md), [`aux-loss-free-routing`](../../docs/glossary/aux-loss-free-routing.md), [`deepseekmoe`](../../docs/glossary/deepseekmoe.md), [`dualpipe`](../../docs/glossary/dualpipe.md), [`fp8-mixed-precision`](../../docs/glossary/fp8-mixed-precision.md), [`global-batch-load-balancing`](../../docs/glossary/global-batch-load-balancing.md), [`grpo`](../../docs/glossary/grpo.md), [`hybrid-thinking`](../../docs/glossary/hybrid-thinking.md), [`indexshare`](../../docs/glossary/indexshare.md), [`latentmoe`](../../docs/glossary/latentmoe.md), [`moonvit`](../../docs/glossary/moonvit.md), [`muon`](../../docs/glossary/muon.md), [`on-policy-distillation`](../../docs/glossary/on-policy-distillation.md), [`qk-norm`](../../docs/glossary/qk-norm.md), [`reasoning-effort`](../../docs/glossary/reasoning-effort.md)
+[`agent-swarm`](../../docs/glossary/agent-swarm.md), [`aux-loss-free-routing`](../../docs/glossary/aux-loss-free-routing.md), [`deepseekmoe`](../../docs/glossary/deepseekmoe.md), [`dualpipe`](../../docs/glossary/dualpipe.md), [`fp8-mixed-precision`](../../docs/glossary/fp8-mixed-precision.md), [`global-batch-load-balancing`](../../docs/glossary/global-batch-load-balancing.md), [`grpo`](../../docs/glossary/grpo.md), [`hybrid-thinking`](../../docs/glossary/hybrid-thinking.md), [`latentmoe`](../../docs/glossary/latentmoe.md), [`moonvit`](../../docs/glossary/moonvit.md), [`muon`](../../docs/glossary/muon.md), [`on-policy-distillation`](../../docs/glossary/on-policy-distillation.md), [`qk-norm`](../../docs/glossary/qk-norm.md)
 
 ## 3. Structured edges missing from a "Used by" table
 
@@ -52,8 +52,12 @@ would make it wrong.
 | Technique | Model | Annotation |
 | --- | --- | --- |
 | [`attnres`](../../docs/glossary/attnres.md) | `qwen3.8-flash-next` | compared against |
+| [`csa-hca`](../../docs/glossary/csa-hca.md) | `deepseek-v4.1-flash` | replaced by CSA2 |
+| [`dsa`](../../docs/glossary/dsa.md) | `deepseek-v4.1-flash` | via CSA2 |
 | [`dsa`](../../docs/glossary/dsa.md) | `qwen3.8-flash-next` | via QSA |
 | [`gated-deltanet`](../../docs/glossary/gated-deltanet.md) | `kimi-k3` | via KDA |
+| [`indexshare`](../../docs/glossary/indexshare.md) | `deepseek-v4.1-flash` | via CSA2 |
+| [`indexshare`](../../docs/glossary/indexshare.md) | `glm-5.3-flash` | dropped |
 | [`mhc`](../../docs/glossary/mhc.md) | `qwen3.8-flash-next` | via GR |
 | [`qsa`](../../docs/glossary/qsa.md) | `glm-5.3-flash` | convergent |
 

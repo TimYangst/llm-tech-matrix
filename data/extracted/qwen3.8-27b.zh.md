@@ -2,7 +2,7 @@
 
 > English: [qwen3.8-27b.md](./qwen3.8-27b.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -156,6 +156,26 @@ _共享模块：_ MTP head with mtp_num_hidden_layers=1 (config) and mtp_use_ded
     - 推荐采样参数：`temperature=0.7`, `top_p=0.80`, `top_k=20`, `min_p=0.0`, `presence_penalty=1.5`, `repetition_penalty=1.0`
 - **`preserved thinking (default ON)`**
     - Kwargs：`preserve_thinking=true`
+
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `system_message_instruction` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `xhigh` | — | ✓ | 'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message) | — |
+| `medium` | — |  | none — the template leaves reasoning_instructions empty for this level | The middle level is the bare prompt; only xhigh and low add text. |
+| `low` | — |  | 'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message) | — |
+
+**生效条件：** Thinking mode only — with enable_thinking=false the template skips effort resolution entirely.
+
+**非法取值的处理：** The chat template raises an exception for any value outside {xhigh, medium, low}.
+
+_说明：_ If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions).
 
 **Tool-call 协议：**
 

@@ -2,7 +2,7 @@
 
 > English: [deepseek-v4-flash-0731.md](./deepseek-v4-flash-0731.md)
 
-*Schema 版本: 7*
+*Schema 版本: 8*
 
 _章节标题、字段名与样板文字译为中文；字段取值保留源材料原文（多为英文），以避免翻译引入偏差。术语解释见 [docs/glossary/](../../docs/glossary/)。_
 
@@ -233,6 +233,24 @@ _共享模块：_ config.num_nextn_predict_layers=1 is unchanged in the 0731 con
     - 推荐采样参数：`temperature=1.0`, `top_p=0.95 for agentic scenarios; 1.0 otherwise`
 - **`interleaved thinking (drop_thinking)`**
     - Kwargs：`drop_thinking=true`
+
+**推理强度（reasoning effort）：**
+
+| | |
+|---|---|
+| API 参数 | `reasoning_effort` |
+| 注入方式 | `prompt_prefix` |
+| 刻度 | `discrete` |
+
+| 档位 | 数值 | 默认 | 注入内容 | 说明 |
+|---|---|---|---|---|
+| `low` | — | ✓ | none — the bare thinking-mode prompt | The preview's unprefixed 'Think High' mode, renamed. |
+| `high` | — |  | 'Reasoning Effort: Absolute maximum with no shortcuts permitted. …' at the very start of the prompt, before the system message | Exactly the preview's 'Think Max' prefix, demoted. |
+| `max` | — |  | 'Reasoning Effort: Beyond maximum — exhaustive, relentless, and uncompromising. …' at the very start of the prompt | New top level in this release. |
+
+**生效条件：** thinking_mode='thinking' only; reasoning_effort has no effect with thinking_mode='chat'.
+
+_说明：_ Level names shifted against the preview, so cross-version 'max' comparisons are not the same prompt condition.
 
 **Tool-call 协议：**
 

@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "metadata": {
     "name": "Qwen3.8-2.4T-A95B",
     "family": "Qwen",
@@ -161,6 +161,39 @@
         "arguments_schema": "Per-arg <parameter=name>VALUE</parameter> blocks nested inside a <function=NAME></function> wrapper — byte-identical instruction block to Qwen3.8-27B and unchanged from Qwen3.5/3.6. Tool schemas are declared in a `<tools>` system block, one `tool | tojson` per line.",
         "parser_flags": {},
         "notes": "Identical wire format to the 27B sibling. As with the 27B, the README no longer prints `--tool-call-parser qwen3_coder` / `--reasoning-parser qwen3` serving flags, linking to per-framework cookbooks instead, so parser_flags is left empty rather than inferred from earlier generations."
+      },
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "system_message_instruction",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "xhigh",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' (injected into the system message)",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "medium",
+            "numeric_value": null,
+            "rendering": "none — the template leaves reasoning_instructions empty for this level",
+            "is_default": false,
+            "notes": "The middle level is the bare prompt; only xhigh and low add text."
+          },
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' (injected into the system message)",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "Unconditional — the open checkpoint is thinking-only (the template raises on enable_thinking=false).",
+        "invalid_value_behavior": "The chat template raises an exception for any value outside {xhigh, medium, low}.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "If no system message exists the template synthesizes one; when tools are declared the instruction is prepended inside the tools system block. Whether the model was RL-trained against these strings is undisclosed (see open_questions)."
       }
     },
     "advanced": {

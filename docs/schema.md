@@ -1,4 +1,4 @@
-# Extraction Schema (v7)
+# Extraction Schema (v8)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
 Every extracted model must conform — downstream comparison and trend analysis assume
@@ -106,6 +106,22 @@ This rule is load-bearing. Half the project's value is being able to trust the d
 - `notes` — string **(v7+)**, free text for attention-level details with no dedicated field:
   output gates, NoPE decisions, per-head QK normalization, attention sinks, training-precision
   choices. Empty `""` when the structured fields say everything.
+- `cross_layer_sharing` — list **(v8+)**, one entry per cross-layer reuse relation: layers that
+  borrow attention state (KV, indexer keys, top-k selections) computed by *another* layer
+  instead of from their own hidden state. Empty `[]` when every layer computes its own state.
+  Distinct from `sparse_attention` (how a layer *selects* entries) and `variants` (what kind of
+  attention a layer runs). A model with several relations — DeepSeek-V4.1-Flash's causal
+  encoder-decoder plus CSA2's decoupled KV sharing and index reuse — gets several entries.
+  - `kind` — `"indexshare"` / `"csa2"` / `"ced"` (causal encoder-decoder) / `"yoco"` / `"cla"` / `"other"`
+  - `shared_state` — list of `"kv"` / `"indexer_keys"` / `"topk_indices"` /
+    `"kv_from_encoder_output"` (K/V *projected* from another layer's hidden state) / `"other"`
+  - `source_layers` — zero-indexed int list (HF keys like `kv_source_layer_ids`), or a string
+    when the set is pattern-defined; UNKNOWN when undisclosed
+  - `consumer_layers` — same shape as `source_layers`
+  - `effect` — string, reported saving (FLOPs, KV bytes/token); UNKNOWN when not reported
+  - `training_recipe` — string (training-aware distillation, from scratch, training-free layer
+    search); empty when undisclosed
+  - `notes` — string (free-text)
 
 The MLA field names mirror HuggingFace `config.json` keys so extractors can copy them
 directly.
@@ -169,6 +185,26 @@ Note the deliberate overlap with `training.objectives.multi_token_prediction`: M
 objective *and* (sometimes) shipped weights. Record the objective there and the module here
 when both apply.
 
+#### Memory modules (optional, v8+)
+
+- `memory_modules` — list of **lookup-addressed parameter tables inside the forward pass**:
+  embedding-table capacity scaling where entries are fetched by deterministic, input-derived
+  addressing (n-gram hashing) rather than by matmul, so they add parameters at negligible
+  per-token FLOPs and can live off-accelerator. Qwen3.8-Flash-Next's n-gram embedding and
+  DeepSeek-V4.1-Flash's Engram. Empty `[]` otherwise. The ordinary token embedding is not a
+  memory module. Before v8 these sat in `auxiliary_modules`, which is for attachments
+  *outside* the forward pass.
+  - `name` — e.g. `"Engram conditional memory"`
+  - `kind` — `"engram"` / `"ngram_embedding"` / `"other"`
+  - `params` — string, parameters in the tables, reported separately from the backbone total
+    (the accounting `metadata.params_total` cannot express on its own)
+  - `layers` — zero-indexed int list where retrieved vectors are injected, or a string
+  - `addressing` — string, how entries are looked up (n-gram orders, hash heads, vocab compression)
+  - `table_config` — string, entries per table, dims, conv / gating
+  - `storage` — string, where the table lives and in what precision (host memory + prefetch, FP8, …)
+  - `optimizer` — string, optimizer / LR treatment when it differs from the backbone
+  - `notes` — string (free-text)
+
 #### Parallelism / infra
 
 - `parallelism_notes` — string describing any architectural hooks for sequence parallelism,
@@ -225,6 +261,25 @@ when both apply.
       parameters when this mode is active (`temperature`, `top_p`, `top_k`, `min_p`,
       `presence_penalty`, `repetition_penalty`, etc.). Values stringified. Empty when
       vendor does not disclose per-mode recommendations.
+  - `reasoning_effort` — object or null **(v8+)** — the structured reasoning-effort axis. None
+    when the model has no effort levels (a plain thinking on/off switch stays in
+    `inference_modes` only). `inference_modes` still lists one entry per level for back-compat
+    readers; this object is the comparable cross-vendor view.
+    - `api_parameter` — string, request field / template kwarg (e.g. `"reasoning_effort"`);
+      UNKNOWN when levels have no named parameter
+    - `delivery` — enum: `"prompt_prefix"` (DeepSeek-V4 / V4.1, GLM-5.2 / 5.3) /
+      `"system_message_instruction"` (Qwen3.8) / `"typed_option_message"` (Kimi K3) /
+      `"control_token"` / `"separate_weights"` / `"other"` / UNKNOWN
+    - `scale` — enum: `"discrete"` / `"continuous"` / UNKNOWN
+    - `range` — string for continuous scales (e.g. `"1-100"`); empty for discrete
+    - `levels` — list of `{name, numeric_value, rendering, is_default, notes}`; `numeric_value`
+      is an int when named levels map onto a scalar (DeepSeek-V4.1: `max`=100), else null;
+      `rendering` quotes exactly what the level injects, or `"none"`
+    - `applies_when` — string (thinking-only, rendered at index 0, …)
+    - `invalid_value_behavior` — string (raise, silent fallback to max, …); UNKNOWN when unstated
+    - `training_method` — string (length-penalty schedule, per-effort experts + MOPD, …);
+      UNKNOWN when undisclosed
+    - `notes` — string (free-text)
   - `tool_call_protocol` — object or null (v6+) — wire format the model emits for tool
     calls, plus serving-stack parsers that decode it. None when the model has no
     documented tool-calling protocol or it is undisclosed.
