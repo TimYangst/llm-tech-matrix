@@ -34,6 +34,20 @@
 | GLM-5.3-Flash                 | **第二家上 mHC 的厂商。** `mhc: true`、`hc_mult: 4`（残差流加宽 4 倍）、`hc_sinkhorn_iters: 20`、`hc_eps: 1e-06`——Z.AI 保留了 Sinkhorn-Knopp 双随机约束，而 Qwen 的 [门控残差](./gated-residual.zh.md) 是刻意把它删掉的。README 原文：「采用流形约束超连接（mHC）以进一步提升扩展效率」。FP8 的 `modules_to_not_convert` 列表暴露了实现细节：一个 `hyper_connection` 模块，外加每层的 `hc_attn_base/fn/scale` 与 `hc_ffn_base/fn/scale` 张量，全部排除在量化之外——即每层的注意力子层和 FFN 子层各有一个独立的 mHC 块，与 DeepSeek-V4 的结构一致。算子是否数据相关未披露。 |
 | DeepSeek-V4.1-Flash           | **Single-Pass mHC。** n_hc=4、Sinkhorn-Knopp 20 次迭代不变。输入混合系数整体后移一个 block——`X_{l+1} = B_l X_l + C_l F_l(A_{l-1} X_l)`——于是隐藏维的每个 tile 可以立即同时用于混合和系数预测，性能损失「可以忽略」。预训练仍用多 kernel 实现；部署时把残差更新、输入混合、系数预测、pre-norm 和 FP8 转换融合进单个 **Mega-mHC** kernel，达到理想的 (n+1)d 次读 + (n+1)d 次写，激活内存流量比 V4 的实现减半。                                                                                                                                                              |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                           | 角色      | 实现方式                                                                                                                                                 | 参数                          | 证据                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`sglang-v0.5.19`](../../data/extracted/engines/sglang-v0.5.19.md) | inference | DeepSeek-V4 mHC handled in the model implementation; v0.5.19 adds an AMD aiter fused mHC post+pre path with cross-layer boundary dispatch.               | —                             | [release notes](https://github.com/sgl-project/sglang/releases/tag/v0.5.19)                                                                                                                                                                                                                       |
+| [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md)     | inference | DeepSeek-V4 mHC handled in the model implementation; v0.29.0 keeps mHC broadcast buffers stable across RL weight sync and adds ROCm mHC/RMSNorm fusions. | —                             | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)                                                                                                                                                                                                                        |
+| [`veomni-v0.1.12`](../../data/extracted/engines/veomni-v0.1.12.md) | training  | DeepSeek-V4 manifold-constrained Hyper-Connections via mhc_implementation eager \| tilelang (tile-kernels).                                              | `mhc_implementation=tilelang` | [arguments.md#L195](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md#L195), [kernel_selection.md#L166](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L166) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [DualPipe](./dualpipe.zh.md) — V4 的 mHC 实现调整了 DualPipe 1F1B 重叠以吸收额外的流水线通讯量。

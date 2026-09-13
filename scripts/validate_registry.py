@@ -7,10 +7,10 @@ Two checks, both cheap and both about keeping the index trustworthy:
    resolve to a glossary entry (an alias) or be declared structural (taxonomy).
    This is what stops `kda` / `kda_linear_attention` style drift from accumulating
    silently across batches.
-2. **Generated files are current.** `data/extracted/README.md`,
-   `data/reports/technique-index.md` and `data/reports/coverage.md` are deterministic
-   from the JSON + registry, so a stale copy in git means someone edited data without
-   re-running the generator.
+2. **Generated files are current.** The model index, technique index, coverage report,
+   engine support matrix, engine adoption report and the generated "Implemented by
+   (engines)" glossary sections are deterministic from the JSON + registry, so a stale copy
+   in git means someone edited data without re-running the generator.
 
 Run: `uv run python scripts/validate_registry.py`
 """
@@ -49,15 +49,7 @@ def main() -> int:
             "entry, or declaring the value structural under `taxonomy`."
         )
 
-    expected = {
-        index_mod.EXTRACTED_DIR / "README.md": index_mod.render_model_index(extractions, edges),
-        index_mod.REPORTS_DIR / "technique-index.md": index_mod.render_technique_index(
-            extractions, edges, registry
-        ),
-        index_mod.REPORTS_DIR / "coverage.md": index_mod.render_coverage(
-            extractions, edges, unregistered, registry
-        ),
-    }
+    expected, _, _ = index_mod.expected_outputs()
     stale = [
         p.relative_to(REPO_ROOT)
         for p, content in expected.items()

@@ -37,6 +37,19 @@ V4 选用**全词表 logit 蒸馏**，而非早期工作里方差较大的 token
 | DeepSeek-V4-Flash-0731 | 沿用预览版的 >10 教师 OPD；0731 重跑后训练时是否使用同一教师集合未披露。另外，附带的 DSpark 草稿本身也是从冻结的目标模型输出分布蒸馏而来。                                                                                                                                                                                                                                                                                                                                                                                                               |
 | DeepSeek-V4.1-Flash    | 后训练的最后阶段：覆盖所有领域的全词表 OPD，教师**超过 40 个**（V4 为 >10 个），这些教师可能来自不同的开发阶段，彼此之间以及与学生之间架构都可能不同。以异步方式运行，数据集配比、单数据集并发上限和当前启用的教师都可以在训练中途重新配置。报告强调后训练算法与 V4 相比没有变化，收益归功于数据和环境的规模。                                                                                                                                                                                                                                           |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                           | 角色                       | 实现方式                                                                                                                            | 参数                        | 证据                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`veomni-v0.1.12`](../../data/extracted/engines/veomni-v0.1.12.md) | training                   | Chunked top-k forward-KL distillation loss for verl's distillation path, computed without materializing the [T, V] student logits.  | —                           | [verl_topk_distill_integration.md#L4](https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/verl_topk_distill_integration.md#L4)                                                                                                           |
+| [`verl-v0.9.0`](../../data/extracted/engines/verl-v0.9.0.md)       | training, rl_post_training | `distillation` config with teacher-based KL losses (k3 default; forward_kl_topk and KL-family modes), usable with async generation. | `distillation.enabled=true` | [distillation.yaml#L14](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/distillation/distillation.yaml#L14), [opd.md#L1](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/algo/opd.md#L1) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [GRPO](./grpo.zh.md) — 在 OPD 之前的按领域 specialist 训练阶段使用；OPD 随后将多个 specialist 合并为一个模型。

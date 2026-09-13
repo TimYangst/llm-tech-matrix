@@ -6,6 +6,12 @@ Outputs, all deterministic from `data/extracted/*.json` + `docs/glossary/registr
   data/reports/technique-index.md technique <-> model matrix, both directions
   data/reports/coverage.md        gaps: drift, unbacked rows, prose-only entries
 
+and, from the engine snapshots in `data/extracted/engines/*.json` (see `engines.py`):
+
+  data/reports/engine-support-matrix.md   models x engine snapshots
+  data/reports/engine-adoption.md         when engines supported each model
+  docs/glossary/<slug>.md / .zh.md        generated "Implemented by (engines)" sections
+
 Run: `uv run python -m llm_tech_matrix.synthesis.index`
 Never hand-edit the outputs; change the JSON, the registry, or this file.
 """
@@ -14,6 +20,7 @@ from __future__ import annotations
 
 import re
 
+from . import engines as engines_mod
 from .registry import (
     EXTRACTED_DIR,
     REPO_ROOT,
@@ -303,17 +310,32 @@ def render_coverage(
     return "\n".join(lines)
 
 
-def main() -> None:
+def expected_outputs() -> tuple[dict, dict[str, set[str]], list[tuple[str, str, str]]]:
+    """Every generated file and its expected content, plus the edges it was built from.
+
+    Shared by `main` (writes) and `scripts/validate_registry.py` (checks staleness), so the two
+    can never disagree about what the generator owns.
+    """
     registry = load_registry()
     extractions = load_extractions()
+    engines = engines_mod.load_engines()
     edges, unregistered = build_edges(extractions, registry)
-
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     targets = {
         EXTRACTED_DIR / "README.md": render_model_index(extractions, edges),
         REPORTS_DIR / "technique-index.md": render_technique_index(extractions, edges, registry),
         REPORTS_DIR / "coverage.md": render_coverage(extractions, edges, unregistered, registry),
+        REPORTS_DIR / "engine-support-matrix.md": engines_mod.render_support_matrix(
+            extractions, engines, edges, registry
+        ),
+        REPORTS_DIR / "engine-adoption.md": engines_mod.render_adoption(extractions, engines),
+        **engines_mod.glossary_targets(engines),
     }
+    return targets, edges, unregistered
+
+
+def main() -> None:
+    targets, edges, unregistered = expected_outputs()
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     for path, content in targets.items():
         path.write_text(content)
         print(f"Wrote {path.relative_to(REPO_ROOT)}")
