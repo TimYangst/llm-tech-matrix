@@ -1,0 +1,684 @@
+{
+  "engine_schema_version": 2,
+  "metadata": {
+    "name": "verl",
+    "engine": "verl",
+    "organization": "verl-project",
+    "repository": "https://github.com/verl-project/verl",
+    "license": "Apache-2.0",
+    "release_tag": "v0.9.0",
+    "commit_sha": "483b8a009ba3a97563edee3a19887e4862b8094a",
+    "release_date": "2026-08-14",
+    "snapshot_date": "2026-09-13",
+    "roles": [
+      "training",
+      "rl_post_training"
+    ],
+    "hardware": [
+      "NVIDIA GPU (cuda)",
+      "Ascend NPU (npu)",
+      "AMD (naive weight sync)"
+    ],
+    "sources": [
+      "https://api.github.com/repos/verl-project/verl/releases/tags/v0.9.0",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/README.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/index.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.vllm",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.sglang",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.trtllm",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/start/install.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/sglang_worker.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/trtllm_worker.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/engine_workers.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/torchtitan_workers.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/rollout/rollout.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/replica.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/base.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/config/rollout.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/sglang_rollout/async_sglang_server.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/base.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/fsdp.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/veomni.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/torchtitan.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/automodel.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/fsdp.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/megatron.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/veomni.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/v1/trainer_base.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/checkpoint_engine/README.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/delta_weight_sync.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/config/actor.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/reward/reward.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/reward_loop.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/distillation/distillation.yaml",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/algo/opd.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/algo/dapo.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/reward_manager/dapo.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/fsdp_extension.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/transformers/monkey_patch.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/patch.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/vllm_fp4_utils.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/config/model.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/deepseek_v4_integration.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/megatron_lite_backend.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/nvfp4_qat.md",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/veomni/transformer_impl.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/tests/workers/rollout/test_pd_disaggregation.py",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/checkpoint.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/ppo_lora.rst",
+      "https://raw.githubusercontent.com/verl-project/verl/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/sft_trainer.py"
+    ]
+  },
+  "parallelism": {
+    "tensor": {
+      "supported": true,
+      "implementation": "megatron: tensor_model_parallel_size; torchtitan: tensor_parallel_size; automodel: tp_size",
+      "notes": "Training-side parallelism depends on the selected engine; FSDP/FSDP2 has no TP.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L14"
+      ]
+    },
+    "pipeline": {
+      "supported": true,
+      "implementation": "megatron: pipeline_model_parallel_size",
+      "notes": "The TorchTitan engine documents that pipeline parallelism is not yet supported.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L23",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/torchtitan_workers.rst#L12"
+      ]
+    },
+    "data": {
+      "supported": true,
+      "implementation": "fsdp: fsdp_size (FSDP/FSDP2 sharding); rollout data_parallel_size",
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/fsdp.yaml#L26"
+      ]
+    },
+    "expert": {
+      "supported": true,
+      "implementation": "megatron: expert_model_parallel_size; veomni: expert_parallel_size",
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L17",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/veomni.yaml#L15"
+      ]
+    },
+    "context": {
+      "supported": true,
+      "implementation": "megatron: context_parallel_size",
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L29"
+      ]
+    },
+    "sequence": {
+      "supported": true,
+      "implementation": "fsdp: ulysses_sequence_parallel_size; veomni: ulysses_parallel_size; megatron: sequence_parallel",
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/fsdp.yaml#L45",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L32"
+      ]
+    }
+  },
+  "training": {
+    "workloads": [
+      "RL post-training",
+      "SFT",
+      "DPO"
+    ],
+    "backends": [
+      "fsdp",
+      "fsdp2",
+      "megatron",
+      "automodel",
+      "veomni",
+      "torchtitan",
+      "mindspeed_megatron"
+    ],
+    "optimizers": [
+      "AdamW (fsdp / veomni optim defaults)",
+      "adam / sgd / muon (megatron)"
+    ],
+    "mixed_precision": "FP8 end-to-end is documented with FP8 training in Megatron (via Transformer Engine) and FP8 rollout in vLLM.",
+    "quantization_aware_training": "NVFP4 QAT: fake quantization during BF16 training (FSDP or Megatron), weights packed to NVFP4 W4A16 for vLLM rollout.",
+    "checkpointing": "Checkpoint save/load contents are configurable (checkpoint.save_contents / load_contents).",
+    "lora": "LoRA for RL algorithms such as PPO and GRPO.",
+    "notes": "Training engines are resolved at runtime from actor/critic `strategy` through EngineRegistry, keyed by (model_type, backend, device). The VeOmni engine imports the external `veomni` package. Megatron defaults to Megatron-Bridge (`use_mbridge: True`). Megatron Lite's glue lives outside the repository.",
+    "evidence": {
+      "workloads": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/README.md#L24",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/sft_trainer.py#L50",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/engine_workers.rst#L138"
+      ],
+      "backends": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/engine_workers.rst#L195",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/engine_workers.rst#L145",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/base.py#L337"
+      ],
+      "optimizers": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/fsdp.yaml#L5",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/veomni.yaml#L4",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/megatron.yaml#L25"
+      ],
+      "mixed_precision": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L10"
+      ],
+      "quantization_aware_training": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/nvfp4_qat.md#L5"
+      ],
+      "checkpointing": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/checkpoint.rst#L15"
+      ],
+      "lora": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/ppo_lora.rst#L6"
+      ]
+    }
+  },
+  "rl": {
+    "algorithms": [
+      "gae",
+      "grpo",
+      "reinforce_plus_plus",
+      "reinforce_plus_plus_baseline",
+      "remax",
+      "rloo",
+      "opo",
+      "grpo_passk",
+      "gpg",
+      "rloo_vectorized",
+      "grpo_vectorized",
+      "optimal_token_baseline",
+      "tir_optimal_token_baseline",
+      "gdpo"
+    ],
+    "policy_losses": [
+      "vanilla",
+      "dppo_tv",
+      "dppo_kl",
+      "gspo",
+      "sapo",
+      "gpg",
+      "clip_cov",
+      "kl_cov",
+      "geo_mean",
+      "dro",
+      "cispo",
+      "bypass_mode"
+    ],
+    "rollout_backends": [
+      "vllm",
+      "sglang",
+      "trtllm"
+    ],
+    "trainer_modes": [
+      "sync",
+      "colocate_async",
+      "separate_async"
+    ],
+    "weight_sync": "Colocated actor/rollout reshards through the 3D-HybridEngine (`hybrid_engine: true`). Weight transfer is pluggable via `rollout.checkpoint_engine.backend` (default naive, for colocated on-policy training; the others target disaggregated off-policy setups). delta_sharded is the only delta backend.",
+    "weight_sync_backends": [
+      "naive",
+      "nccl",
+      "hccl",
+      "nixl",
+      "kimi_ckpt_engine",
+      "mooncake",
+      "delta_sharded"
+    ],
+    "routing_replay": "MoE router replay modes disabled / R2 / R3: R2 records routes during actor log-prob computation; R3 records routes in the rollout backend and replays them in training. Rollout routing replay requires vLLM >= 0.22.0.",
+    "reward": "Function-based (verifiable) and model-based rewards; reward managers selected by name (default naive); reward models may be discriminative or generative. Reward Loop is the default reward computation implementation.",
+    "distillation": "On-policy distillation (OPD) via the `distillation` config (disabled by default; loss_mode k3 default), with forward-KL top-k and KL-family loss modes.",
+    "notes": "Algorithms are the AdvantageEstimator enum values; DAPO is composed from a `dapo` reward manager plus group filtering and clip settings rather than an estimator. Policy losses are the @register_policy_loss names. HF rollout exists (HFRollout) but is not in the rollout replica registry. Trainer modes are the v1 trainer (`trainer.use_v1: true`); one-step-off and fully-async trainers are experimental.",
+    "evidence": {
+      "algorithms": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py#L88",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L74"
+      ],
+      "policy_losses": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py#L1285",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py#L2412"
+      ],
+      "rollout_backends": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/replica.py#L378",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/rollout/rollout.yaml#L4"
+      ],
+      "trainer_modes": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L227",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L222"
+      ],
+      "weight_sync": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/README.md#L42",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L56",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/rollout/rollout.yaml#L278",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/delta_weight_sync.md#L26"
+      ],
+      "weight_sync_backends": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/checkpoint_engine/README.md#L17",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/checkpoint_engine/README.md#L22",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/delta_weight_sync.md#L26"
+      ],
+      "routing_replay": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/config/actor.py#L57",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/deepseek_v4_integration.rst#L69",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/vllm_rollout/vllm_async_server.py#L400"
+      ],
+      "reward": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/reward/reward.yaml#L26",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/reward/reward.yaml#L19",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/reward_loop.rst#L13"
+      ],
+      "distillation": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/distillation/distillation.yaml#L24",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/algo/opd.md#L1"
+      ]
+    }
+  },
+  "integrations": [
+    {
+      "name": "vLLM",
+      "relation": "rollout_backend",
+      "engine_slug": "vllm-v0.29.0",
+      "version_constraints": [
+        "setup.py extra: vllm>=0.18.0",
+        "docs/start/install.rst: vllm 0.18.0 and later versions are supported",
+        "docker/Dockerfile.stable.vllm: VLLM_VERSION=0.24.0",
+        "vllm_async_server.py: rollout routing replay requires vLLM >= 0.22.0"
+      ],
+      "notes": "The tracked snapshot vllm-v0.29.0 satisfies the >=0.18.0 floor but is newer than the Docker-tested 0.24.0.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py#L55",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/start/install.rst#L25",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.vllm#L13",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/vllm_rollout/vllm_async_server.py#L398"
+      ]
+    },
+    {
+      "name": "SGLang",
+      "relation": "rollout_backend",
+      "engine_slug": "sglang-v0.5.19",
+      "version_constraints": [
+        "setup.py extra: sglang[srt,openai]==0.5.8",
+        "docker/Dockerfile.stable.sglang: lmsysorg/sglang:v0.5.12",
+        "docs/workers/sglang_worker.rst: 'Currently 0.4.8' (stale)",
+        "async_sglang_server.py: weights CPU backup path needs sglang >= 0.5.6"
+      ],
+      "notes": "Sources disagree (0.5.8 pin, 0.5.12 Docker base, 0.4.8 in docs); none matches the tracked snapshot sglang-v0.5.19.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py#L59",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.sglang#L4",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/sglang_worker.rst#L27",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/sglang_rollout/async_sglang_server.py#L390"
+      ]
+    },
+    {
+      "name": "TensorRT-LLM",
+      "relation": "rollout_backend",
+      "version_constraints": [
+        "setup.py extra: tensorrt-llm>=1.2.0rc6"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py#L56"
+      ]
+    },
+    {
+      "name": "VeOmni",
+      "relation": "training_backend",
+      "engine_slug": "veomni-v0.1.12",
+      "version_constraints": [],
+      "notes": "The `veomni` engine imports the external veomni package (registered for language_model and value_model on cuda and npu). No version pin was found in setup.py.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/veomni/transformer_impl.py#L25",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/veomni/transformer_impl.py#L865"
+      ]
+    },
+    {
+      "name": "Megatron-Bridge / Megatron",
+      "relation": "training_backend",
+      "version_constraints": [],
+      "notes": "The megatron engine uses Megatron-Bridge by default; MTP training is only supported on the Megatron-Bridge + Megatron combination.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L98",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md#L11"
+      ]
+    }
+  ],
+  "model_support": [
+    {
+      "hf_architecture": "DeepseekV3ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3",
+        "kimi-k2-thinking"
+      ],
+      "support": "model_specific",
+      "implementation": "Megatron mcore SupportedModel entry (marked '# not tested', under a 'deprecated code' banner) and vLLM MoE weight-loading patch",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "No FSDP-specific patch; FSDP/FSDP2 load HF implementations directly.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L123",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L87",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/patch.py#L23"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV32ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3.2-exp"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The architecture string appears nowhere in the repository at this commit (checked across the full tree).",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV4ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4-pro",
+        "deepseek-v4-flash",
+        "deepseek-v4-flash-0731"
+      ],
+      "support": "model_specific",
+      "implementation": "Code keyed on model_type == 'deepseek_v4' (not the architecture string): FP4/FP8 weight sync to vLLM, Megatron integration",
+      "documented": true,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The integration guide covers DeepSeek-V4-Flash with a Megatron actor and vLLM rollout: dense FP8 (E4M3 + UE8M0) and packed FP4 expert weight sync, R2/R3 routing replay, hash-router layers. The architecture string itself appears nowhere; support is keyed on model_type.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/deepseek_v4_integration.rst#L6",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/vllm_fp4_utils.py#L51"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV41ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4.1-flash"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Not present at this commit; verl v0.9.0 predates the model (2026-08-14 vs 2026-09-10).",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "Glm4MoeForCausalLM",
+      "model_slugs": [
+        "glm-4.7"
+      ],
+      "support": "model_specific",
+      "implementation": "Megatron mcore SupportedModel entry (under the deprecated-code banner, no test marker)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Only the legacy Megatron registry names it.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L130",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L87"
+      ]
+    },
+    {
+      "hf_architecture": "GlmMoeDsaForCausalLM",
+      "model_slugs": [
+        "glm-5",
+        "glm-5.1",
+        "glm-5.2"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The architecture string appears nowhere in the repository at this commit.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "Glm5NextForConditionalGeneration",
+      "model_slugs": [
+        "glm-5.3-flash"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK25ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k2.5",
+        "kimi-k2.6"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK3ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k3"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3ForCausalLM",
+      "model_slugs": [
+        "qwen3-32b"
+      ],
+      "support": "model_specific",
+      "implementation": "Megatron mcore SupportedModel entry marked '# tested' (under the deprecated-code banner)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L127",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L87"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3MoeForCausalLM",
+      "model_slugs": [
+        "qwen3-235b-a22b"
+      ],
+      "support": "model_specific",
+      "implementation": "vLLM MoE weight-loading patch; Megatron mcore entry marked '# tested'",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/patch.py#L44",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L128"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5ForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-27b",
+        "qwen3.6-27b",
+        "qwen3.8-27b"
+      ],
+      "support": "model_specific",
+      "implementation": "FSDP monkey patch for model_type qwen3_5 (verl.models.transformers.qwen3_5 forward)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/transformers/monkey_patch.py#L497"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-35b-a3b",
+        "qwen3.6-35b-a3b"
+      ],
+      "support": "model_specific",
+      "implementation": "FSDP monkey patch for model_type qwen3_5_moe",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/transformers/monkey_patch.py#L497"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForCausalLM",
+      "model_slugs": [
+        "qwen3.8-2.4t-a95b"
+      ],
+      "support": "model_specific",
+      "implementation": "vLLM MoE weight-loading patch; Megatron mcore entry marked '# tested'",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/utils/vllm/patch.py#L72",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/mcore/registry.py#L129"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen4ExpForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.8-flash-next"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/models/README.md",
+        "https://github.com/verl-project/verl/tree/483b8a009ba3a97563edee3a19887e4862b8094a"
+      ]
+    }
+  ],
+  "technique_support": [
+    {
+      "glossary_slug": "grpo",
+      "implementation": "AdvantageEstimator 'grpo' (plus grpo_passk and grpo_vectorized); selected with algorithm.adv_estimator.",
+      "flags": [
+        "algorithm.adv_estimator=grpo"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/ppo/core_algos.py#L98",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/ppo_trainer.yaml#L74"
+      ]
+    },
+    {
+      "glossary_slug": "on-policy-distillation",
+      "implementation": "`distillation` config with teacher-based KL losses (k3 default; forward_kl_topk and KL-family modes), usable with async generation.",
+      "flags": [
+        "distillation.enabled=true"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/distillation/distillation.yaml#L14",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/algo/opd.md#L1"
+      ]
+    },
+    {
+      "glossary_slug": "mtp",
+      "implementation": "MtpConfig (enable / enable_train / enable_rollout): MTP training on Megatron-Bridge + Megatron, MTP speculative rollout in vLLM (method=mtp) or SGLang (EAGLE).",
+      "flags": [
+        "actor_rollout_ref.model.mtp.enable=true"
+      ],
+      "notes": "The guide names mimo-7B-RL, Qwen-next and DeepSeek-series models, and advises against enabling MTP acceleration during inference for now.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/config/model.py#L30",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md#L11"
+      ]
+    },
+    {
+      "glossary_slug": "muon",
+      "implementation": "Megatron engine optimizer 'muon' through Megatron-Core's emerging_optimizers path (tensor-parallel-aware Muon).",
+      "flags": [
+        "optim: muon (megatron)"
+      ],
+      "notes": "Megatron engine only; the FSDP and VeOmni optim defaults are AdamW.",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/optim/megatron.yaml#L25"
+      ]
+    },
+    {
+      "glossary_slug": "fp8-mixed-precision",
+      "implementation": "FP8 end-to-end: FP8 training in Megatron via Transformer Engine plus FP8 rollout in vLLM.",
+      "flags": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L10",
+        "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/low_precision/fp8.md#L163"
+      ]
+    }
+  ],
+  "open_questions": [
+    "SGLang version is contradictory across sources: setup.py pins sglang[srt,openai]==0.5.8, the stable Docker image is lmsysorg/sglang:v0.5.12, and docs/workers/sglang_worker.rst still says 'Currently 0.4.8'. None matches the tracked sglang-v0.5.19 snapshot, so verl v0.9.0 + SGLang v0.5.19 is an untested pairing as far as these sources go.",
+    "vLLM compatibility is a floor (>=0.18.0) plus a Docker-tested 0.24.0; the tracked vllm-v0.29.0 satisfies the floor but is five minor versions past the tested build.",
+    "Release notes vs code on PD rollout: the notes advertise `rollout.name=vllm_pd`, but PD is selected with rollout.disaggregation.enabled and a test asserts 'vllm_pd' is not in the rollout replica registry ('sglang_pd/vllm_pd were dropped').",
+    "Megatron model coverage: the in-repo mcore SupportedModel enum sits under a 'deprecated code' banner and the default path is Megatron-Bridge AutoBridge, so which architectures the Megatron engine actually supports is decided upstream in Megatron-Bridge, outside these sources. The mcore entries recorded as model_specific are therefore legacy signals.",
+    "DeepSeek-V4 support is keyed on model_type 'deepseek_v4' rather than the architecture string; the row is joined through the architecture only because every DeepSeek-V4 record's config uses that model_type.",
+    "FSDP/FSDP2 load any HF implementation the installed transformers (pinned >=5.5.3,!=5.6.0,<5.11) can load, so `not_found` rows (GLM-5.x, Kimi K2.5/K3, Qwen3.8-Flash-Next, DeepSeek-V3.2/V4.1) may still run on the generic path; whether that transformers range includes those architectures is not assessed here.",
+    "NVFP4 QAT is documented, but the fp4-qat glossary entry describes the MXFP4 recipe used by DeepSeek-V4/Kimi, so it is not asserted as a technique edge. DSpark does not appear anywhere at this commit.",
+    "Megatron Lite (mlite) is documented but its glue lives outside the repository and it is not in EngineRegistry, so it is not listed as a backend."
+  ]
+}

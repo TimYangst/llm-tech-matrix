@@ -6,9 +6,28 @@ Model status stays in [`ROADMAP.md`](./ROADMAP.md).
 
 ## Current focus
 
-**Phase:** **E2 done** (`sglang-v0.5.19`). **Next: E3**, `verl-v0.9.0`
-(RL post-training role), then `veomni-v0.1.12` (training role), which add the first non-inference
-role subobjects.
+**Phase:** **E3 done**: all four tracked engines have a 2026-Q3 snapshot (engine schema v2).
+**Next: E4**, the first engine synthesis: a model × engine support matrix generated from
+`model_support[]`, "Implemented by (engines)" glossary tables generated from
+`technique_support[]`, and one adoption-lag report.
+
+E3 added the training and RL role subobjects, and replaced `in_native_registry` with a
+three-level `support` because verl has no model registry. First training/RL findings, detailed
+in [`engines/verl-v0.9.0.md`](./engines/verl-v0.9.0.md) and
+[`engines/veomni-v0.1.12.md`](./engines/veomni-v0.1.12.md):
+
+- **verl's rollout pins do not match our inference snapshots.** It requires `vllm>=0.18.0` but
+  its Docker image tests 0.24.0, five minor versions before `vllm-v0.29.0`. For SGLang the
+  sources disagree (`setup.py` 0.5.8, Docker 0.5.12, docs 0.4.8), and none matches
+  `sglang-v0.5.19`.
+- **The two training frameworks cover models differently.** VeOmni registers DeepSeek-V3/V4,
+  GLM-5.x and the Qwen3/3.5 family. verl carries model-specific code for DeepSeek-V4 (keyed on
+  model_type, Megatron + vLLM) and Qwen3.5. Neither has Kimi K2.5/K3, Qwen3.8-Flash-Next,
+  DeepSeek-V4.1-Flash or GLM-5.3-Flash.
+- **MTP training is narrow.** verl supports it only on Megatron-Bridge + Megatron, and VeOmni
+  drops DeepSeek-V4 MTP weights at load ("MTP not supported for now").
+
+**E2 done** (`sglang-v0.5.19`).
 
 E2 surfaced one schema break before engine schema v1 was merged, so the fix went straight into
 v1: parsers and `since_version` are per model, not per architecture (models sharing an
@@ -68,8 +87,8 @@ because a newer tag may land before the quarter ends.
 | ---------------- | --------- | ---------- | ----- | ----------- |
 | `vllm-v0.29.0`   | `v0.29.0` | 2026-09-09 | E1    | `extracted` |
 | `sglang-v0.5.19` | `v0.5.19` | 2026-09-05 | E2    | `extracted` |
-| `verl-v0.9.0`    | `v0.9.0`  | 2026-08-14 | E3    | `backlog`   |
-| `veomni-v0.1.12` | `v0.1.12` | 2026-09-09 | E3    | `backlog`   |
+| `verl-v0.9.0`    | `v0.9.0`  | 2026-08-14 | E3    | `extracted` |
+| `veomni-v0.1.12` | `v0.1.12` | 2026-09-09 | E3    | `extracted` |
 
 Status values mirror the model track: `backlog` | `sourcing` | `extracting` | `extracted`
 | `reviewed` | `blocked`.

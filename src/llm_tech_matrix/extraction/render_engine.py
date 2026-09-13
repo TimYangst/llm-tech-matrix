@@ -24,6 +24,7 @@ from pathlib import Path
 from llm_tech_matrix.engine_schema import UNKNOWN, EngineRecord
 
 ENGINES_DIR = Path("data/extracted/engines")
+PLAIN_LISTS = frozenset({"api_surfaces", "workloads"})
 LANGS: tuple[str, ...] = ("en", "zh")
 
 LABELS: dict[str, dict[str, str]] = {
@@ -55,12 +56,31 @@ LABELS: dict[str, dict[str, str]] = {
         "attention_backends": "Attention backends",
         "reasoning_parsers": "Reasoning parsers",
         "tool_call_parsers": "Tool-call parsers",
+        "training": "Training",
+        "workloads": "Workloads",
+        "backends": "Training backends",
+        "optimizers": "Optimizers",
+        "mixed_precision": "Mixed precision",
+        "quantization_aware_training": "Quantization-aware training",
+        "checkpointing": "Checkpointing",
+        "lora": "LoRA",
+        "kernels": "Kernels",
+        "rl": "RL post-training",
+        "algorithms": "Algorithms",
+        "policy_losses": "Policy losses",
+        "rollout_backends": "Rollout backends",
+        "trainer_modes": "Trainer modes",
+        "weight_sync": "Weight sync",
+        "weight_sync_backends": "Weight-sync backends",
+        "routing_replay": "Routing replay",
+        "reward": "Reward",
+        "distillation": "Distillation",
         "notes": "Notes",
         "evidence": "Evidence",
         "integrations": "Integrations",
-        "int_header": "| Name | Relation | Notes | Evidence |",
+        "int_header": "| Name | Relation | Version constraints | Notes | Evidence |",
         "model_support": "Model support",
-        "ms_header": "| Architecture | Model records | Native registry | Documented | Features | Spec. decoding | Evidence |",
+        "ms_header": "| Architecture | Model records | Support | Documented | Features | Spec. decoding | Evidence |",
         "ms_notes": "Row notes",
         "md_title": "Per-model details",
         "md_header": "| Model record | Since | Reasoning parser | Tool parser | Notes | Evidence |",
@@ -100,12 +120,31 @@ LABELS: dict[str, dict[str, str]] = {
         "attention_backends": "Attention 后端",
         "reasoning_parsers": "Reasoning parser",
         "tool_call_parsers": "Tool-call parser",
+        "training": "训练",
+        "workloads": "训练类型",
+        "backends": "训练后端",
+        "optimizers": "优化器",
+        "mixed_precision": "混合精度",
+        "quantization_aware_training": "量化感知训练",
+        "checkpointing": "Checkpoint",
+        "lora": "LoRA",
+        "kernels": "算子",
+        "rl": "RL 后训练",
+        "algorithms": "算法",
+        "policy_losses": "Policy loss",
+        "rollout_backends": "Rollout 后端",
+        "trainer_modes": "Trainer 模式",
+        "weight_sync": "权重同步",
+        "weight_sync_backends": "权重同步后端",
+        "routing_replay": "路由回放",
+        "reward": "奖励",
+        "distillation": "蒸馏",
         "notes": "说明",
         "evidence": "证据",
         "integrations": "集成",
-        "int_header": "| 名称 | 关系 | 说明 | 证据 |",
+        "int_header": "| 名称 | 关系 | 版本约束 | 说明 | 证据 |",
         "model_support": "模型支持",
-        "ms_header": "| 架构 | 模型记录 | 原生注册 | 文档列出 | 特性 | 投机解码 | 证据 |",
+        "ms_header": "| 架构 | 模型记录 | 支持程度 | 文档列出 | 特性 | 投机解码 | 证据 |",
         "ms_notes": "逐行说明",
         "md_title": "逐模型信息",
         "md_header": "| 模型记录 | 起始版本 | Reasoning parser | Tool parser | 说明 | 证据 |",
@@ -187,40 +226,37 @@ def render(record: EngineRecord, lang: str, slug: str) -> str:
         )
     parts.append("")
 
-    if record.serving is not None:
-        s = record.serving
-        parts += [f"## {labels['serving']}", ""]
-        for name in ("scheduler", "kv_cache_management", "prefix_caching", "disaggregation"):
-            value = getattr(s, name)
-            if value == UNKNOWN:
+    for attr in ("serving", "training", "rl"):
+        section = getattr(record, attr)
+        if section is None:
+            continue
+        parts += [f"## {labels[attr]}", ""]
+        prose = [
+            n for n, f in type(section).model_fields.items() if f.annotation is str and n != "notes"
+        ]
+        lists = [n for n, f in type(section).model_fields.items() if f.annotation == list[str]]
+        for name in prose + lists:
+            value = getattr(section, name)
+            if not value or value == UNKNOWN:
                 continue
-            parts += [f"**{labels[name]}{colon}** {value}", ""]
-            parts += [f"_{labels['evidence']}{colon}_ {_links(s.evidence.get(name, []))}", ""]
-        for name in (
-            "api_surfaces",
-            "speculative_decoding_methods",
-            "quantization_methods",
-            "kv_cache_dtypes",
-            "attention_backends",
-            "reasoning_parsers",
-            "tool_call_parsers",
-        ):
-            values = getattr(s, name)
-            if not values:
-                continue
-            listed = (
-                ", ".join(values) if name == "api_surfaces" else ", ".join(f"`{v}`" for v in values)
-            )
-            parts += [f"**{labels[name]}** ({len(values)}){colon} {listed}", ""]
-            parts += [f"_{labels['evidence']}{colon}_ {_links(s.evidence.get(name, []))}", ""]
-        if s.notes:
-            parts += [f"_{labels['notes']}{colon}_ {s.notes}", ""]
+            if isinstance(value, list):
+                shown = (
+                    ", ".join(value) if name in PLAIN_LISTS else ", ".join(f"`{v}`" for v in value)
+                )
+                parts += [f"**{labels[name]}** ({len(value)}){colon} {shown}", ""]
+            else:
+                parts += [f"**{labels[name]}{colon}** {value}", ""]
+            parts += [f"_{labels['evidence']}{colon}_ {_links(section.evidence.get(name, []))}", ""]
+        if section.notes:
+            parts += [f"_{labels['notes']}{colon}_ {section.notes}", ""]
 
     parts += [f"## {labels['integrations']}", ""]
     if record.integrations:
-        parts += [labels["int_header"], "|---|---|---|---|"]
+        parts += [labels["int_header"], "|---|---|---|---|---|"]
         parts += [
-            f"| {i.name} | `{i.relation}` | {cell(i.notes)} | {_links(i.evidence)} |"
+            f"| {i.name}{f' ([`{i.engine_slug}`](./{i.engine_slug}.md))' if i.engine_slug else ''} "
+            f"| `{i.relation}` | {cell('<br>'.join(i.version_constraints))} | {cell(i.notes)} | "
+            f"{_links(i.evidence)} |"
             for i in record.integrations
         ]
     else:
@@ -233,7 +269,7 @@ def render(record: EngineRecord, lang: str, slug: str) -> str:
         for m in record.model_support:
             slugs = ", ".join(f"[`{x}`](../{x}.md)" for x in m.model_slugs) or "—"
             parts.append(
-                f"| `{m.hf_architecture}` | {slugs} | {cell(m.in_native_registry)} | "
+                f"| `{m.hf_architecture}` | {slugs} | `{m.support}` | "
                 f"{cell(m.documented)} | {cell(m.features)} | {cell(m.speculative_decoding)} | "
                 f"{_links(m.evidence)} |"
             )

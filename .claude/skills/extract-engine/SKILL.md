@@ -65,8 +65,10 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
 3. **Join against the model records.** For every `data/extracted/*.json`, take the HF
    `architectures[0]` from its cached or manifest `config.json`, and check it against the
    engine's native registry *and* its docs. Record one `model_support` row per architecture,
-   including architectures that are **absent** (`in_native_registry: false`, whole-file
-   evidence). Absence is a snapshot fact, not a claim the model cannot run.
+   including architectures that are **absent** (`support: not_found`, whole-file evidence).
+   Absence is a snapshot fact, not a claim the model cannot run. Use `registered` for registry
+   entries and `model_specific` when there is no registry entry (or no registry, like verl) but
+   code keyed on the architecture or its model_type exists.
 
    Registries differ: vLLM has a static table (`registry.py`); SGLang collects `EntryClass`
    from every module under `srt/models/`, so register the modules that declare your
@@ -75,7 +77,11 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    per-model facts — doc-stated parsers, `since_version` from release notes — in
    `model_details[]`, never on the architecture row.
 
-4. **Fill the record.** Keep list fields as literal registry contents; keep prose fields to
+4. **Fill the record.** Each claimed role needs its subobject (`serving` / `training` / `rl`).
+   Record version requirements on the counterpart engine in `integrations[].version_constraints`,
+   one entry per source, even when they disagree.
+
+   **Details.** Keep list fields as literal registry contents; keep prose fields to
    what design docs state. Fill `model_details[]` (`reasoning_parser` / `tool_call_parser` /
    `since_version`) only when docs or release notes state them for that specific model. Add `technique_support` only for glossary slugs the
    sources assert; name-based guesses go to `open_questions` instead.
@@ -99,7 +105,8 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
 ## When to push back
 
 - Asked to mark a model "supported" because a README news item mentions it: record the news
-  item, but registry membership decides `in_native_registry`.
+  item, but code decides `support`.
 - Asked to snapshot `main` or a local checkout: refuse; pick a tag.
-- Asked to add a `training` or `rl` role before those subobjects exist: that is an engine
-  schema bump (E3), not a record edit.
+- Asked to claim a role the snapshot's own sources do not document (e.g. `rl_post_training`
+  for VeOmni, whose RL algorithms live in verl): refuse; record the relationship under
+  `integrations[]` instead.
