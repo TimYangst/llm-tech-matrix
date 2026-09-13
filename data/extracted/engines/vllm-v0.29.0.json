@@ -1,5 +1,5 @@
 {
-  "engine_schema_version": 1,
+  "engine_schema_version": 2,
   "metadata": {
     "name": "vLLM",
     "engine": "vllm",
@@ -427,7 +427,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L93",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L375",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L673"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "DeepseekV32ForCausalLM",
@@ -450,7 +451,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L376",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L645",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md#L3"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "DeepseekV4ForCausalLM",
@@ -479,7 +481,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1376",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/README.md#L40",
         "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "DeepseekV41ForCausalLM",
@@ -495,7 +498,8 @@
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Glm4MoeForCausalLM",
@@ -512,13 +516,24 @@
       "speculative_decoding": [
         "mtp"
       ],
-      "tool_call_parser": "glm47",
       "notes": "Docs row names GLM-4.5, GLM-4.6 and GLM-4.7. The tool-calling guide maps zai-org/GLM-4.7 to --tool-call-parser glm47. The reasoning guide's table maps the GLM-4.5 series to glm45 but does not name GLM-4.7, so reasoning_parser stays UNKNOWN.",
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L120",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L394",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L754",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md#L405"
+      ],
+      "model_details": [
+        {
+          "model_slug": "glm-4.7",
+          "since_version": "[Unknown/Not Disclosed]",
+          "reasoning_parser": "[Unknown/Not Disclosed]",
+          "tool_call_parser": "glm47",
+          "notes": "",
+          "evidence": [
+            "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md#L405"
+          ]
+        }
       ]
     },
     {
@@ -544,7 +559,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L396",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L645",
         "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Glm5NextForConditionalGeneration",
@@ -560,7 +576,8 @@
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "KimiK25ForConditionalGeneration",
@@ -580,7 +597,8 @@
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L457",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L559"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "KimiK3ForConditionalGeneration",
@@ -605,7 +623,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L696",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1374",
         "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Qwen3ForCausalLM",
@@ -620,12 +639,23 @@
         "pp": "marked"
       },
       "speculative_decoding": [],
-      "reasoning_parser": "qwen3",
       "notes": "The reasoning guide maps the Qwen3 series to --reasoning-parser qwen3.",
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L200",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L451",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28"
+      ],
+      "model_details": [
+        {
+          "model_slug": "qwen3-32b",
+          "since_version": "[Unknown/Not Disclosed]",
+          "reasoning_parser": "qwen3",
+          "tool_call_parser": "[Unknown/Not Disclosed]",
+          "notes": "",
+          "evidence": [
+            "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28"
+          ]
+        }
       ]
     },
     {
@@ -641,12 +671,23 @@
         "pp": "marked"
       },
       "speculative_decoding": [],
-      "reasoning_parser": "qwen3",
       "notes": "The reasoning guide maps the Qwen3 series to --reasoning-parser qwen3.",
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L201",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L452",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28"
+      ],
+      "model_details": [
+        {
+          "model_slug": "qwen3-235b-a22b",
+          "since_version": "[Unknown/Not Disclosed]",
+          "reasoning_parser": "qwen3",
+          "tool_call_parser": "[Unknown/Not Disclosed]",
+          "notes": "",
+          "evidence": [
+            "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28"
+          ]
+        }
       ]
     },
     {
@@ -672,7 +713,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L603",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L897",
         "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Qwen3_5MoeForConditionalGeneration",
@@ -695,7 +737,8 @@
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L576",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L604",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L897"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Qwen3_5MoeForCausalLM",
@@ -713,7 +756,8 @@
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L203",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L889"
-      ]
+      ],
+      "model_details": []
     },
     {
       "hf_architecture": "Qwen4ExpForConditionalGeneration",
@@ -727,12 +771,23 @@
       "speculative_decoding": [
         "mtp"
       ],
-      "since_version": "v0.29.0",
       "notes": "Added in v0.29.0 per the release notes ('Qwen3.8-Flash-Next with BF16/FP8/NVFP4 and MTP (#53896)'), but not yet listed in supported_models.md. MTP maps qwen4_exp / qwen4_exp_text to qwen4_exp_mtp.",
       "evidence": [
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L580",
         "https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L822",
         "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
+      ],
+      "model_details": [
+        {
+          "model_slug": "qwen3.8-flash-next",
+          "since_version": "v0.29.0",
+          "reasoning_parser": "[Unknown/Not Disclosed]",
+          "tool_call_parser": "[Unknown/Not Disclosed]",
+          "notes": "",
+          "evidence": [
+            "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
+          ]
+        }
       ]
     }
   ],

@@ -33,9 +33,11 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    Slug: `<engine>-<tag>` lowercase.
 
    ```bash
-   gh api repos/<org>/<repo>/git/ref/tags/<tag> -q .object.sha      # resolve the commit
+   gh api repos/<org>/<repo>/git/ref/tags/<tag> -q '.object.type + " " + .object.sha'
+   # type "tag" = annotated tag (SGLang): dereference it, the object sha is NOT the commit
+   gh api repos/<org>/<repo>/git/tags/<tag-object-sha> -q .object.sha
    gh api repos/<org>/<repo>/releases/tags/<tag> -q .published_at   # release date
-   gh api "repos/<org>/<repo>/git/trees/<sha>?recursive=1"           # find registries & docs
+   gh api "repos/<org>/<repo>/git/trees/<commit-sha>?recursive=1"    # find registries & docs
    ```
 
 2. **Register sources** under the engines track, pinned to the SHA:
@@ -61,9 +63,16 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    including architectures that are **absent** (`in_native_registry: false`, whole-file
    evidence). Absence is a snapshot fact, not a claim the model cannot run.
 
+   Registries differ: vLLM has a static table (`registry.py`); SGLang collects `EntryClass`
+   from every module under `srt/models/`, so register the modules that declare your
+   architectures and prove absence with `git grep <arch> <commit-sha> -- <models dir> docs`
+   against a local upstream clone (reading the commit object, not the checkout). Record
+   per-model facts — doc-stated parsers, `since_version` from release notes — in
+   `model_details[]`, never on the architecture row.
+
 4. **Fill the record.** Keep list fields as literal registry contents; keep prose fields to
-   what design docs state. Fill `reasoning_parser` / `tool_call_parser` / `since_version` only
-   when docs or release notes state them. Add `technique_support` only for glossary slugs the
+   what design docs state. Fill `model_details[]` (`reasoning_parser` / `tool_call_parser` /
+   `since_version`) only when docs or release notes state them for that specific model. Add `technique_support` only for glossary slugs the
    sources assert; name-based guesses go to `open_questions` instead.
 
    Compute `#L` anchors from the cached files rather than typing them — a small script that

@@ -1,6 +1,6 @@
 # Engines track: design
 
-Status: **E1 (pilot) done.** Engine schema v1 is implemented in
+Status: **E2 done** (`sglang-v0.5.19`; engine schema v2). E1 (pilot) done: engine schema is implemented in
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py), with the
 field spec in [`schema.md`](./schema.md). The first record is
 [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md). The draft schema section below

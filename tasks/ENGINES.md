@@ -6,7 +6,22 @@ Model status stays in [`ROADMAP.md`](./ROADMAP.md).
 
 ## Current focus
 
-**Phase:** **E1 (pilot) done.** Engine schema v1, the `extract-engine` skill, the
+**Phase:** **E2 done** (`sglang-v0.5.19`; engine schema v2). **Next: E3**, `verl-v0.9.0`
+(RL post-training role), then `veomni-v0.1.12` (training role), which add the first non-inference
+role subobjects.
+
+E2 surfaced one schema break and fixed it in **engine schema v2**: parsers and `since_version`
+are per model, not per architecture (models sharing an architecture differ). First
+cross-engine findings, detailed in [`engines/sglang-v0.5.19.md`](./engines/sglang-v0.5.19.md):
+
+- **First adoption split.** Qwen3.8-Flash-Next is native in vLLM v0.29.0 but absent from
+  SGLang v0.5.19.
+- **Absent from both:** DeepSeek-V4.1-Flash and GLM-5.3-Flash.
+- **GLM-5 reuses DeepSeek code in both engines**, in different places.
+- **IndexShare reaches the model differently:** vLLM needs `--hf-overrides`, SGLang reads the
+  model config.
+
+**E1 (pilot) done.** Engine schema v1, the `extract-engine` skill, the
 `--track engines` sourcing option, the `render_engine` renderer and engine validation in
 `scripts/validate_extractions.py` all landed with the first record,
 [`vllm-v0.29.0`](../data/extracted/engines/vllm-v0.29.0.md). It has 15 model-architecture rows
@@ -51,7 +66,7 @@ because a newer tag may land before the quarter ends.
 | Slug             | Tag       | Released   | Phase | Status      |
 | ---------------- | --------- | ---------- | ----- | ----------- |
 | `vllm-v0.29.0`   | `v0.29.0` | 2026-09-09 | E1    | `extracted` |
-| `sglang-v0.5.19` | `v0.5.19` | 2026-09-05 | E2    | `backlog`   |
+| `sglang-v0.5.19` | `v0.5.19` | 2026-09-05 | E2    | `extracted` |
 | `verl-v0.9.0`    | `v0.9.0`  | 2026-08-14 | E3    | `backlog`   |
 | `veomni-v0.1.12` | `v0.1.12` | 2026-09-09 | E3    | `backlog`   |
 

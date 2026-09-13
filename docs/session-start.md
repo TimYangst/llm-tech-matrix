@@ -26,32 +26,32 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 
 ## File map
 
-| Location                                   | Purpose                                                                       |
-| ------------------------------------------ | ----------------------------------------------------------------------------- |
-| `CLAUDE.md`                                | Always loaded by Claude Code. Cardinal rules + pointers.                      |
-| `docs/`                                    | Authoritative reference docs.                                                 |
-| `docs/schema.md`                           | Field-by-field extraction spec (current version).                             |
-| `docs/conventions.md`                      | Naming, file layout, **schema changelog**.                                    |
-| `docs/glossary/`                           | Per-technique wiki — short entries, "Used by" tables.                         |
-| `docs/roadmap.md`                          | Strategic milestones (M1/M2 scope).                                           |
-| `tasks/ROADMAP.md`                         | Per-model status table + **Current focus**.                                   |
-| `tasks/models/<slug>.md`                   | Per-model notes, sources, open questions.                                     |
-| `data/sources/<slug>/manifest.json`        | Source URLs + sha256 (**committed**).                                         |
-| `data/sources/<slug>/<file>`               | Cached source files (gitignored).                                             |
-| `data/extracted/<slug>.json`               | Schema-validated extraction (**committed**).                                  |
-| `data/extracted/<slug>.md`                 | Rendered readable summary (**committed**; deterministic from .json).          |
-| `src/llm_tech_matrix/schema.py`            | Pydantic schema (executable spec; wins over docs/schema.md on conflict).      |
-| `src/llm_tech_matrix/sourcing/`            | Fetch CLI, manifest schema, pdf_to_text.                                      |
-| `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer.                                                     |
-| `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                      |
-| `docs/glossary/registry.json`              | Controlled vocabulary: typed field values → glossary entries.                 |
-| `src/llm_tech_matrix/synthesis/index.py`   | Generates the model index, technique matrix and coverage report.              |
-| `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.                 |
-| `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump.                              |
-| `docs/engines/overview.md`                 | Engines track design: roles, snapshots, evidence rules, draft schema.         |
-| `tasks/ENGINES.md`                         | Engines track status + quarterly snapshot calendar.                           |
-| `src/llm_tech_matrix/engine_schema.py`     | Engine snapshot schema (independent version). Spec: `docs/engines/schema.md`. |
-| `.claude/skills/extract-engine/`           | Engine snapshot procedure — invoke when recording an engine release.          |
+| Location                                   | Purpose                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `CLAUDE.md`                                | Always loaded by Claude Code. Cardinal rules + pointers.                        |
+| `docs/`                                    | Authoritative reference docs.                                                   |
+| `docs/schema.md`                           | Field-by-field extraction spec (current version).                               |
+| `docs/conventions.md`                      | Naming, file layout, **schema changelog**.                                      |
+| `docs/glossary/`                           | Per-technique wiki — short entries, "Used by" tables.                           |
+| `docs/roadmap.md`                          | Strategic milestones (M1/M2 scope).                                             |
+| `tasks/ROADMAP.md`                         | Per-model status table + **Current focus**.                                     |
+| `tasks/models/<slug>.md`                   | Per-model notes, sources, open questions.                                       |
+| `data/sources/<slug>/manifest.json`        | Source URLs + sha256 (**committed**).                                           |
+| `data/sources/<slug>/<file>`               | Cached source files (gitignored).                                               |
+| `data/extracted/<slug>.json`               | Schema-validated extraction (**committed**).                                    |
+| `data/extracted/<slug>.md`                 | Rendered readable summary (**committed**; deterministic from .json).            |
+| `src/llm_tech_matrix/schema.py`            | Pydantic schema (executable spec; wins over docs/schema.md on conflict).        |
+| `src/llm_tech_matrix/sourcing/`            | Fetch CLI, manifest schema, pdf_to_text.                                        |
+| `src/llm_tech_matrix/extraction/render.py` | JSON → Markdown renderer.                                                       |
+| `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                        |
+| `docs/glossary/registry.json`              | Controlled vocabulary: typed field values → glossary entries.                   |
+| `src/llm_tech_matrix/synthesis/index.py`   | Generates the model index, technique matrix and coverage report.                |
+| `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.                   |
+| `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump (engines: `migrate_engine_v*`). |
+| `docs/engines/overview.md`                 | Engines track design: roles, snapshots, evidence rules, draft schema.           |
+| `tasks/ENGINES.md`                         | Engines track status + quarterly snapshot calendar.                             |
+| `src/llm_tech_matrix/engine_schema.py`     | Engine snapshot schema (independent version). Spec: `docs/engines/schema.md`.   |
+| `.claude/skills/extract-engine/`           | Engine snapshot procedure — invoke when recording an engine release.            |
 
 ## How to pick a next task
 

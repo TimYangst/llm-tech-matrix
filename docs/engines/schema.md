@@ -1,4 +1,4 @@
-# Engine Snapshot Schema (engine schema v1)
+# Engine Snapshot Schema (engine schema v2)
 
 The contract for `data/extracted/engines/<slug>.json`. The executable version is
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py); if the
@@ -31,7 +31,7 @@ v8). A record declares `engine_schema_version`.
 - `name`, `engine` (lowercase id used in the slug), `organization`, `repository` (upstream,
   never a fork), `license` (SPDX)
 - `release_tag`, `commit_sha`, `release_date` (`YYYY-MM-DD` or UNKNOWN), `snapshot_date`
-- `roles` — list of `"inference"` / `"training"` / `"rl_post_training"`. **v1 implements only
+- `roles` — list of `"inference"` / `"training"` / `"rl_post_training"`. **v2 implements only
   `inference`**; a record claiming the other two fails validation until their subobjects exist.
 - `hardware` — platforms the snapshot's own sources name
 - `sources` — every URL in the snapshot's manifest
@@ -63,18 +63,25 @@ the counterpart is itself a tracked engine snapshot.
 
 ### `model_support[]`
 
-One row per HF architecture (`architectures[0]`), the join key to model records:
+One row per HF architecture (`architectures[0]`), the join key to model records. "Native
+registry" means the engine's built-in model list, whatever form it takes: vLLM's static
+`registry.py` table, or SGLang's `EntryClass` declarations under `srt/models/`.
 
 - `hf_architecture`, `model_slugs` (model records using it)
 - `in_native_registry` — bool. **Absent architectures get a row too**, with whole-file
   evidence; absence from the native registry is a snapshot fact, not a claim the model
   cannot run through another path.
 - `implementation` — module / class the registry maps to
-- `documented` — listed in the engine's supported-models docs (docs can lag code)
+- `documented` — covered by the engine's supported-models docs (docs can lag code; vLLM's are
+  architecture-level, SGLang's family-level — say which in `notes`)
 - `features` — per-model doc columns, e.g. `{"lora": "marked", "pp": "not marked"}`
 - `speculative_decoding` — methods with model-specific handling in code or docs
-- `reasoning_parser`, `tool_call_parser` — only when docs map the model to a parser
-- `since_version` — only when release notes or history state it
+- `model_details[]` **(v2)** — per-model facts that do not follow from the architecture,
+  `{model_slug, since_version, reasoning_parser, tool_call_parser, notes, evidence}`.
+  `model_slug` must be one of the row's `model_slugs`, and appear at most once. Parsers only
+  when docs map *that model*; `since_version` only when release notes or history state it for
+  *that model*. (v1 had these three fields on the row, which broke as soon as two models shared
+  an architecture — see the changelog.)
 - `notes`, `evidence`
 
 ### `technique_support[]`
@@ -89,7 +96,7 @@ recipe. Unassertable near-misses belong in `open_questions`.
 Doc/code disagreements, name-based near-misses, reproducibility caveats, and things a later
 snapshot should settle.
 
-## Not in v1 (deliberately)
+## Not in v2 (deliberately)
 
 - `training` and `rl` role subobjects — arrive with the first snapshots that need them
   (`verl-v0.9.0`, `veomni-v0.1.12`, phase E3).

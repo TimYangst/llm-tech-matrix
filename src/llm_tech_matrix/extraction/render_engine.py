@@ -60,8 +60,10 @@ LABELS: dict[str, dict[str, str]] = {
         "integrations": "Integrations",
         "int_header": "| Name | Relation | Notes | Evidence |",
         "model_support": "Model support",
-        "ms_header": "| Architecture | Model records | Native registry | Documented | Features | Spec. decoding | Reasoning parser | Tool parser | Since | Evidence |",
+        "ms_header": "| Architecture | Model records | Native registry | Documented | Features | Spec. decoding | Evidence |",
         "ms_notes": "Row notes",
+        "md_title": "Per-model details",
+        "md_header": "| Model record | Since | Reasoning parser | Tool parser | Notes | Evidence |",
         "technique_support": "Technique support",
         "ts_header": "| Glossary entry | Implementation | Flags | Since | Evidence |",
         "open_questions": "Open questions",
@@ -103,8 +105,10 @@ LABELS: dict[str, dict[str, str]] = {
         "integrations": "集成",
         "int_header": "| 名称 | 关系 | 说明 | 证据 |",
         "model_support": "模型支持",
-        "ms_header": "| 架构 | 模型记录 | 原生注册 | 文档列出 | 特性 | 投机解码 | Reasoning parser | Tool parser | 起始版本 | 证据 |",
+        "ms_header": "| 架构 | 模型记录 | 原生注册 | 文档列出 | 特性 | 投机解码 | 证据 |",
         "ms_notes": "逐行说明",
+        "md_title": "逐模型信息",
+        "md_header": "| 模型记录 | 起始版本 | Reasoning parser | Tool parser | 说明 | 证据 |",
         "technique_support": "技术实现",
         "ts_header": "| Glossary 条目 | 实现方式 | 参数 | 起始版本 | 证据 |",
         "open_questions": "开放问题",
@@ -225,16 +229,30 @@ def render(record: EngineRecord, lang: str, slug: str) -> str:
 
     parts += [f"## {labels['model_support']}", ""]
     if record.model_support:
-        parts += [labels["ms_header"], "|---|---|---|---|---|---|---|---|---|---|"]
+        parts += [labels["ms_header"], "|---|---|---|---|---|---|---|"]
         for m in record.model_support:
             slugs = ", ".join(f"[`{x}`](../{x}.md)" for x in m.model_slugs) or "—"
             parts.append(
                 f"| `{m.hf_architecture}` | {slugs} | {cell(m.in_native_registry)} | "
                 f"{cell(m.documented)} | {cell(m.features)} | {cell(m.speculative_decoding)} | "
-                f"{cell(m.reasoning_parser)} | {cell(m.tool_call_parser)} | {cell(m.since_version)} | "
                 f"{_links(m.evidence)} |"
             )
         parts.append("")
+        details = [d for m in record.model_support for d in m.model_details]
+        if details:
+            parts += [
+                f"### {labels['md_title']}",
+                "",
+                labels["md_header"],
+                "|---|---|---|---|---|---|",
+            ]
+            parts += [
+                f"| [`{d.model_slug}`](../{d.model_slug}.md) | {cell(d.since_version)} | "
+                f"{cell(d.reasoning_parser)} | {cell(d.tool_call_parser)} | {cell(d.notes)} | "
+                f"{_links(d.evidence)} |"
+                for d in details
+            ]
+            parts.append("")
         parts += [f"### {labels['ms_notes']}", ""]
         parts += [
             f"- **`{m.hf_architecture}`** — {m.notes}" for m in record.model_support if m.notes

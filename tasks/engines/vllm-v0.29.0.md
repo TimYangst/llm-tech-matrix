@@ -83,11 +83,18 @@ counts, `updated_at`), so its sha256 will drift. The release-notes body is what 
 
 ## Schema notes from the pilot (feed into v1 → v2)
 
+- **Resolved in engine schema v2** (driven by `sglang-v0.5.19`): the row-level
+  `reasoning_parser` / `tool_call_parser` / `since_version` of this record moved into
+  per-model `model_details[]` via `scripts/migrate_engine_v1_to_v2.py` (4 entries).
+
 - **Absence rows were needed.** v1 records `in_native_registry: false` with whole-file evidence.
   Without them the support matrix couldn't distinguish "not supported yet" from "not checked".
+
 - **Glossary gap for serving formats.** MXFP4 / NVFP4 serving support has no glossary entry
   (`fp4-qat` is a training recipe), so it can't become a typed edge yet.
+
 - **Non-native loading paths** (Transformers backend, plugins) are out of v1. Revisit if absent
   architectures turn out to run anyway.
+
 - **`speculative_decoding_methods` collapses the MTP model-type sub-literal to `mtp`.** The
   per-family MTP types are captured in `technique_support` and `model_support` instead.

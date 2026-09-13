@@ -1,4 +1,4 @@
-"""Pydantic models for the engine snapshot schema (engine schema v1).
+"""Pydantic models for the engine snapshot schema (engine schema v2).
 
 Engines (vLLM, SGLang, verl, VeOmni) are a second record type, parallel to the model
 records validated by `schema.py`. Records live at `data/extracted/engines/<slug>.json`.
@@ -14,7 +14,7 @@ Cardinal rules carried over from the model track, tightened for engines:
   URLs with `#L` line anchors where possible) or the tag's release notes. `EngineRecord`
   enforces that populated serving fields, parallelism entries, model rows and technique rows
   all cite something.
-- v1 implements only the `inference` role. `training` and `rl_post_training` are part of the
+- v2 implements only the `inference` role. `training` and `rl_post_training` are part of the
   vocabulary but their subobjects arrive with the first snapshot that needs them (E3), so a
   record claiming those roles fails validation for now instead of silently carrying nothing.
 """
@@ -23,7 +23,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ENGINE_SCHEMA_VERSION = 1
+ENGINE_SCHEMA_VERSION = 2
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 EngineRole = Literal["inference", "training", "rl_post_training"]
@@ -141,12 +141,37 @@ class Integration(_Strict):
     evidence: list[str] = Field(min_length=1)
 
 
+class ModelDetail(_Strict):
+    """Facts about one model record that do not follow from its architecture (added in v2).
+
+    Two models can share an HF architecture yet differ here: SGLang v0.5.19 maps Kimi K2
+    Thinking (DeepseekV3ForCausalLM) to the `kimi_k2` parsers while DeepSeek-V3 gets none, and
+    lists Qwen3.8-27B as new in that release although its Qwen3_5ForConditionalGeneration
+    architecture was already supported.
+    """
+
+    model_slug: str = Field(description="Must be one of the parent row's `model_slugs`")
+    since_version: str = Field(
+        default=UNKNOWN, description="Only when release notes or history state it for this model"
+    )
+    reasoning_parser: str = Field(
+        default=UNKNOWN, description="Only when the engine's docs map this model to a parser"
+    )
+    tool_call_parser: str = Field(
+        default=UNKNOWN, description="Only when the engine's docs map this model to a parser"
+    )
+    notes: str = ""
+    evidence: list[str] = Field(min_length=1)
+
+
 class ModelSupport(_Strict):
     """One model architecture as the engine sees it at this snapshot.
 
-    Absence is recorded too: an architecture missing from an exhaustive native registry is a
-    fact about the snapshot. It is not a claim that the model cannot run (fallback backends
+    Absence is recorded too: an architecture missing from the engine's native model registry is
+    a fact about the snapshot. It is not a claim that the model cannot run (fallback backends
     or plugins may exist), which is why the field is `in_native_registry`, not `supported`.
+    "Native registry" means whatever the engine treats as its built-in model list: vLLM's
+    static `registry.py` table, SGLang's `EntryClass` declarations under `srt/models/`.
     """
 
     hf_architecture: str = Field(description="HF `architectures[0]`, the join key to models")
@@ -160,7 +185,10 @@ class ModelSupport(_Strict):
     )
     documented: bool | str = Field(
         default=UNKNOWN,
-        description="Listed in the engine's supported-models documentation at this snapshot",
+        description=(
+            "Covered by the engine's supported-models documentation at this snapshot. Docs may be "
+            "architecture-level (vLLM) or family-level (SGLang); `notes` says which."
+        ),
     )
     features: dict[str, str] = Field(
         default_factory=dict,
@@ -168,16 +196,11 @@ class ModelSupport(_Strict):
     )
     speculative_decoding: list[str] = Field(
         default_factory=list,
-        description="Methods with model-specific handling in code or docs (e.g. 'mtp', 'dspark')",
+        description="Methods with architecture-specific handling in code or docs (e.g. 'mtp', 'dspark')",
     )
-    reasoning_parser: str = Field(
-        default=UNKNOWN, description="Only when the engine's docs map this model to a parser"
-    )
-    tool_call_parser: str = Field(
-        default=UNKNOWN, description="Only when the engine's docs map this model to a parser"
-    )
-    since_version: str = Field(
-        default=UNKNOWN, description="Only when release notes or history state it"
+    model_details: list[ModelDetail] = Field(
+        default_factory=list,
+        description="Per-model facts: since_version and doc-stated parser mappings (v2)",
     )
     notes: str = ""
     evidence: list[str] = Field(min_length=1)
@@ -215,7 +238,7 @@ class EngineRecord(_Strict):
         unimplemented = roles - IMPLEMENTED_ROLES
         if unimplemented:
             raise ValueError(
-                f"roles {sorted(unimplemented)} have no subobject in engine schema v1 "
+                f"roles {sorted(unimplemented)} have no subobject in engine schema v2 "
                 "(training / rl subobjects land with the first snapshot that needs them)"
             )
         if ("inference" in roles) != (self.serving is not None):
@@ -229,6 +252,15 @@ class EngineRecord(_Strict):
             stray = sorted(set(self.serving.evidence) - set(self.serving.populated_fields()))
             if stray:
                 raise ValueError(f"serving.evidence keys for unpopulated fields: {stray}")
+        for row in self.model_support:
+            slugs = [d.model_slug for d in row.model_details]
+            stray = sorted(set(slugs) - set(row.model_slugs))
+            if stray:
+                raise ValueError(
+                    f"{row.hf_architecture}: model_details for non-member slugs {stray}"
+                )
+            if len(slugs) != len(set(slugs)):
+                raise ValueError(f"{row.hf_architecture}: duplicate model_details entries")
         for name in type(self.parallelism).model_fields:
             entry: ParallelismEntry = getattr(self.parallelism, name)
             if entry.supported != UNKNOWN and not entry.evidence:
