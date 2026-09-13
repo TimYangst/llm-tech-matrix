@@ -70,7 +70,7 @@ uv run ruff format .
 # Format Markdown only
 uv run mdformat .
 
-# Validate every data/extracted/*.json against the schema
+# Validate every data/extracted/*.json (models) and data/extracted/engines/*.json (engines)
 uv run python scripts/validate_extractions.py
 ```
 
@@ -92,8 +92,9 @@ After changing dev tooling versions, bump the corresponding `rev:` in
 2. `uv run pre-commit run --all-files --show-diff-on-failure` — same
    hooks you run locally.
 3. `uv run python scripts/validate_extractions.py` — re-validates every
-   `data/extracted/*.json` against `src/llm_tech_matrix/schema.py`. This
-   is the gate for the **schema strictness** cardinal rule.
+   `data/extracted/*.json` against `src/llm_tech_matrix/schema.py`, and every
+   `data/extracted/engines/*.json` against `src/llm_tech_matrix/engine_schema.py` plus
+   its cross-links. This is the gate for the **schema strictness** cardinal rule.
 
 GitHub Actions is free for the public repository with no minute cap.
 Cold start is ~30s; warm cache (uv + pre-commit envs) is ~10s.

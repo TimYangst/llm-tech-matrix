@@ -6,11 +6,29 @@ Model status stays in [`ROADMAP.md`](./ROADMAP.md).
 
 ## Current focus
 
-**Phase:** E0 (design) is done in this branch. **Next: E1**, the `vllm-v0.29.0` pilot, which
-builds engine schema v1, the `extract-engine` skill, a sourcing target for
-`data/sources/engines/`, rendering and CI validation alongside the first record.
+**Phase:** **E2 done** (`sglang-v0.5.19`). **Next: E3**, `verl-v0.9.0`
+(RL post-training role), then `veomni-v0.1.12` (training role), which add the first non-inference
+role subobjects.
 
-No engine records exist yet.
+E2 surfaced one schema break before engine schema v1 was merged, so the fix went straight into
+v1: parsers and `since_version` are per model, not per architecture (models sharing an
+architecture differ). First
+cross-engine findings, detailed in [`engines/sglang-v0.5.19.md`](./engines/sglang-v0.5.19.md):
+
+- **First adoption split.** Qwen3.8-Flash-Next is native in vLLM v0.29.0 but absent from
+  SGLang v0.5.19.
+- **Absent from both:** DeepSeek-V4.1-Flash and GLM-5.3-Flash.
+- **GLM-5 reuses DeepSeek code in both engines**, in different places.
+- **IndexShare reaches the model differently:** vLLM needs `--hf-overrides`, SGLang reads the
+  model config.
+
+**E1 (pilot) done.** Engine schema v1, the `extract-engine` skill, the
+`--track engines` sourcing option, the `render_engine` renderer and engine validation in
+`scripts/validate_extractions.py` all landed with the first record,
+[`vllm-v0.29.0`](../data/extracted/engines/vllm-v0.29.0.md). It has 15 model-architecture rows
+covering all 24 model records (2 absent) and 8 technique rows, and every claim is
+line-anchored to the tag commit. **Next: E2**, `sglang-v0.5.19`, the same role as a
+cross-engine stress test for the schema.
 
 ## Snapshot policy
 
@@ -46,12 +64,12 @@ or read the pinned upstream URLs, before using them as evidence.
 Candidate tags, checked against GitHub releases on 2026-09-12. Re-check at snapshot time,
 because a newer tag may land before the quarter ends.
 
-| Slug             | Tag       | Released   | Phase | Status    |
-| ---------------- | --------- | ---------- | ----- | --------- |
-| `vllm-v0.29.0`   | `v0.29.0` | 2026-09-09 | E1    | `backlog` |
-| `sglang-v0.5.19` | `v0.5.19` | 2026-09-05 | E2    | `backlog` |
-| `verl-v0.9.0`    | `v0.9.0`  | 2026-08-14 | E3    | `backlog` |
-| `veomni-v0.1.12` | `v0.1.12` | 2026-09-09 | E3    | `backlog` |
+| Slug             | Tag       | Released   | Phase | Status      |
+| ---------------- | --------- | ---------- | ----- | ----------- |
+| `vllm-v0.29.0`   | `v0.29.0` | 2026-09-09 | E1    | `extracted` |
+| `sglang-v0.5.19` | `v0.5.19` | 2026-09-05 | E2    | `extracted` |
+| `verl-v0.9.0`    | `v0.9.0`  | 2026-08-14 | E3    | `backlog`   |
+| `veomni-v0.1.12` | `v0.1.12` | 2026-09-09 | E3    | `backlog`   |
 
 Status values mirror the model track: `backlog` | `sourcing` | `extracting` | `extracted`
 | `reviewed` | `blocked`.
@@ -59,18 +77,30 @@ Status values mirror the model track: `backlog` | `sourcing` | `extracting` | `e
 ## Seed questions for the pilot
 
 These come from existing model records. They check that the schema can close real gaps; they
-are not a to-do list.
+are not a to-do list. **Outcomes for `vllm-v0.29.0` are in
+[`engines/vllm-v0.29.0.md`](./engines/vllm-v0.29.0.md)**:
+
+- V4.1-Flash is absent at this tag.
+
+- DSpark is implemented, but the γ mismatch is unresolved.
+
+- DSA and IndexCache are implemented; CSA/HCA is not asserted.
+
+- The parser gap is on the engine side too.
 
 - **DSpark.** `deepseek-v4-flash-0731` records vendor serving flags for vLLM
   (`--speculative-config '{"method":"dspark"}'`) and SGLang (`--speculative-algorithm DSPARK`).
   Which engine versions implement DSpark, and does either engine document the
   `num_speculative_tokens: 7` vs trained γ=5 mismatch?
+
 - **DeepSeek-V4.1-Flash.** Its record says no serving command was published. Does
   `vllm-v0.29.0` (released the day before V4.1) or a later snapshot list
   `DeepseekV41ForCausalLM`?
+
 - **Sparse attention.** DSA (DeepSeek-V3.2-Exp, 2025-09), CSA/HCA (DeepSeek-V4) and IndexShare
-  (GLM-5.2) all have glossary entries. `vllm/docs/design/hisparse.md` is a candidate source
-  for how vLLM implements sparse attention.
+  (GLM-5.2) all have glossary entries. (`vllm/docs/design/hisparse.md` turned out to post-date
+  `v0.29.0`; it belongs to the next snapshot.)
+
 - **Reasoning and tool parsers.** Model records note that no `--tool-call-parser` flag is
   published for DeepSeek-V4 / V4.1. The engine's parser registry is the authoritative place to
   check.

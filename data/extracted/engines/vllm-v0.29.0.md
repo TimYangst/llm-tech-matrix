@@ -1,0 +1,193 @@
+# vLLM v0.29.0
+
+> 中文版：[vllm-v0.29.0.zh.md](./vllm-v0.29.0.zh.md)
+
+*Engine schema version: 1*
+
+## Overview
+
+| Field | Value |
+|---|---|
+| Repository | https://github.com/vllm-project/vllm |
+| License | Apache-2.0 |
+| Release tag | `v0.29.0` |
+| Commit | `98dff2a81d747d1dba01a47f939f48c3526d4206` |
+| Release date | 2026-09-09 |
+| Snapshot date | 2026-09-12 |
+| Roles | `inference` |
+| Hardware | NVIDIA, AMD ROCm, Intel XPU, CPU |
+
+## Parallelism
+
+| Dimension | Supported | Implementation | Notes | Evidence |
+|---|---|---|---|---|
+| Tensor | ✓ | tensor_parallel_size | One GPU worker process per GPU; workers per engine core = tensor_parallel_size x pipeline_parallel_size. | [parallel.py#L124](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L124), [arch_overview.md#L91](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md#L91) |
+| Pipeline | ✓ | pipeline_parallel_size | Per-architecture PP support is a column in supported_models.md (see model_support[].features). | [parallel.py#L122](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L122) |
+| Data | ✓ | data_parallel_size; one engine core process per DP rank, API servers scale with DP size | — | [parallel.py#L129](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L129), [arch_overview.md#L83](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md#L83) |
+| Expert | ✓ | enable_expert_parallel, expert_placement_strategy; elastic EP via enable_elastic_ep | v0.29.0 release notes list elastic-EP reconfiguration improvements; elastic EP is among the features that still fall back to Model Runner V1. | [parallel.py#L165](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L165), [parallel.py#L215](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L215), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| Context | ✓ | prefill_context_parallel_size (PCP) and decode_context_parallel_size (DCP) | Release notes: Kimi-K3 DCP with DSpark (#52188), PCP for DSv3.2 sparse MLA (#52046), `--dcp-q-replicate` default-on for GLM sparse attention (#50382). | [parallel.py#L126](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L126), [parallel.py#L349](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py#L349), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| Sequence | ✓ | _unknown_ | Only evidenced by the release notes: sequence parallelism is listed among features Model Runner V2 does not yet support, for which vLLM falls back to Model Runner V1. The configuration surface is not among this snapshot's sources. | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+
+## Serving
+
+**Scheduler:** Multi-process V1 architecture: API server process(es) handle HTTP and input processing and talk to engine core processes over ZMQ; each engine core runs the scheduler in a busy loop that continuously schedules requests and dispatches work to one worker process per GPU. Model Runner V2 is the default for all models as of v0.29.0; Model Runner V1 remains as a fallback for unsupported features and is targeted for removal in v0.32. New admission-control flags: --max-num-queued-reqs / --max-num-queued-tokens.
+
+_Evidence:_ [arch_overview.md#L81](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md#L81), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)
+
+**KV cache management:** The engine core owns KV cache management. A hybrid KV cache manager handles models that mix attention types (sliding-window + full, Mamba + full, local chunked + full); the design doc flags the feature as early-stage. KV cache layout is standardized under a KVCacheLayout enum in v0.29.0.
+
+_Evidence:_ [hybrid_kv_cache_manager.md#L1](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/hybrid_kv_cache_manager.md#L1), [hybrid_kv_cache_manager.md#L4](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/hybrid_kv_cache_manager.md#L4), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)
+
+**Prefix caching:** Hash-based automatic prefix caching: each KV-cache block is hashed from its own tokens plus the prefix before it. v0.29.0 adds Mamba internal prefill checkpoints for prefix caching, a prefix_cache_retention_interval CLI argument (default 0), and a deterministic NONE_HASH by default.
+
+_Evidence:_ [prefix_caching.md#L5](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/prefix_caching.md#L5), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)
+
+**Disaggregation:** Disaggregated prefill/decode through KV connectors configured with --kv-transfer-config; the guide lists 9 connector types, including NixlConnector, MooncakeConnector, LMCacheConnectorV1, MoRIIOConnector (ROCm only), OffloadingConnector, FlexKVConnectorV1 and MultiConnector. Disaggregated encoder runs the vision-encoder stage of multimodal LLMs in a separate vLLM instance.
+
+_Evidence:_ [disagg_prefill.md#L20](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md#L20), [disagg_encoder.md#L1](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_encoder.md#L1)
+
+**API surfaces** (5): OpenAI-compatible HTTP API, Anthropic Messages API (render endpoint /v1/messages/render added in v0.29.0), Cohere v2 chat render endpoint, gRPC (Rust frontend), Offline Python API (LLM)
+
+_Evidence:_ [arch_overview.md#L73](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md#L73), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0)
+
+**Speculative decoding methods** (13): `ngram`, `ngram_gpu`, `medusa`, `mlp_speculator`, `draft_model`, `suffix`, `custom_class`, `eagle`, `eagle3`, `extract_hidden_states`, `mtp`, `dflash`, `dspark`
+
+_Evidence:_ [speculative.py#L71](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L71)
+
+**Quantization methods** (30): `awq`, `auto_awq`, `fp8`, `fbgemm_fp8`, `fp_quant`, `modelopt`, `modelopt_fp4`, `modelopt_mxfp8`, `modelopt_mixed`, `auto_gptq`, `gptq`, `gptq_marlin`, `awq_marlin`, `humming`, `compressed-tensors`, `experts_int8`, `quark`, `moe_wna16`, `torchao`, `inc`, `mxfp4`, `gpt_oss_mxfp4`, `deepseek_v4_fp8`, `online`, `fp8_per_tensor`, `fp8_per_block`, `fp8_per_channel`, `int8_per_channel_weight_only`, `nvfp4_per_token`, `mxfp8`
+
+_Evidence:_ [__init__.py#L12](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/layers/quantization/__init__.py#L12)
+
+**KV cache dtypes** (17): `auto`, `float16`, `bfloat16`, `fp8`, `fp8_e4m3`, `fp8_e5m2`, `fp8_inc`, `fp8_ds_mla`, `turboquant_k8v4`, `turboquant_4bit_nc`, `turboquant_k3v4_nc`, `turboquant_3bit_nc`, `int4_per_token_head`, `int8_per_token_head`, `fp8_per_token_head`, `nvfp4`, `nvfp4_4over6`
+
+_Evidence:_ [cache.py#L39](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/cache.py#L39)
+
+**Attention backends** (41): `FLASH_ATTN`, `FLASH_ATTN_DIFFKV`, `TRITON_ATTN`, `TRITON_ATTN_DIFFKV`, `ROCM_ATTN`, `ROCM_AITER_MLA`, `ROCM_AITER_TRITON_MLA`, `ROCM_AITER_FA`, `ROCM_AITER_MLA_SPARSE`, `XPU_MLA_SPARSE`, `TORCH_SDPA`, `FLASHINFER`, `FLASHINFER_MLA`, `TOKENSPEED_MLA`, `FLASHINFER_MLA_SPARSE`, `FLASHINFER_MLA_SPARSE_SM120`, `TRITON_MLA`, `CUTLASS_MLA`, `FLASHMLA`, `FLASHMLA_SPARSE`, `FLASHMLA_SPARSE_DSV4`, `FLASHINFER_MLA_SPARSE_DSV4`, `ROCM_FLASHMLA_SPARSE_DSV4`, `FLASH_ATTN_MLA`, `FLASH_ATTN_MLA_SPARSE`, `MINIMAX_M3_SPARSE`, `CUTLASS_MSA`, `TRITON_MSA`, `NO_ATTENTION`, `FLEX_ATTENTION`, `HPC_ATTN`, `ROCM_AITER_UNIFIED_ATTN`, `CPU_ATTN`, `CPU_MLA`, `AMX_MLA`, `TURBOQUANT`, `MAMBA1`, `MAMBA2`, `SHORT_CONV`, `LINEAR`, `GDN_ATTN`
+
+_Evidence:_ [registry.py#L44](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L44), [registry.py#L190](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L190)
+
+**Reasoning parsers** (32): `cohere_command3`, `cohere_command4`, `deepseek_r1`, `deepseek_v3`, `deepseek_v4`, `ernie45`, `gemma4`, `glm45`, `glm47`, `granite`, `holo2`, `hunyuan_a13b`, `hy_v3`, `hy_v4`, `inkling`, `kimi_k2`, `kimi_k3`, `ling3`, `mimo`, `minimax_m2`, `minimax_m2_append_think`, `minimax_m3`, `mistral`, `muse_glimmer`, `nemotron_v3`, `olmo3`, `openai_gptoss`, `poolside_v1`, `qwen3`, `seed_oss`, `step3`, `step3p5`
+
+_Evidence:_ [__init__.py#L31](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/reasoning/__init__.py#L31)
+
+**Tool-call parsers** (48): `apertus`, `cohere_command3`, `cohere_command4`, `deepseek_v3`, `deepseek_v31`, `deepseek_v32`, `deepseek_v4`, `dots`, `ernie45`, `functiongemma`, `gemma4`, `gigachat3`, `glm45`, `glm47`, `granite`, `granite4`, `hermes`, `hunyuan_a13b`, `hy_v3`, `hy_v4`, `inkling`, `internlm`, `jamba`, `kimi_k2`, `kimi_k3`, `lfm2`, `ling3`, `llama3_json`, `llama4_json`, `llama4_pythonic`, `longcat`, `mimo`, `minicpm5`, `minimax_m2`, `minimax_m3`, `mistral`, `muse_glimmer`, `olmo3`, `openai`, `phi4_mini_json`, `poolside_v1`, `pythonic`, `qwen3_coder`, `qwen3_xml`, `seed_oss`, `step3`, `step3p5`, `xlam`
+
+_Evidence:_ [__init__.py#L41](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/tool_parsers/__init__.py#L41)
+
+_Notes:_ List fields are the literal registry contents at the pinned commit: SpeculativeMethod literal (with its MTP model-type sub-literal collapsed to 'mtp'; the per-family MTP types are covered in technique_support), QuantizationMethods literal (including the online-quant shorthand names), CacheDType literal, AttentionBackendEnum + MambaAttentionBackendEnum members (the CUSTOM placeholders omitted), and the reasoning / tool parser registries. A parser name matching a model family is NOT evidence that vLLM maps that model to the parser — see model_support[] for the mappings the docs actually state.
+
+## Integrations
+
+| Name | Relation | Notes | Evidence |
+|---|---|---|---|
+| FlashInfer | `kernel_library` | FLASHINFER* attention backends; FlashInfer all-reduce enabled by default for TP CUDA groups in v0.29.0. | [registry.py#L65](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L65), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| FlashMLA | `kernel_library` | FLASHMLA, FLASHMLA_SPARSE and FLASHMLA_SPARSE_DSV4 attention backends. | [registry.py#L87](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L87) |
+| FlashAttention | `kernel_library` | FLASH_ATTN / FLASH_ATTN_MLA backends. | [registry.py#L44](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L44) |
+| NIXL | `kv_transfer` | NixlConnector for disaggregated prefill; v0.29.0 also adds a `sharded_rdt` P2P RL weight-sync backend over NIXL or Ray Direct Transport. | [disagg_prefill.md#L24](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md#L24), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| Mooncake | `kv_transfer` | MooncakeConnector. | [disagg_prefill.md#L30](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md#L30) |
+| LMCache | `kv_transfer` | LMCacheConnectorV1. | [disagg_prefill.md#L23](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md#L23) |
+
+## Model support
+
+| Architecture | Model records | Native registry | Documented | Features | Spec. decoding | Evidence |
+|---|---|---|---|---|---|---|
+| `DeepseekV3ForCausalLM` | [`deepseek-v3`](../deepseek-v3.md), [`kimi-k2-thinking`](../kimi-k2-thinking.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L93](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L93), [supported_models.md#L375](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L375), [speculative.py#L673](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L673) |
+| `DeepseekV32ForCausalLM` | [`deepseek-v3.2-exp`](../deepseek-v3.2-exp.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L94](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L94), [supported_models.md#L376](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L376), [speculative.py#L645](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L645), [index_cache.md#L3](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md#L3) |
+| `DeepseekV4ForCausalLM` | [`deepseek-v4-pro`](../deepseek-v4-pro.md), [`deepseek-v4-flash`](../deepseek-v4-flash.md), [`deepseek-v4-flash-0731`](../deepseek-v4-flash-0731.md) | ✓ | ✓ | lora: not marked, pp: marked | `mtp`, `dspark` | [registry.py#L98](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L98), [supported_models.md#L377](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L377), [speculative.py#L681](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L681), [speculative.py#L1114](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1114), [speculative.py#L1376](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1376), [README.md#L40](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/README.md#L40), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| `DeepseekV41ForCausalLM` | [`deepseek-v4.1-flash`](../deepseek-v4.1-flash.md) | ✗ | ✗ | — | — | [registry.py](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py), [supported_models.md](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md) |
+| `Glm4MoeForCausalLM` | [`glm-4.7`](../glm-4.7.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L120](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L120), [supported_models.md#L394](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L394), [speculative.py#L754](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L754), [tool_calling.md#L405](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md#L405) |
+| `GlmMoeDsaForCausalLM` | [`glm-5`](../glm-5.md), [`glm-5.1`](../glm-5.1.md), [`glm-5.2`](../glm-5.2.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L122](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L122), [supported_models.md#L396](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L396), [speculative.py#L645](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L645), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| `Glm5NextForConditionalGeneration` | [`glm-5.3-flash`](../glm-5.3-flash.md) | ✗ | ✗ | — | — | [registry.py](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py), [supported_models.md](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md) |
+| `KimiK25ForConditionalGeneration` | [`kimi-k2.5`](../kimi-k2.5.md), [`kimi-k2.6`](../kimi-k2.6.md) | ✓ | ✓ | lora: not marked, pp: marked | — | [registry.py#L457](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L457), [supported_models.md#L559](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L559) |
+| `KimiK3ForConditionalGeneration` | [`kimi-k3`](../kimi-k3.md) | ✓ | ✓ | lora: not marked, pp: marked | `mtp`, `dspark` | [registry.py#L458](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L458), [supported_models.md#L560](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L560), [speculative.py#L696](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L696), [speculative.py#L1374](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1374), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| `Qwen3ForCausalLM` | [`qwen3-32b`](../qwen3-32b.md) | ✓ | ✓ | lora: marked, pp: marked | — | [registry.py#L200](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L200), [supported_models.md#L451](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L451), [reasoning_outputs.md#L28](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28) |
+| `Qwen3MoeForCausalLM` | [`qwen3-235b-a22b`](../qwen3-235b-a22b.md) | ✓ | ✓ | lora: marked, pp: marked | — | [registry.py#L201](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L201), [supported_models.md#L452](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L452), [reasoning_outputs.md#L28](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28) |
+| `Qwen3_5ForConditionalGeneration` | [`qwen3.5-27b`](../qwen3.5-27b.md), [`qwen3.6-27b`](../qwen3.6-27b.md), [`qwen3.8-27b`](../qwen3.8-27b.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L575](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L575), [supported_models.md#L603](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L603), [speculative.py#L897](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L897), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| `Qwen3_5MoeForConditionalGeneration` | [`qwen3.5-35b-a3b`](../qwen3.5-35b-a3b.md), [`qwen3.6-35b-a3b`](../qwen3.6-35b-a3b.md) | ✓ | ✓ | lora: marked, pp: marked | `mtp` | [registry.py#L576](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L576), [supported_models.md#L604](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md#L604), [speculative.py#L897](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L897) |
+| `Qwen3_5MoeForCausalLM` | [`qwen3.8-2.4t-a95b`](../qwen3.8-2.4t-a95b.md) | ✓ | ✗ | — | `mtp` | [registry.py#L203](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L203), [speculative.py#L889](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L889) |
+| `Qwen4ExpForConditionalGeneration` | [`qwen3.8-flash-next`](../qwen3.8-flash-next.md) | ✓ | ✗ | — | `mtp` | [registry.py#L580](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L580), [speculative.py#L822](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L822), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+
+### Per-model details
+
+| Model record | Since | Reasoning parser | Tool parser | Notes | Evidence |
+|---|---|---|---|---|---|
+| [`glm-4.7`](../glm-4.7.md) | _unknown_ | _unknown_ | glm47 | — | [tool_calling.md#L405](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md#L405) |
+| [`qwen3-32b`](../qwen3-32b.md) | _unknown_ | qwen3 | _unknown_ | — | [reasoning_outputs.md#L28](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28) |
+| [`qwen3-235b-a22b`](../qwen3-235b-a22b.md) | _unknown_ | qwen3 | _unknown_ | — | [reasoning_outputs.md#L28](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md#L28) |
+| [`qwen3.8-flash-next`](../qwen3.8-flash-next.md) | v0.29.0 | _unknown_ | _unknown_ | — | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+
+### Row notes
+
+- **`DeepseekV3ForCausalLM`** — MTP maps deepseek_v3 to deepseek_mtp / DeepSeekMTPModel. The docs row names DeepSeek-V3, R1 and V3.1; Kimi K2-Thinking reuses this architecture class but is not named in the row.
+- **`DeepseekV32ForCausalLM`** — MTP uses DeepseekV32MTPModel. IndexCache (cross-layer top-k reuse) is documented for DeepSeek-V3.2 DSA models via --hf-overrides. The docs row names DeepSeek-V3.2, not V3.2-Exp specifically.
+- **`DeepseekV4ForCausalLM`** — MTP: deepseek_v4 maps to DeepSeekV4MTPModel. DSpark: 'DeepSeek DSpark can ship the weights inside the target checkpoint' — the draft reuses the full DeepSeek-V4 config as DSparkDraftModel with the target's quantization, and DSpark forces parallel_drafting. Adaptive verification is documented as DSpark-only. The docs LoRA column is empty for DeepSeek-V4 although the v0.29.0 release notes add DeepSeek V4 LoRA (#53361) — see open_questions.
+- **`DeepseekV41ForCausalLM`** — Absent from the native registry and the supported-models doc at this snapshot. vLLM v0.29.0 was published 2026-09-09; DeepSeek-V4.1-Flash was released 2026-09-10. Absence from the native registry does not rule out other loading paths (e.g. the Transformers modeling backend), which this record does not assess.
+- **`Glm4MoeForCausalLM`** — Docs row names GLM-4.5, GLM-4.6 and GLM-4.7. The tool-calling guide maps zai-org/GLM-4.7 to --tool-call-parser glm47. The reasoning guide's table maps the GLM-4.5 series to glm45 but does not name GLM-4.7, so reasoning_parser stays UNKNOWN.
+- **`GlmMoeDsaForCausalLM`** — Docs row names GLM-5, GLM-5.1 and GLM-5.2. MTP maps glm_moe_dsa to DeepseekV32MTPModel. v0.29.0 release notes: GLM-5.2 no longer uses dense MHA (#52512), SM100 sparse MLA for GLM-5.2 (#52783), DeepSeek V3.2 / GLM-5.2 DSA routed to the optimized CUDA path on all GPUs (#52861), --dcp-q-replicate default-on for GLM sparse attention (#50382).
+- **`Glm5NextForConditionalGeneration`** — Absent from the native registry and the supported-models doc at this snapshot. Other loading paths are not assessed.
+- **`KimiK25ForConditionalGeneration`** — Docs row names Kimi-K2.5 with text + image inputs. No model-specific speculative-decoding mapping for kimi_k25 appears in speculative.py.
+- **`KimiK3ForConditionalGeneration`** — MTP: kimi_k3 maps to KimiK3MTPModel, reading num_nextn_predict_layers from text_config. DSpark: speculative.py recognizes a K3DSparkModel draft architecture, and the release notes add Kimi-K3 DCP with DSpark (#52188); where a K3 DSpark draft checkpoint comes from is not stated in these sources. Release notes also add Kimi K3 NVFP4 checkpoints (#53132).
+- **`Qwen3ForCausalLM`** — The reasoning guide maps the Qwen3 series to --reasoning-parser qwen3.
+- **`Qwen3MoeForCausalLM`** — The reasoning guide maps the Qwen3 series to --reasoning-parser qwen3.
+- **`Qwen3_5ForConditionalGeneration`** — Docs row names Qwen3.5 (text + image + video). MTP maps qwen3_5 to Qwen3_5MTP. Release notes: fused GDN MTP for all Qwen head ratios (#52539), partial LoRA on Qwen3.5/3.6 GatedDeltaNet fixed (#47640).
+- **`Qwen3_5MoeForConditionalGeneration`** — Docs row names Qwen3.5-MOE. MTP maps qwen3_5_moe to Qwen3_5MoeMTP.
+- **`Qwen3_5MoeForCausalLM`** — Registered in code but not listed in supported_models.md at this snapshot. MTP handling explicitly covers the text-only qwen3_5_moe_text model type (the model_type of the Qwen3.8-2.4T-A95B config).
+- **`Qwen4ExpForConditionalGeneration`** — Added in v0.29.0 per the release notes ('Qwen3.8-Flash-Next with BF16/FP8/NVFP4 and MTP (#53896)'), but not yet listed in supported_models.md. MTP maps qwen4_exp / qwen4_exp_text to qwen4_exp_mtp.
+
+## Technique support
+
+| Glossary entry | Implementation | Flags | Since | Evidence |
+|---|---|---|---|---|
+| [dsa](../../../docs/glossary/dsa.md) | DeepseekV32ForCausalLM and GlmMoeDsaForCausalLM share the deepseek_v32 implementation; sparse-MLA attention backends (FLASHMLA_SPARSE, FLASHINFER_MLA_SPARSE, FLASH_ATTN_MLA_SPARSE, ROCM_AITER_MLA_SPARSE, XPU_MLA_SPARSE). | — | _unknown_ | [registry.py#L122](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py#L122), [registry.py#L83](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L83), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [indexshare](../../../docs/glossary/indexshare.md) | IndexCache: layers marked F compute and cache top-k indices, layers marked S reuse the previous layer's indices; configured per layer or by frequency. | `--hf-overrides '{"use_index_cache": true, "index_topk_freq": 4}'`<br>`--hf-overrides '{"use_index_cache": true, "index_topk_pattern": "FFSF..."}'` | _unknown_ | [index_cache.md#L3](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md#L3), [index_cache.md#L26](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md#L26) |
+| [mla](../../../docs/glossary/mla.md) | Dedicated MLA attention backends: FLASHMLA, FLASHINFER_MLA, TRITON_MLA, CUTLASS_MLA, FLASH_ATTN_MLA, TOKENSPEED_MLA, ROCM_AITER_MLA, CPU_MLA, AMX_MLA; KV cache dtype fp8_ds_mla. | — | _unknown_ | [registry.py#L82](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L82), [cache.py#L47](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/cache.py#L47), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [mtp](../../../docs/glossary/mtp.md) | Speculative method 'mtp' using the target model's native MTP layers; per-family mappings in SpeculativeConfig.hf_config_override (deepseek_mtp, glm4_moe_mtp, qwen3_5_mtp, qwen4_exp_mtp, kimi_k3_mtp, among others). | `--speculative-config '{"method":"mtp","num_speculative_tokens":1}'` | _unknown_ | [speculative.py#L37](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L37), [mtp.md#L3](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/mtp.md#L3) |
+| [speculative-decoding](../../../docs/glossary/speculative-decoding.md) | Draft-module methods dspark, dflash, eagle, eagle3 and draft_model. DSpark: DeepSeek-V4 draft weights load from the target checkpoint (DSparkDraftModel); Qwen3, Qwen3-Omni, Gemma4 and K3 DSpark draft architectures are also recognized; dflash and dspark force parallel drafting. Adaptive verification (verification length sized from drafter confidence) is documented as DSpark-only. | `--speculative-config '{"method":"dspark",...}'` | _unknown_ | [speculative.py#L67](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L67), [speculative.py#L1376](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1376), [speculative.py#L1404](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L1404), [speculative.py#L178](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py#L178), [README.md#L40](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/README.md#L40) |
+| [gated-deltanet](../../../docs/glossary/gated-deltanet.md) | GDN_ATTN backend in MambaAttentionBackendEnum; fused GDN MTP kernels for Qwen models. | — | _unknown_ | [registry.py#L190](https://github.com/vllm-project/vllm/blob/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py#L190), [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [kda](../../../docs/glossary/kda.md) | Fused KDA decode kernel on AMD MI325X (ROCm), per the release notes. | — | _unknown_ | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+| [mhc](../../../docs/glossary/mhc.md) | DeepSeek-V4 mHC handled in the model implementation; v0.29.0 keeps mHC broadcast buffers stable across RL weight sync and adds ROCm mHC/RMSNorm fusions. | — | _unknown_ | [release notes](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) |
+
+- **dsa** — v0.29.0: DeepSeek V3.2 / GLM-5.2 DSA routed to the optimized CUDA path on all GPUs (#52861); PCP for DSv3.2 sparse MLA (#52046).
+- **indexshare** — Documented for DeepSeek-V3.2 'or compatible DSA model'. The doc does not mention GLM-5.2's shipped indexer_types partition, so whether vLLM reads GLM-5.2's config-native pattern is not established by these sources.
+- **mla** — v0.29.0 adds an AMX high-performance MLA backend for DeepSeek V2/V3/R1 on CPU (#52616).
+- **speculative-decoding** — The DeepSeek-V4-Flash-0731 model card's vLLM command uses num_speculative_tokens 7 against a trained block size of 5. In this snapshot, a strict num_speculative_tokens == block_size check is visible only in the Qwen3-Omni DSpark validator; for DeepSeek-V4, num_speculative_tokens defaults to the draft config's n_predict when unset. No DeepSeek-V4-specific validation was found in speculative.py.
+- **kda** — Only release-note evidence in this snapshot's sources; the backend or module implementing KDA for Kimi K3 on other platforms is not among the sources.
+- **mhc** — Only release-note evidence in this snapshot's sources.
+
+## Open questions
+
+- Docs lag code in this snapshot, three ways: Qwen3_5MoeForCausalLM and Qwen4ExpForConditionalGeneration are in the native registry but absent from supported_models.md; and supported_models.md leaves DeepSeek-V4's LoRA column empty although the same release adds DeepSeek V4 LoRA (#53361). The record follows code for registry membership and records the doc columns as-is.
+- DeepSeek-V4.1-Flash (DeepseekV41ForCausalLM) and GLM-5.3-Flash (Glm5NextForConditionalGeneration) are absent from the native registry. Whether they load through the Transformers modeling backend or a plugin was not assessed — v1 records native registry membership only. The next snapshot (or an on-demand refresh) is the place to record their arrival.
+- CSA/HCA (DeepSeek-V4) has dedicated-looking backends (FLASHMLA_SPARSE_DSV4, FLASHINFER_MLA_SPARSE_DSV4, ROCM_FLASHMLA_SPARSE_DSV4) and release notes mention 'C4A top-k' and 'C4 compressor' kernels on ROCm, but no source in this snapshot names CSA or HCA, so csa-hca is deliberately not asserted in technique_support.
+- Glossary gap: vLLM's MXFP4 / NVFP4 weight and KV-cache formats are serving-format support, while the existing fp4-qat glossary entry describes a training recipe. Asserting fp4-qat from a quantization method name would conflate the two; a format-level glossary entry (or registry mapping) is needed before FP4 serving support can become a typed edge.
+- Model-to-parser mappings are stated in the docs for only a few families (Qwen3 series -> qwen3 reasoning parser, GLM-4.7 -> glm47 tool parser). Parsers named deepseek_v4 and kimi_k3 exist in both registries, but no doc in this snapshot maps them to a model, so model_support leaves those fields UNKNOWN.
+- KimiK3: speculative.py recognizes a K3DSparkModel draft architecture and the release notes add K3 DCP with DSpark, but the Kimi K3 model record says its trained draft (EAGLE-3 from the MTP layer) was withheld from the open weights. Where a K3 DSpark draft checkpoint comes from is not stated in these sources.
+- Sequence parallelism is evidenced only by the release-note statement that it still falls back to Model Runner V1; its configuration surface is not among the snapshot's sources.
+- Source reproducibility: release notes come from the GitHub releases API, whose JSON carries mutable counters (asset download counts). The sourcing layer stores and hashes only the release `body` (release_notes.md), so the manifest stays reproducible; every other asset is a raw file pinned to the tag commit.
+
+## Sources
+
+- <https://api.github.com/repos/vllm-project/vllm/releases/tags/v0.29.0>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/models/registry.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/models/supported_models.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/speculative.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/README.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/speculative_decoding/mtp.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/index_cache.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/reasoning/__init__.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/reasoning_outputs.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/tool_parsers/__init__.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/tool_calling.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/model_executor/layers/quantization/__init__.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/quantization/README.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/quantization/quantized_kvcache.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/cache.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/v1/attention/backends/registry.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/attention_backends.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/vllm/config/parallel.py>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/arch_overview.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/prefix_caching.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/design/hybrid_kv_cache_manager.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_prefill.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/disagg_encoder.md>
+- <https://raw.githubusercontent.com/vllm-project/vllm/98dff2a81d747d1dba01a47f939f48c3526d4206/docs/features/README.md>

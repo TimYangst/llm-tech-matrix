@@ -23,7 +23,8 @@ What lives here:
   (URL, sha256, filename, kind, optional archive_url).
 - `fetch.py` — CLI for downloading assets and verifying checksums:
   - `add` — register a new asset (downloads, computes sha256, appends to manifest)
-  - `fetch` — re-download every asset listed in a manifest into the cache directory
+  - `fetch` — re-download every asset listed in a manifest into the cache directory; continues past
+    failures and ends with a `FETCH REPORT` (see conventions, "When `fetch` reports a failure")
   - `verify` — compare cached files against recorded sha256 without re-downloading
   - `list` — enumerate all manifests in the repo
 
@@ -118,3 +119,11 @@ contract, in parallel subtrees: `data/sources/engines/<slug>/` and
 `data/extracted/engines/<slug>.json`. It has its own schema and version. Every model-side
 glob is non-recursive, so the two tracks cannot interfere, and model and engine records meet
 only in synthesis. Design: [`engines/overview.md`](./engines/overview.md).
+
+Code per layer:
+
+- **Sourcing:** `sourcing --track engines`, with asset kinds `repo_file` and `release_notes`.
+- **Extraction:** `engine_schema.py`, `extraction/render_engine.py`, `.claude/skills/extract-engine/`,
+  plus the engine branch of `scripts/validate_extractions.py`, which also checks the cross-links
+  to model and glossary slugs.
+- **Synthesis:** planned for E4.

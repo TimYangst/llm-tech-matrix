@@ -17,6 +17,8 @@ AssetKind = Literal[
     "tech_report",  # PDF hosted by the lab/vendor (non-arxiv)
     "blog_html",  # blog post / release notes (HTML)
     "model_card",  # HuggingFace model card or vendor model card
+    "repo_file",  # a file (code or in-repo doc) from a git repository, pinned to a commit
+    "release_notes",  # GitHub releases API JSON for a tag; only its `body` is stored and hashed
     "other",  # everything else; describe in `description`
 ]
 
@@ -42,7 +44,7 @@ class Asset(_Strict):
 
 
 class SourceManifest(_Strict):
-    """One per model. Lives at data/sources/<slug>/manifest.json."""
+    """One per model or engine snapshot. Lives at data/sources/[engines/]<slug>/manifest.json."""
 
     slug: str
     assets: list[Asset]

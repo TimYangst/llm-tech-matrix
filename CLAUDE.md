@@ -20,14 +20,14 @@ A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI
 - Naming, file layout, schema versioning: [`docs/conventions.md`](./docs/conventions.md)
 - Dev environment, lint, CI, AI review, PR conventions: [`docs/development.md`](./docs/development.md)
 - Per-model status: [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)
-- Engines track (vLLM / SGLang / verl / VeOmni — design stage): [`docs/engines/overview.md`](./docs/engines/overview.md), status in [`tasks/ENGINES.md`](./tasks/ENGINES.md)
+- Engines track (vLLM / SGLang / verl / VeOmni): design [`docs/engines/overview.md`](./docs/engines/overview.md), schema [`docs/engines/schema.md`](./docs/engines/schema.md), status [`tasks/ENGINES.md`](./tasks/ENGINES.md)
 
 ## Cardinal rules (load-bearing)
 
 These rules underpin the project's value. Do not violate them, even if asked to "just fill it in":
 
 1. **No hallucination.** Missing information is the literal string `"[Unknown/Not Disclosed]"`. Never guess from training-data priors. See [`docs/schema.md`](./docs/schema.md#cardinal-rule-no-hallucination).
-2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py`. Do not invent fields, rename fields, or skip required groups.
+2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py` (engine snapshots in `data/extracted/engines/` against `engine_schema.py`). Do not invent fields, rename fields, or skip required groups.
 3. **Closed-model inferences go in `inferred_fields`.** The primary field stays `"[Unknown/Not Disclosed]"`. Synthesis tools opt in to inferred values; default is to ignore them.
 4. **Schema changes are versioned.** Bump `schema_version` and update [`docs/conventions.md`](./docs/conventions.md#schema-changelog) on any breaking change.
 
