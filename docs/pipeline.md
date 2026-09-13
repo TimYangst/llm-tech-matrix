@@ -110,3 +110,11 @@ Code: `src/llm_tech_matrix/synthesis/`
 - **Synthesis** asks new questions over time. It should re-read extracted JSON, not re-trigger extraction.
 
 The contract is the JSON file. As long as `data/extracted/<model>.json` validates against `schema.py`, all three layers can iterate independently.
+
+## Engines track
+
+The engines track (vLLM, SGLang, verl, VeOmni) reuses all three layers and the same
+contract, in parallel subtrees: `data/sources/engines/<slug>/` and
+`data/extracted/engines/<slug>.json`. It has its own schema and version. Every model-side
+glob is non-recursive, so the two tracks cannot interfere, and model and engine records meet
+only in synthesis. Design: [`engines/overview.md`](./engines/overview.md).

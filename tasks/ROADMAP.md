@@ -1,6 +1,6 @@
 # Per-Model Roadmap
 
-Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequencing), see [`../docs/roadmap.md`](../docs/roadmap.md). For how to pick up the project from a fresh session, see [`../docs/session-start.md`](../docs/session-start.md).
+Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequencing), see [`../docs/roadmap.md`](../docs/roadmap.md). For how to pick up the project from a fresh session, see [`../docs/session-start.md`](../docs/session-start.md). Engine snapshots (vLLM, SGLang, verl, VeOmni) are tracked separately in [`ENGINES.md`](./ENGINES.md).
 
 ## Current focus
 
