@@ -1,4 +1,4 @@
-# Engine Snapshot Schema (engine schema v1)
+# Engine Snapshot Schema (engine schema v2)
 
 The contract for `data/extracted/engines/<slug>.json`. The executable version is
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py); if the
@@ -31,8 +31,9 @@ v8). A record declares `engine_schema_version`.
 - `name`, `engine` (lowercase id used in the slug), `organization`, `repository` (upstream,
   never a fork), `license` (SPDX)
 - `release_tag`, `commit_sha`, `release_date` (`YYYY-MM-DD` or UNKNOWN), `snapshot_date`
-- `roles` — list of `"inference"` / `"training"` / `"rl_post_training"`. **v1 implements only
-  `inference`**; a record claiming the other two fails validation until their subobjects exist.
+- `roles` — list of `"inference"` / `"training"` / `"rl_post_training"`. each role has exactly one subobject —
+  `inference` → `serving`, `training` → `training`, `rl_post_training` → `rl` — present exactly
+  when the role is claimed. Claim a role only when the snapshot's own sources document it.
 - `hardware` — platforms the snapshot's own sources name
 - `sources` — every URL in the snapshot's manifest
 
@@ -55,23 +56,45 @@ or UNKNOWN.
 A parser or backend *name* matching a model family is not a model mapping — mappings live
 in `model_support[]` and only where docs state them.
 
+### `training` (role `training`, v2)
+
+- Lists: `workloads` (pre-training, SFT, DPO, RL trainer backend…), `backends` (as the config
+  names them, e.g. `fsdp2`, `megatron`), `optimizers`
+- Prose: `mixed_precision`, `quantization_aware_training`, `checkpointing`, `lora`, `kernels`
+- `notes`, `evidence` (same per-field rule as `serving`)
+
+### `rl` (role `rl_post_training`, v2)
+
+- Lists: `algorithms` (advantage-estimator / algorithm identifiers from code), `policy_losses`,
+  `rollout_backends`, `trainer_modes`, `weight_sync_backends`
+- Prose: `weight_sync`, `routing_replay`, `reward`, `distillation`
+- `notes`, `evidence` (same per-field rule)
+
 ### `integrations[]`
 
-`{name, relation, engine_slug, notes, evidence}`. `relation` ∈ `kernel_library` /
-`kv_transfer` / `rollout_backend` / `training_backend` / `other`. `engine_slug` is set when
-the counterpart is itself a tracked engine snapshot.
+`{name, relation, engine_slug, version_constraints, notes, evidence}`. `relation` is the
+counterpart's role relative to *this* engine: `kernel_library` / `kv_transfer` /
+`rollout_backend` / `training_backend` / `used_by` / `other` (verl lists vLLM as
+`rollout_backend`; VeOmni lists verl as `used_by`). `engine_slug` is set when the counterpart
+is itself a tracked engine snapshot, and must exist. `version_constraints` (v2) records each
+source's version requirement side by side, naming the source — they often disagree (verl v0.9.0:
+`setup.py` pins SGLang 0.5.8, Docker uses 0.5.12, docs say 0.4.8).
 
 ### `model_support[]`
 
-One row per HF architecture (`architectures[0]`), the join key to model records. "Native
-registry" means the engine's built-in model list, whatever form it takes: vLLM's static
-`registry.py` table, or SGLang's `EntryClass` declarations under `srt/models/`.
+One row per HF architecture (`architectures[0]`), the join key to model records.
 
 - `hf_architecture`, `model_slugs` (model records using it)
-- `in_native_registry` — bool. **Absent architectures get a row too**, with whole-file
-  evidence; absence from the native registry is a snapshot fact, not a claim the model
-  cannot run through another path.
-- `implementation` — module / class the registry maps to
+- `support` (v2) — one of:
+  - `registered`: in the engine's built-in model registry, whatever form it takes — vLLM's
+    static `registry.py`, SGLang's `EntryClass` declarations, VeOmni's `MODELING_REGISTRY` keyed
+    by model_type;
+  - `model_specific`: no registry entry (or no registry at all, like verl), but code or docs
+    written for this architecture or its model_type exist at the commit;
+  - `not_found`: neither, verified across the whole repository at the commit. **Absent
+    architectures get a row too**, with whole-file evidence; this is a snapshot fact, not a
+    claim the model cannot run through a generic path (HF Transformers backends, FSDP).
+- `implementation` — module / class / patch that implements it
 - `documented` — covered by the engine's supported-models docs (docs can lag code; vLLM's are
   architecture-level, SGLang's family-level — say which in `notes`)
 - `features` — per-model doc columns, e.g. `{"lora": "marked", "pp": "not marked"}`
@@ -98,10 +121,8 @@ recipe. Unassertable near-misses belong in `open_questions`.
 Doc/code disagreements, name-based near-misses, reproducibility caveats, and things a later
 snapshot should settle.
 
-## Not in v1 (deliberately)
+## Not in v2 (deliberately)
 
-- `training` and `rl` role subobjects — arrive with the first snapshots that need them
-  (`verl-v0.9.0`, `veomni-v0.1.12`, phase E3).
 - Registry slots / generated "Implemented by (engines)" tables / support matrix — phase E4.
 - Assessing non-native loading paths (Transformers modeling backend, plugins) for absent
   architectures.

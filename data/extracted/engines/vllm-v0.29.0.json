@@ -1,5 +1,5 @@
 {
-  "engine_schema_version": 1,
+  "engine_schema_version": 2,
   "metadata": {
     "name": "vLLM",
     "engine": "vllm",
@@ -412,7 +412,7 @@
         "deepseek-v3",
         "kimi-k2-thinking"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "deepseek_v2.DeepseekV3ForCausalLM",
       "documented": true,
       "features": {
@@ -435,7 +435,7 @@
       "model_slugs": [
         "deepseek-v3.2-exp"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "deepseek_v32 (registry entry spans multiple lines)",
       "documented": true,
       "features": {
@@ -461,7 +461,7 @@
         "deepseek-v4-flash",
         "deepseek-v4-flash-0731"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "vllm.models.deepseek_v4.DeepseekV4ForCausalLM",
       "documented": true,
       "features": {
@@ -489,7 +489,7 @@
       "model_slugs": [
         "deepseek-v4.1-flash"
       ],
-      "in_native_registry": false,
+      "support": "not_found",
       "implementation": "[Unknown/Not Disclosed]",
       "documented": false,
       "features": {},
@@ -506,7 +506,7 @@
       "model_slugs": [
         "glm-4.7"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "glm4_moe.Glm4MoeForCausalLM",
       "documented": true,
       "features": {
@@ -543,7 +543,7 @@
         "glm-5.1",
         "glm-5.2"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "vllm.models.deepseek_v32.GlmMoeDsaForCausalLM (implemented in the DeepSeek-V3.2 DSA module)",
       "documented": true,
       "features": {
@@ -567,7 +567,7 @@
       "model_slugs": [
         "glm-5.3-flash"
       ],
-      "in_native_registry": false,
+      "support": "not_found",
       "implementation": "[Unknown/Not Disclosed]",
       "documented": false,
       "features": {},
@@ -585,7 +585,7 @@
         "kimi-k2.5",
         "kimi-k2.6"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "kimi_k25.KimiK25ForConditionalGeneration",
       "documented": true,
       "features": {
@@ -605,7 +605,7 @@
       "model_slugs": [
         "kimi-k3"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "kimi_k3 (registry entry spans multiple lines)",
       "documented": true,
       "features": {
@@ -631,7 +631,7 @@
       "model_slugs": [
         "qwen3-32b"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "qwen3.Qwen3ForCausalLM",
       "documented": true,
       "features": {
@@ -663,7 +663,7 @@
       "model_slugs": [
         "qwen3-235b-a22b"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "qwen3_moe.Qwen3MoeForCausalLM",
       "documented": true,
       "features": {
@@ -697,7 +697,7 @@
         "qwen3.6-27b",
         "qwen3.8-27b"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "qwen3_5.Qwen3_5ForConditionalGeneration",
       "documented": true,
       "features": {
@@ -722,7 +722,7 @@
         "qwen3.5-35b-a3b",
         "qwen3.6-35b-a3b"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "qwen3_5 (registry entry spans multiple lines)",
       "documented": true,
       "features": {
@@ -745,7 +745,7 @@
       "model_slugs": [
         "qwen3.8-2.4t-a95b"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "qwen3_5.Qwen3_5MoeForCausalLM",
       "documented": false,
       "features": {},
@@ -764,7 +764,7 @@
       "model_slugs": [
         "qwen3.8-flash-next"
       ],
-      "in_native_registry": true,
+      "support": "registered",
       "implementation": "registry entry spans multiple lines (module not recorded)",
       "documented": false,
       "features": {},

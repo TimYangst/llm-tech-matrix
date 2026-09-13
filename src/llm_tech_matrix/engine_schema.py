@@ -1,4 +1,4 @@
-"""Pydantic models for the engine snapshot schema (engine schema v1).
+"""Pydantic models for the engine snapshot schema (engine schema v2).
 
 Engines (vLLM, SGLang, verl, VeOmni) are a second record type, parallel to the model
 records validated by `schema.py`. Records live at `data/extracted/engines/<slug>.json`.
@@ -12,25 +12,31 @@ Cardinal rules carried over from the model track, tightened for engines:
 - Missing information is the literal string UNKNOWN below.
 - Every support claim carries evidence: URLs pinned to the snapshot commit (GitHub `blob/<sha>`
   URLs with `#L` line anchors where possible) or the tag's release notes. `EngineRecord`
-  enforces that populated serving fields, parallelism entries, model rows and technique rows
-  all cite something.
-- v1 implements only the `inference` role. `training` and `rl_post_training` are part of the
-  vocabulary but their subobjects arrive with the first snapshot that needs them (E3), so a
-  record claiming those roles fails validation for now instead of silently carrying nothing.
+  enforces that populated role-subobject fields, parallelism entries, integrations, model
+  rows and technique rows all cite something.
+- Each role has exactly one subobject: `inference` -> `serving`, `training` -> `training`,
+  `rl_post_training` -> `rl`. A subobject is present exactly when its role is claimed.
 """
 
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ENGINE_SCHEMA_VERSION = 1
+ENGINE_SCHEMA_VERSION = 2
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 EngineRole = Literal["inference", "training", "rl_post_training"]
-IMPLEMENTED_ROLES: frozenset[str] = frozenset({"inference"})
+ROLE_SUBOBJECTS: dict[str, str] = {
+    "inference": "serving",
+    "training": "training",
+    "rl_post_training": "rl",
+}
+# The counterpart's role relative to THIS engine: verl's record lists vLLM as its
+# `rollout_backend`; VeOmni's record lists verl as `used_by`.
 IntegrationRelation = Literal[
-    "kernel_library", "kv_transfer", "rollout_backend", "training_backend", "other"
+    "kernel_library", "kv_transfer", "rollout_backend", "training_backend", "used_by", "other"
 ]
+SupportLevel = Literal["registered", "model_specific", "not_found"]
 
 
 class _Strict(BaseModel):
@@ -92,14 +98,38 @@ class Parallelism(_Strict):
 # ---------- 3. Role subobjects ----------
 
 
-class Serving(_Strict):
-    """The `inference` role: what the serving engine offers at this snapshot.
+class _EvidencedSection(_Strict):
+    """A role subobject whose populated fields each carry evidence.
 
     List fields record the engine's own registries at the pinned commit (method literals,
-    enum members, parser registries), so they are reproducible rather than curated. Prose
-    fields summarize the design docs. `evidence` maps each populated field name to the URLs
-    that back it; validation requires an entry for every populated field.
+    enum members, config choices), so they are reproducible rather than curated. Prose fields
+    summarize the design docs. `evidence` maps each populated field name to the URLs that back
+    it; validation requires an entry for every populated field and no entries for empty ones.
     """
+
+    def populated_fields(self) -> list[str]:
+        out = []
+        for name in type(self).model_fields:
+            if name in ("notes", "evidence"):
+                continue
+            value = getattr(self, name)
+            if value and value != UNKNOWN:
+                out.append(name)
+        return out
+
+    def evidence_errors(self, section: str) -> list[str]:
+        populated = self.populated_fields()
+        evidence: dict[str, list[str]] = getattr(self, "evidence")  # noqa: B009
+        errors = [f"{section}.{f}: no evidence" for f in populated if not evidence.get(f)]
+        errors += [
+            f"{section}.evidence[{k!r}]: field is not populated"
+            for k in sorted(set(evidence) - set(populated))
+        ]
+        return errors
+
+
+class Serving(_EvidencedSection):
+    """The `inference` role: what the serving engine offers at this snapshot."""
 
     api_surfaces: list[str] = Field(default_factory=list)
     scheduler: str = UNKNOWN
@@ -117,15 +147,61 @@ class Serving(_Strict):
     notes: str = ""
     evidence: dict[str, list[str]] = Field(default_factory=dict)
 
-    def populated_fields(self) -> list[str]:
-        out = []
-        for name in type(self).model_fields:
-            if name in ("notes", "evidence"):
-                continue
-            value = getattr(self, name)
-            if value and value != UNKNOWN:
-                out.append(name)
-        return out
+
+class Training(_EvidencedSection):
+    """The `training` role: what a training framework offers at this snapshot (added in v2).
+
+    Driven by VeOmni v0.1.12 (a training framework) and verl v0.9.0 (whose SFT trainer and
+    training engines are documented alongside its RL loop).
+    """
+
+    workloads: list[str] = Field(
+        default_factory=list,
+        description="Training workloads the sources document, e.g. 'pre-training', 'sft', 'dpo'",
+    )
+    backends: list[str] = Field(
+        default_factory=list,
+        description="Selectable training backends / engines as the config names them",
+    )
+    optimizers: list[str] = Field(default_factory=list)
+    mixed_precision: str = UNKNOWN
+    quantization_aware_training: str = UNKNOWN
+    checkpointing: str = UNKNOWN
+    lora: str = UNKNOWN
+    kernels: str = Field(
+        default=UNKNOWN, description="Kernel libraries / fused ops and how they are selected"
+    )
+    notes: str = ""
+    evidence: dict[str, list[str]] = Field(default_factory=dict)
+
+
+class RLPostTraining(_EvidencedSection):
+    """The `rl_post_training` role: what an RL post-training framework offers (added in v2).
+
+    Driven by verl v0.9.0. `rollout_backends` names inference engines, which may themselves be
+    tracked snapshots — the version constraints live on `integrations[]`.
+    """
+
+    algorithms: list[str] = Field(
+        default_factory=list,
+        description="Algorithm / advantage-estimator identifiers as the code names them",
+    )
+    policy_losses: list[str] = Field(default_factory=list)
+    rollout_backends: list[str] = Field(default_factory=list)
+    trainer_modes: list[str] = Field(
+        default_factory=list, description="Sync / async trainer modes as the config names them"
+    )
+    weight_sync: str = Field(
+        default=UNKNOWN, description="How trained weights reach the rollout engine"
+    )
+    weight_sync_backends: list[str] = Field(default_factory=list)
+    routing_replay: str = Field(
+        default=UNKNOWN, description="MoE routing replay between rollout and training"
+    )
+    reward: str = UNKNOWN
+    distillation: str = Field(default=UNKNOWN, description="On-policy distillation support")
+    notes: str = ""
+    evidence: dict[str, list[str]] = Field(default_factory=dict)
 
 
 # ---------- 4. Cross-links ----------
@@ -136,6 +212,14 @@ class Integration(_Strict):
     relation: IntegrationRelation
     engine_slug: str | None = Field(
         default=None, description="Engine snapshot slug when the counterpart is itself tracked"
+    )
+    version_constraints: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Versions of the counterpart this snapshot requires or was tested with, each naming "
+            "its source, e.g. 'setup.py: vllm>=0.18.0', 'Dockerfile.stable.vllm: 0.24.0'. Record "
+            "disagreeing sources side by side (added in v2)."
+        ),
     )
     notes: str = ""
     evidence: list[str] = Field(min_length=1)
@@ -167,11 +251,14 @@ class ModelDetail(_Strict):
 class ModelSupport(_Strict):
     """One model architecture as the engine sees it at this snapshot.
 
-    Absence is recorded too: an architecture missing from the engine's native model registry is
-    a fact about the snapshot. It is not a claim that the model cannot run (fallback backends
-    or plugins may exist), which is why the field is `in_native_registry`, not `supported`.
-    "Native registry" means whatever the engine treats as its built-in model list: vLLM's
-    static `registry.py` table, SGLang's `EntryClass` declarations under `srt/models/`.
+    `support` (v2, replacing v1's `in_native_registry: bool`):
+    - `registered` — in the engine's built-in model registry, whatever form it takes: vLLM's
+      static `registry.py` table, SGLang's `EntryClass` declarations, VeOmni's
+      `MODELING_REGISTRY` keyed by model_type.
+    - `model_specific` — no registry entry (or the engine has no registry, like verl), but the
+      snapshot carries code or docs written for this architecture / its model_type.
+    - `not_found` — neither. This is a fact about the snapshot, not a claim the model cannot run:
+      generic loading paths (HF Transformers backends, FSDP on any HF model) may still work.
     """
 
     hf_architecture: str = Field(description="HF `architectures[0]`, the join key to models")
@@ -179,9 +266,10 @@ class ModelSupport(_Strict):
         default_factory=list,
         description="data/extracted/<slug>.json records using this architecture",
     )
-    in_native_registry: bool
+    support: SupportLevel
     implementation: str = Field(
-        default=UNKNOWN, description="Module / class the registry maps to; UNKNOWN when absent"
+        default=UNKNOWN,
+        description="Module / class / patch that implements it; UNKNOWN when not found",
     )
     documented: bool | str = Field(
         default=UNKNOWN,
@@ -227,6 +315,8 @@ class EngineRecord(_Strict):
     metadata: EngineMetadata
     parallelism: Parallelism = Field(default_factory=Parallelism)
     serving: Serving | None = None
+    training: Training | None = None
+    rl: RLPostTraining | None = None
     integrations: list[Integration] = Field(default_factory=list)
     model_support: list[ModelSupport] = Field(default_factory=list)
     technique_support: list[TechniqueSupport] = Field(default_factory=list)
@@ -235,23 +325,15 @@ class EngineRecord(_Strict):
     @model_validator(mode="after")
     def _roles_and_evidence(self) -> "EngineRecord":
         roles = set(self.metadata.roles)
-        unimplemented = roles - IMPLEMENTED_ROLES
-        if unimplemented:
-            raise ValueError(
-                f"roles {sorted(unimplemented)} have no subobject in engine schema v1 "
-                "(training / rl subobjects land with the first snapshot that needs them)"
-            )
-        if ("inference" in roles) != (self.serving is not None):
-            raise ValueError("`serving` must be present exactly when roles include 'inference'")
-        if self.serving is not None:
-            missing = [
-                f for f in self.serving.populated_fields() if not self.serving.evidence.get(f)
-            ]
-            if missing:
-                raise ValueError(f"serving fields without evidence: {missing}")
-            stray = sorted(set(self.serving.evidence) - set(self.serving.populated_fields()))
-            if stray:
-                raise ValueError(f"serving.evidence keys for unpopulated fields: {stray}")
+        errors: list[str] = []
+        for role, attr in ROLE_SUBOBJECTS.items():
+            section = getattr(self, attr)
+            if (role in roles) != (section is not None):
+                errors.append(f"`{attr}` must be present exactly when roles include {role!r}")
+            if section is not None:
+                errors += section.evidence_errors(attr)
+        if errors:
+            raise ValueError("; ".join(errors))
         for row in self.model_support:
             slugs = [d.model_slug for d in row.model_details]
             stray = sorted(set(slugs) - set(row.model_slugs))

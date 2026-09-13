@@ -1,0 +1,563 @@
+{
+  "engine_schema_version": 2,
+  "metadata": {
+    "name": "VeOmni",
+    "engine": "veomni",
+    "organization": "ByteDance-Seed",
+    "repository": "https://github.com/ByteDance-Seed/VeOmni",
+    "license": "Apache-2.0",
+    "release_tag": "v0.1.12",
+    "commit_sha": "fd99abfda9ef4d9d485f0dae14841de88d30963d",
+    "release_date": "2026-09-09",
+    "snapshot_date": "2026-09-13",
+    "roles": [
+      "training"
+    ],
+    "hardware": [
+      "NVIDIA GPU",
+      "AMD ROCm (through PyTorch's HIP backend)",
+      "Ascend NPU",
+      "Cambricon MLU"
+    ],
+    "sources": [
+      "https://api.github.com/repos/ByteDance-Seed/VeOmni/releases/tags/v0.1.12",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/README.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/pyproject.toml",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/_version.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/auto.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v3/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/deepseek_v4_gpu_patch_gen_config.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/checkpoint_tensor_converter.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/parallel_plan.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/glm_moe_dsa/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/glm_moe_dsa/glm_moe_dsa_gpu_patch_gen_config.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_moe/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/qwen3_5_gpu_patch_gen_config.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5_moe/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/patchgen.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/support_new_models/guide_and_checklist.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/deepseek_v4_context_parallel.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/deepseek_v4_indexer_loss.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/verl_topk_distill_integration.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/fused_moe_kernels.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/ops/kernel_registry.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/ops/kernels/moe/__init__.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/ops/kernels/cross_entropy/chunk_logprobs.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/utils/moe_router_replay.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/trainer/base_rl_trainer.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/checkpoint/dcp_checkpointer.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/optim/muon.py",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/lora.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/ulysses.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/ep_fsdp2.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/hardware_support/get_started_npu.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/hardware_support/rocm/README.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/hardware_support/mlu/README.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/basic_modules.md",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/configs/text/deepseek_v4.yaml",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/configs/text/qwen3_moe_muon.yaml",
+      "https://raw.githubusercontent.com/ByteDance-Seed/VeOmni/fd99abfda9ef4d9d485f0dae14841de88d30963d/tasks/train_text_dpo.py"
+    ]
+  },
+  "parallelism": {
+    "tensor": {
+      "supported": false,
+      "implementation": "tp_size (field exists)",
+      "notes": "Configuration asserts tp_size == 1: 'Tensor parallel size not supported yet.'",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L889"
+      ]
+    },
+    "pipeline": {
+      "supported": false,
+      "implementation": "pp_size (field exists)",
+      "notes": "Configuration asserts pp_size == 1: 'Pipeline parallel size not supported yet.'",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L890"
+      ]
+    },
+    "data": {
+      "supported": true,
+      "implementation": "fsdp_config.fsdp_mode: ddp | fsdp2 (FSDP1 removed)",
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L444"
+      ]
+    },
+    "expert": {
+      "supported": true,
+      "implementation": "ep_size, with per-model parallel_plan.py shard plans; EP + FSDP2",
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L561",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/ep_fsdp2.md#L5"
+      ]
+    },
+    "context": {
+      "supported": true,
+      "implementation": "cp_size (all-gathered KV, query-axis sharding)",
+      "notes": "DeepSeek-V4 only (CONTEXT_PARALLEL_MODEL_TYPES allow-list) and GPU-only in this release.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L593",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/auto.py#L50",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/auto.py#L95"
+      ]
+    },
+    "sequence": {
+      "supported": true,
+      "implementation": "ulysses_size (DeepSpeed-Ulysses), optional Async Ulysses",
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L585",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/ulysses.md#L311"
+      ]
+    }
+  },
+  "training": {
+    "workloads": [
+      "pre-training",
+      "post-training",
+      "DPO",
+      "RL trainer backend"
+    ],
+    "backends": [
+      "fsdp2",
+      "ddp"
+    ],
+    "optimizers": [
+      "adamw",
+      "anyprecision_adamw",
+      "muon"
+    ],
+    "mixed_precision": "FSDP2 MixedPrecisionConfig: param_dtype bfloat16 and reduce_dtype float32 by default.",
+    "quantization_aware_training": "qat_implementation none | fp8_blockwise: a DeepSeek-V4 quantization-aware training recipe (block-wise FP8 fake quantization; routed experts use FP4 groups when the checkpoint's expert dtype is FP4).",
+    "checkpointing": "Torch Distributed Checkpoint (dcp.save / dcp.async_save / dcp.load).",
+    "lora": "VeOmni's own PEFT-free LoRA stack (veomni.lora) with MoE-LoRA and EP-LoRA, FSDP2-native.",
+    "kernels": "Kernel selection is config-driven (OpsImplementationConfig) through a kernel registry: Liger-Kernel defaults for cross-entropy / RMSNorm / SwiGLU / RoPE on GPU; fused MoE (Triton group-GEMM, Quack, NPU, MLU); DSA indexer and attention kernels (cuDNN / FlashMLA-cuDNN for GLM-DSA, TileLang for DeepSeek-V4); tile-kernels mHC.",
+    "notes": "Models become supported through registries keyed by HF model_type (MODELING_REGISTRY etc.) plus patchgen-generated modeling files instead of runtime monkey patches. The RL trainer is a backend for RL frameworks; the RL algorithms themselves live in verl.",
+    "evidence": {
+      "workloads": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/README.md#L20",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/tasks/train_text_dpo.py#L2",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/trainer/base_rl_trainer.py#L16"
+      ],
+      "backends": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L444",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/README.md#L41"
+      ],
+      "optimizers": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L73"
+      ],
+      "mixed_precision": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L413"
+      ],
+      "quantization_aware_training": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L1224",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md#L196"
+      ],
+      "checkpointing": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/checkpoint/dcp_checkpointer.py#L781"
+      ],
+      "lora": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/key_features/lora.md#L8"
+      ],
+      "kernels": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L21",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L18",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/ops/kernel_registry.py#L180",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L166"
+      ]
+    }
+  },
+  "integrations": [
+    {
+      "name": "verl",
+      "relation": "used_by",
+      "engine_slug": "verl-v0.9.0",
+      "version_constraints": [],
+      "notes": "VeOmni exposes contracts that verl's VeOmni engine consumes: top-k forward-KL distillation without materializing student logits, chunked fused log-probs mirroring verl's FusedLinearForPPOFunction, and R2/R3 MoE router replay hooks. VeOmni does not import verl.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/verl_topk_distill_integration.md#L54",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/ops/kernels/cross_entropy/chunk_logprobs.py#L25",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/utils/moe_router_replay.py#L21"
+      ]
+    },
+    {
+      "name": "Hugging Face Transformers",
+      "relation": "other",
+      "version_constraints": [
+        "pyproject.toml default group: transformers==5.9.0"
+      ],
+      "notes": "Modeling code is generated from transformers' modeling files (patchgen), so the transformers version is load-bearing.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/pyproject.toml#L169",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/patchgen.md#L3"
+      ]
+    },
+    {
+      "name": "Liger-Kernel",
+      "relation": "kernel_library",
+      "version_constraints": [],
+      "notes": "Default GPU implementation for cross-entropy, RMSNorm, SwiGLU and RoPE.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/pyproject.toml#L71",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L21"
+      ]
+    },
+    {
+      "name": "tile-kernels",
+      "relation": "kernel_library",
+      "version_constraints": [
+        "pyproject.toml gpu extra: tile-kernels==1.0.0"
+      ],
+      "notes": "Provides the DeepSeek-V4 mHC implementation.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/pyproject.toml#L81",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L166"
+      ]
+    }
+  ],
+  "model_support": [
+    {
+      "hf_architecture": "DeepseekV3ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3",
+        "kimi-k2-thinking"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/deepseek_v3 (MODELING_REGISTRY 'deepseek_v3', patchgen GPU/NPU modeling, EP parallel plan)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v3/__init__.py#L18"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV32ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3.2-exp"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The architecture string appears nowhere at the commit (DeepSeek-V3.2 is only cited as the source of the indexer-loss equation).",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV4ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4-pro",
+        "deepseek-v4-flash",
+        "deepseek-v4-flash-0731"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/deepseek_v4 (config + modeling registries, patchgen modeling, EP parallel plan, checkpoint tensor converter)",
+      "documented": true,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The most extensive support in the tree: TileLang DSA indexer/attention, tile-kernels mHC, context parallelism (DeepSeek-V4 only), an indexer KL loss, FP8/FP4 QAT and a sample DeepSeek-V4-Flash-Base SFT config. MTP is explicitly not supported: the checkpoint converter drops MTP weights ('MTP not supported for now, ignore it').",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/__init__.py#L28",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/deepseek_v4/checkpoint_tensor_converter.py#L426",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/configs/text/deepseek_v4.yaml#L1"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV41ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4.1-flash"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "Glm4MoeForCausalLM",
+      "model_slugs": [
+        "glm-4.7"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "GlmMoeDsaForCausalLM",
+      "model_slugs": [
+        "glm-5",
+        "glm-5.1",
+        "glm-5.2"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/glm_moe_dsa (MODELING_REGISTRY 'glm_moe_dsa', patchgen GPU/NPU modeling)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Patchgen description 'GLM-5 with GPU replacements' (cuDNN DSA indexer, FlashMLA-cuDNN attention). Unlike the DeepSeek and Qwen MoE packages, glm_moe_dsa ships no parallel_plan.py, so no expert-parallel shard plan at this commit.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/glm_moe_dsa/__init__.py#L5",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/glm_moe_dsa/glm_moe_dsa_gpu_patch_gen_config.py#L14"
+      ]
+    },
+    {
+      "hf_architecture": "Glm5NextForConditionalGeneration",
+      "model_slugs": [
+        "glm-5.3-flash"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK25ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k2.5",
+        "kimi-k2.6"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "No Kimi model appears anywhere at the commit.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK3ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k3"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3ForCausalLM",
+      "model_slugs": [
+        "qwen3-32b"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/qwen3",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3/__init__.py#L18"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3MoeForCausalLM",
+      "model_slugs": [
+        "qwen3-235b-a22b"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/qwen3_moe (with EP parallel plan)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "A Muon config exists for Qwen3-MoE (configs/text/qwen3_moe_muon.yaml).",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_moe/__init__.py#L37",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/configs/text/qwen3_moe_muon.yaml"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5ForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-27b",
+        "qwen3.6-27b",
+        "qwen3.8-27b"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/qwen3_5 (registered for model_type qwen3_5 and qwen3_5_text; GatedDeltaNet varlen FLA + Ulysses patches)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/__init__.py#L24",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/qwen3_5_gpu_patch_gen_config.py#L21"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-35b-a3b",
+        "qwen3.6-35b-a3b"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/qwen3_5_moe (model_type qwen3_5_moe, with EP parallel plan)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5_moe/__init__.py#L46"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForCausalLM",
+      "model_slugs": [
+        "qwen3.8-2.4t-a95b"
+      ],
+      "support": "registered",
+      "implementation": "veomni/models/transformers/qwen3_5_moe (model_type qwen3_5_moe_text)",
+      "documented": "[Unknown/Not Disclosed]",
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Registered for the text-only qwen3_5_moe_text model_type, which the Qwen3.8-2.4T-A95B config declares.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5_moe/__init__.py#L74"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen4ExpForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.8-flash-next"
+      ],
+      "support": "not_found",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/loader.py",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/__init__.py"
+      ]
+    }
+  ],
+  "technique_support": [
+    {
+      "glossary_slug": "muon",
+      "implementation": "DistributedMuon (DTensor-aware, FSDP2 and MoE expert stacks) as a Muon + AdamW multi-optimizer; optional head-grouped orthogonalization ('Muon Split', GLM-5's variant).",
+      "flags": [
+        "optimizer type: muon",
+        "muon_head_group_size"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L73",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/optim/muon.py#L15",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/basic_modules.md#L427"
+      ]
+    },
+    {
+      "glossary_slug": "dsa",
+      "implementation": "DSA indexer and sparse-attention kernels (cuDNN / FlashMLA-cuDNN for GLM-DSA, TileLang for DeepSeek-V4) plus a DeepSeek-V4 indexer KL loss following DeepSeek-V3.2 eq. (4).",
+      "flags": [
+        "dsa_indexer_implementation",
+        "dsa_attention_implementation"
+      ],
+      "notes": "The indexer loss requires TileLang indexer and attention with ulysses_size == 1 and cp_size == 1.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L18",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/deepseek_v4_indexer_loss.md#L9"
+      ]
+    },
+    {
+      "glossary_slug": "mhc",
+      "implementation": "DeepSeek-V4 manifold-constrained Hyper-Connections via mhc_implementation eager | tilelang (tile-kernels).",
+      "flags": [
+        "mhc_implementation=tilelang"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md#L195",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/kernel_selection.md#L166"
+      ]
+    },
+    {
+      "glossary_slug": "gated-deltanet",
+      "implementation": "Qwen3.5 GatedDeltaNet with varlen flash-linear-attention forward and Ulysses sequence parallelism.",
+      "flags": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/models/transformers/qwen3_5/qwen3_5_gpu_patch_gen_config.py#L21"
+      ]
+    },
+    {
+      "glossary_slug": "fp4-qat",
+      "implementation": "DeepSeek-V4 QAT recipe (qat_implementation=fp8_blockwise): block-wise FP8 fake quantization, with routed experts in FP4 groups when the checkpoint's expert dtype is FP4.",
+      "flags": [
+        "qat_implementation=fp8_blockwise"
+      ],
+      "notes": "Training-time fake quantization for the DeepSeek-V4 FP4 expert format, requiring SM90+ CUDA GPUs.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/usage/arguments.md#L196",
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/veomni/arguments/arguments_types.py#L1224"
+      ]
+    },
+    {
+      "glossary_slug": "on-policy-distillation",
+      "implementation": "Chunked top-k forward-KL distillation loss for verl's distillation path, computed without materializing the [T, V] student logits.",
+      "flags": [],
+      "notes": "Engine-side kernel support consumed by verl's VeOmni engine; the distillation loop itself lives in verl.",
+      "evidence": [
+        "https://github.com/ByteDance-Seed/VeOmni/blob/fd99abfda9ef4d9d485f0dae14841de88d30963d/docs/design/verl_topk_distill_integration.md#L4"
+      ]
+    }
+  ],
+  "open_questions": [
+    "VeOmni v0.1.12 pins transformers==5.9.0, while verl v0.9.0 requires transformers>=5.5.3,!=5.6.0,<5.11 — compatible on paper. The upstream main branch later moved to transformers 5.16.1 (after this tag).",
+    "MTP is explicitly unsupported (DeepSeek-V4 checkpoint conversion drops MTP weights), while verl documents MTP training only on Megatron. A DeepSeek-V4 RL run with MTP therefore cannot use the VeOmni engine at these versions.",
+    "GLM-5.x (GlmMoeDsaForCausalLM) is registered but has no expert-parallel shard plan and no example config in configs/, unlike the DeepSeek-V4 and Qwen MoE packages; whether EP works for it is not stated.",
+    "The README claims AMD ROCm and Ascend NPU support; the ROCm doc says VeOmni contains no ROCm-specific code and runs through PyTorch's HIP backend, and several optimized kernels (DSA, mHC, QAT) require NVIDIA SM90+.",
+    "VeOmni's own RL trainer is described as a trainer backend for RL frameworks; no RL algorithm implementation (PPO/GRPO loops) exists in VeOmni, so the rl_post_training role is not claimed. RL post-training with VeRL for omni models is listed as upcoming.",
+    "MLA: DeepSeek-V4 sparse-MLA TileLang kernel modules exist in the tree but are not among this snapshot's sources, so mla is not asserted as a technique edge."
+  ]
+}

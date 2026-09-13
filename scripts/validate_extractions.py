@@ -3,8 +3,8 @@
 - data/extracted/*.json          model records   -> schema.ExtractedModel
 - data/extracted/engines/*.json  engine records  -> engine_schema.EngineRecord, plus
   cross-link checks: the filename equals `<engine>-<release_tag>`, the commit is a full SHA,
-  every `model_slugs` entry has a model record, and every `glossary_slug` has a glossary
-  entry.
+  every `model_slugs` entry has a model record, every `glossary_slug` has a glossary entry,
+  and every `integrations[].engine_slug` has an engine snapshot.
 
 Run locally:
     uv run python scripts/validate_extractions.py
@@ -49,6 +49,10 @@ def _engine_crosslinks(path: Path, record: EngineRecord) -> list[str]:
     for row in record.technique_support:
         if not (GLOSSARY_DIR / f"{row.glossary_slug}.md").exists():
             errors.append(f"technique_support: no glossary entry {row.glossary_slug!r}")
+    engines = {p.stem for p in ENGINES_DIR.glob("*.json")}
+    for row in record.integrations:
+        if row.engine_slug and row.engine_slug not in engines:
+            errors.append(f"integrations {row.name}: no engine snapshot {row.engine_slug!r}")
     return errors
 
 

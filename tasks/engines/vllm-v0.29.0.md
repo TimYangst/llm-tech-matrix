@@ -89,7 +89,7 @@ the raw JSON and broke `fetch` on a fresh clone; a Codex review caught it.
   `reasoning_parser` / `tool_call_parser` / `since_version` on the architecture row; they now
   live in per-model `model_details[]` (4 entries in this record).
 
-- **Absence rows were needed.** v1 records `in_native_registry: false` with whole-file evidence.
+- **Absence rows were needed.** Rows record absent architectures with whole-file evidence (`in_native_registry: false` in v1, `support: not_found` since v2).
   Without them the support matrix couldn't distinguish "not supported yet" from "not checked".
 
 - **Glossary gap for serving formats.** MXFP4 / NVFP4 serving support has no glossary entry
