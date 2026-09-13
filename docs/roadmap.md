@@ -36,6 +36,31 @@ Not started. Will require:
 
 Defer until M1 exit criteria are met.
 
+## Engines track (parallel to M1)
+
+**Goal**: record which engine versions serve or train which extracted models, and when each
+engine implemented each glossary technique. This track is independent of M1/M2 and does not
+block their exit criteria. Full design: [`engines/overview.md`](./engines/overview.md). Live
+status and snapshot calendar: [`../tasks/ENGINES.md`](../tasks/ENGINES.md).
+
+1. ✅ **E0: design.** Roles, layout, snapshot policy (quarterly, on-demand refresh), evidence
+   rules, draft schema.
+2. ⬜ **E1: pilot `vllm-v0.29.0`.** Engine schema v1, `extract-engine` skill, sourcing target
+   for `data/sources/engines/`, renderer, CI validation.
+3. ⬜ **E2: `sglang-v0.5.19`.** Same role, used as a cross-engine stress test.
+4. ⬜ **E3: `verl-v0.9.0`, then `veomni-v0.1.12`.** Exercises the RL and training roles and
+   integrations.
+5. ⬜ **E4: first engine synthesis.** Models × engines support matrix and one adoption-lag
+   report.
+
+Exit criteria for the first cycle:
+
+- All three role subobjects (`serving`, `training`, `rl`) exercised by at least one
+  validating record.
+- A support matrix covering every extracted model.
+- Glossary technique entries carry an "Implemented by (engines)" table that is backed by
+  typed engine fields.
+
 ## Cross-cutting initiatives
 
 These are not tied to a specific milestone:

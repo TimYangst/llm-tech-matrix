@@ -3,6 +3,7 @@
 ## Naming
 
 - **Model slug** — kebab-case, lowercase, version included. `deepseek-v3`, `llama-3.1-70b-instruct`, `qwen-2.5-72b`. Used as directory names and JSON filenames.
+- **Engine slug** — `<engine>-<release-tag>`, lowercase: `vllm-v0.29.0`, `sglang-v0.5.19`. One slug per snapshot; snapshots accumulate and are never renamed. Lives under `data/sources/engines/` and `data/extracted/engines/` (see [`engines/overview.md`](./engines/overview.md)).
 - **Family slug** — kebab-case family root: `deepseek`, `llama`, `qwen`. Used for grouping in synthesis.
 - **Date format** — `YYYY-MM` for release dates (day-precision is rarely meaningful for model releases). Use full `YYYY-MM-DD` only inside `manifest.json` for fetch dates.
 

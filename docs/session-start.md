@@ -48,6 +48,8 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 | `src/llm_tech_matrix/synthesis/index.py`   | Generates the model index, technique matrix and coverage report.         |
 | `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.            |
 | `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump.                         |
+| `docs/engines/overview.md`                 | Engines track design: roles, snapshots, evidence rules, draft schema.    |
+| `tasks/ENGINES.md`                         | Engines track status + quarterly snapshot calendar.                      |
 
 ## How to pick a next task
 
@@ -80,6 +82,13 @@ In rough priority order:
    records, so the mechanism the schema was designed around has never run. Any closed
    model fixes that; `qwen3.7-max` is currently the cheapest one (see
    [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)).
+
+### Engines track
+
+The engines track (vLLM, SGLang, verl, VeOmni) runs in parallel to the model queue and has
+its own status file. If the user asks for engine work, or the quarterly snapshot is due,
+start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
+[`docs/engines/overview.md`](./engines/overview.md) instead of the priority list above.
 
 ## Common workflows
 

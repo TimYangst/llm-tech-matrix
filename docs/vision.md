@@ -26,8 +26,20 @@ Live model list and per-model status: see `../tasks/ROADMAP.md`.
 
 Stable Diffusion family, Flux, Sora (inferred), Veo, Midjourney (inferred). Schema will need extension for diffusion-specific concepts (UNet vs DiT backbone, noise schedule, conditioning, etc.) — defer schema design until M1 is stable.
 
+## Tracks beyond models
+
+### Engines — inference, training and RL systems (design stage)
+
+A second record type for the systems that run the models: inference engines (vLLM, SGLang),
+training frameworks (VeOmni) and RL post-training systems (verl). The value is the
+**model ↔ technique ↔ engine** triangle: which engine versions serve or train which extracted
+models, and how long a technique takes to go from a model release to engine support. Engine
+records are quarterly release snapshots, plus on-demand refreshes, in their own subtrees
+with an independent schema version. Design: `engines/overview.md`; live status:
+`../tasks/ENGINES.md`.
+
 ## Non-goals
 
 - **Reproducing models** — this is an analysis project, not a training project.
 - **Benchmark leaderboards** — eval results change weekly; we focus on architecture and training methodology, which change less.
-- **Real-time tracking** — extractions are snapshots tied to a model release, not a live feed.
+- **Real-time tracking** — extractions are snapshots tied to a model release (or, for engines, a quarterly release snapshot), not a live feed.
