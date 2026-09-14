@@ -50,6 +50,13 @@ def _engine_crosslinks(path: Path, record: EngineRecord) -> list[str]:
         if not (GLOSSARY_DIR / f"{row.glossary_slug}.md").exists():
             errors.append(f"technique_support: no glossary entry {row.glossary_slug!r}")
     engines = {p.stem for p in ENGINES_DIR.glob("*.json")}
+    for row in record.model_support:
+        if row.delegated_to == path.stem:
+            errors.append(f"model_support {row.hf_architecture}: delegated_to its own snapshot")
+        elif row.delegated_to is not None and row.delegated_to not in engines:
+            errors.append(
+                f"model_support {row.hf_architecture}: no engine snapshot {row.delegated_to!r}"
+            )
     for row in record.integrations:
         if row.engine_slug and row.engine_slug not in engines:
             errors.append(f"integrations {row.name}: no engine snapshot {row.engine_slug!r}")

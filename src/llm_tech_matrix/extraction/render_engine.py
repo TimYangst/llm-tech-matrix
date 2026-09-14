@@ -268,8 +268,11 @@ def render(record: EngineRecord, lang: str, slug: str) -> str:
         parts += [labels["ms_header"], "|---|---|---|---|---|---|---|"]
         for m in record.model_support:
             slugs = ", ".join(f"[`{x}`](../{x}.md)" for x in m.model_slugs) or "—"
+            support = f"`{m.support}`"
+            if m.delegated_to:
+                support += f" → [`{m.delegated_to}`](./{m.delegated_to}.md)"
             parts.append(
-                f"| `{m.hf_architecture}` | {slugs} | `{m.support}` | "
+                f"| `{m.hf_architecture}` | {slugs} | {support} | "
                 f"{cell(m.documented)} | {cell(m.features)} | {cell(m.speculative_decoding)} | "
                 f"{_links(m.evidence)} |"
             )

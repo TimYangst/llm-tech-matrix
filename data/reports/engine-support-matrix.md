@@ -2,55 +2,59 @@
 
 # Engine support matrix
 
-24 model records × 4 engine snapshots, generated from each snapshot's
+24 model records × 6 engine snapshots, generated from each snapshot's
 typed `model_support[]` rows. A cell answers *what does this engine release carry for this
 model's architecture?* — not *will it run*: a `not found` model may still load through a
 generic path (HF Transformers backends, FSDP on any HF model), which snapshots do not assess.
 
 - ✅ **registered** — in the engine's built-in model registry
 - 🟡 **model-specific** — no registry entry, but code or docs written for this architecture / model_type
+- ↪ **delegated** — the engine maps no HF architectures itself; the cell shows the named
+  delegate snapshot's support for the model (e.g. Megatron-LM → Megatron-Bridge)
 - ✗ **not found** — neither, verified across the repository at the pinned commit
 - — the snapshot has no row for this model (refresh the snapshot)
 
 ## Snapshots
 
-| Snapshot | Roles | Release | Commit | Registered | Model-specific | Not found |
-| --- | --- | --- | --- | --- | --- | --- |
-| [`sglang-v0.5.19`](../extracted/engines/sglang-v0.5.19.md) | inference | 2026-09-05 | `0bcd822` | 21 | 0 | 3 |
-| [`vllm-v0.29.0`](../extracted/engines/vllm-v0.29.0.md) | inference | 2026-09-09 | `98dff2a` | 22 | 0 | 2 |
-| [`veomni-v0.1.12`](../extracted/engines/veomni-v0.1.12.md) | training | 2026-09-09 | `fd99abf` | 16 | 0 | 8 |
-| [`verl-v0.9.0`](../extracted/engines/verl-v0.9.0.md) | training, rl_post_training | 2026-08-14 | `483b8a0` | 0 | 14 | 10 |
+| Snapshot | Roles | Release | Commit | Registered | Model-specific | Delegated | Not found |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [`sglang-v0.5.19`](../extracted/engines/sglang-v0.5.19.md) | inference | 2026-09-05 | `0bcd822` | 21 | 0 | 0 | 3 |
+| [`vllm-v0.29.0`](../extracted/engines/vllm-v0.29.0.md) | inference | 2026-09-09 | `98dff2a` | 22 | 0 | 0 | 2 |
+| [`megatron-bridge-v0.6.0`](../extracted/engines/megatron-bridge-v0.6.0.md) | training | 2026-08-19 | `51885cf` | 19 | 0 | 0 | 5 |
+| [`megatron-lm-core_v0.19.0`](../extracted/engines/megatron-lm-core_v0.19.0.md) | training, rl_post_training, inference | 2026-08-19 | `5be9626` | 0 | 4 | 20 | 0 |
+| [`veomni-v0.1.12`](../extracted/engines/veomni-v0.1.12.md) | training | 2026-09-09 | `fd99abf` | 16 | 0 | 0 | 8 |
+| [`verl-v0.9.0`](../extracted/engines/verl-v0.9.0.md) | training, rl_post_training | 2026-08-14 | `483b8a0` | 0 | 14 | 0 | 10 |
 
 Counts are per model record: an architecture shared by several records counts once per record.
 
 ## Matrix
 
-| Model | Family | Released | `sglang-v0.5.19` | `vllm-v0.29.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
-| --- | --- | --- | --- | --- | --- | --- |
-| [`deepseek-v3`](../extracted/deepseek-v3.md) | DeepSeek | 2024-12 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) | DeepSeek | 2025-09 | ✅ registered | ✅ registered | ✗ not found | ✗ not found |
-| [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | DeepSeek | 2026-07 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | DeepSeek | 2026-09 | ✗ not found | ✗ not found | ✗ not found | ✗ not found |
-| [`glm-4.7`](../extracted/glm-4.7.md) | GLM-4.5 | 2026-01 | ✅ registered | ✅ registered | ✗ not found | 🟡 model-specific |
-| [`glm-5`](../extracted/glm-5.md) | GLM-5 | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ✗ not found |
-| [`glm-5.1`](../extracted/glm-5.1.md) | GLM-5 | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ✗ not found |
-| [`glm-5.2`](../extracted/glm-5.2.md) | GLM-5 | 2026-06 | ✅ registered | ✅ registered | ✅ registered | ✗ not found |
-| [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) | GLM-5 | 2026-08 | ✗ not found | ✗ not found | ✗ not found | ✗ not found |
-| [`kimi-k2.5`](../extracted/kimi-k2.5.md) | Kimi K2 | 2026-01 | ✅ registered | ✅ registered | ✗ not found | ✗ not found |
-| [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`kimi-k2.6`](../extracted/kimi-k2.6.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✗ not found | ✗ not found |
-| [`kimi-k3`](../extracted/kimi-k3.md) | Kimi K3 | 2026-07 | ✅ registered | ✅ registered | ✗ not found | ✗ not found |
-| [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3-32b`](../extracted/qwen3-32b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | Qwen | 2026-02 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.5-35b-a3b`](../extracted/qwen3.5-35b-a3b.md) | Qwen | 2026-02 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.6-27b`](../extracted/qwen3.6-27b.md) | Qwen | 2026-04 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.6-35b-a3b`](../extracted/qwen3.6-35b-a3b.md) | Qwen | 2026-04 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.8-2.4t-a95b`](../extracted/qwen3.8-2.4t-a95b.md) | Qwen | 2026-08 | ✅ registered (since v0.5.19) | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.8-27b`](../extracted/qwen3.8-27b.md) | Qwen | 2026-08 | ✅ registered (since v0.5.19) | ✅ registered | ✅ registered | 🟡 model-specific |
-| [`qwen3.8-flash-next`](../extracted/qwen3.8-flash-next.md) | Qwen | 2026-08 | ✗ not found | ✅ registered (since v0.29.0) | ✗ not found | ✗ not found |
+| Model | Family | Released | `sglang-v0.5.19` | `vllm-v0.29.0` | `megatron-bridge-v0.6.0` | `megatron-lm-core_v0.19.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [`deepseek-v3`](../extracted/deepseek-v3.md) | DeepSeek | 2024-12 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
+| [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) | DeepSeek | 2025-09 | ✅ registered | ✅ registered | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | DeepSeek | 2026-07 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | DeepSeek | 2026-09 | ✗ not found | ✗ not found | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`glm-4.7`](../extracted/glm-4.7.md) | GLM-4.5 | 2026-01 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✗ not found | 🟡 model-specific |
+| [`glm-5`](../extracted/glm-5.md) | GLM-5 | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | ✗ not found |
+| [`glm-5.1`](../extracted/glm-5.1.md) | GLM-5 | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | ✗ not found |
+| [`glm-5.2`](../extracted/glm-5.2.md) | GLM-5 | 2026-06 | ✅ registered | ✅ registered | ✅ registered (since v0.6.0) | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | ✗ not found |
+| [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) | GLM-5 | 2026-08 | ✗ not found | ✗ not found | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`kimi-k2.5`](../extracted/kimi-k2.5.md) | Kimi K2 | 2026-01 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✗ not found | ✗ not found |
+| [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
+| [`kimi-k2.6`](../extracted/kimi-k2.6.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✗ not found | ✗ not found |
+| [`kimi-k3`](../extracted/kimi-k3.md) | Kimi K3 | 2026-07 | ✅ registered | ✅ registered | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
+| [`qwen3-32b`](../extracted/qwen3-32b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
+| [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | Qwen | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.5-35b-a3b`](../extracted/qwen3.5-35b-a3b.md) | Qwen | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.6-27b`](../extracted/qwen3.6-27b.md) | Qwen | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.6-35b-a3b`](../extracted/qwen3.6-35b-a3b.md) | Qwen | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.8-2.4t-a95b`](../extracted/qwen3.8-2.4t-a95b.md) | Qwen | 2026-08 | ✅ registered (since v0.5.19) | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.8-27b`](../extracted/qwen3.8-27b.md) | Qwen | 2026-08 | ✅ registered (since v0.5.19) | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`qwen3.8-flash-next`](../extracted/qwen3.8-flash-next.md) | Qwen | 2026-08 | ✗ not found | ✅ registered (since v0.29.0) | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
 
 ## Techniques × engines
 
@@ -61,35 +65,36 @@ commodity ones (GQA, YaRN, FIM) are blank by scope, and some are implemented in 
 (a kernel library, Megatron) rather than in the tracked repository. Prose-only techniques
 have no typed model slot, so their model count is not computed.
 
-| Technique | Models using | `sglang-v0.5.19` | `vllm-v0.29.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
-| --- | --- | --- | --- | --- | --- |
-| [Multi-Token Prediction (MTP)](../../docs/glossary/mtp.md) | 18 | ✅ | ✅ |  | ✅ |
-| [YaRN RoPE scaling](../../docs/glossary/yarn-rope.md) | 17 |  |  |  |  |
-| [Multi-head Latent Attention (MLA)](../../docs/glossary/mla.md) | 10 | ✅ | ✅ |  |  |
-| [Reasoning effort](../../docs/glossary/reasoning-effort.md) | 10 |  |  |  |  |
-| [Grouped Query Attention (GQA)](../../docs/glossary/gqa.md) | 9 |  |  |  |  |
-| [Gated DeltaNet](../../docs/glossary/gated-deltanet.md) | 7 |  | ✅ | ✅ |  |
-| [Multimodal RoPE (mRoPE)](../../docs/glossary/mrope.md) | 6 |  |  |  |  |
-| [Speculative-decoding modules](../../docs/glossary/speculative-decoding.md) | 6 | ✅ | ✅ |  |  |
-| [DeepSeek Sparse Attention (DSA)](../../docs/glossary/dsa.md) | 5 | ✅ | ✅ | ✅ |  |
-| [Fill-in-Middle (FIM)](../../docs/glossary/fim.md) | 5 |  |  |  |  |
-| [FP4 Quantization-Aware Training (MXFP4)](../../docs/glossary/fp4-qat.md) | 5 |  |  | ✅ |  |
-| [Native INT4 Quantization-Aware Training](../../docs/glossary/int4-qat.md) | 5 |  |  |  |  |
-| [Manifold-Constrained Hyper-Connections (mHC)](../../docs/glossary/mhc.md) | 5 | ✅ | ✅ | ✅ |  |
-| [Compressed Sparse Attention + Heavily Compressed Attention](../../docs/glossary/csa-hca.md) | 3 |  |  |  |  |
-| [Dual Chunk Attention (DCA)](../../docs/glossary/dual-chunk-attention.md) | 2 |  |  |  |  |
-| [Kimi Delta Attention (KDA)](../../docs/glossary/kda.md) | 2 | ✅ | ✅ |  |  |
-| [N-gram Embedding](../../docs/glossary/ngram-embedding.md) | 2 |  |  |  |  |
-| [Attention Residuals (AttnRes)](../../docs/glossary/attnres.md) | 1 |  |  |  |  |
-| [Causal Encoder-Decoder (CED)](../../docs/glossary/causal-encoder-decoder.md) | 1 |  |  |  |  |
-| [Compressed Sparse Attention 2 (CSA2)](../../docs/glossary/csa2.md) | 1 |  |  |  |  |
-| [Gated Residual (GR)](../../docs/glossary/gated-residual.md) | 1 |  |  |  |  |
-| [IndexShare (IndexCache)](../../docs/glossary/indexshare.md) | 1 | ✅ | ✅ |  |  |
-| [Qwen Sparse Attention (QSA)](../../docs/glossary/qsa.md) | 1 |  |  |  |  |
-| [FP8 mixed precision (DeepSeek-V3 variant)](../../docs/glossary/fp8-mixed-precision.md) | prose-only |  |  |  | ✅ |
-| [Group Relative Policy Optimization (GRPO)](../../docs/glossary/grpo.md) | prose-only |  |  |  | ✅ |
-| [Muon optimizer](../../docs/glossary/muon.md) | prose-only |  |  | ✅ | ✅ |
-| [On-Policy Distillation (OPD)](../../docs/glossary/on-policy-distillation.md) | prose-only |  |  | ✅ | ✅ |
+| Technique | Models using | `sglang-v0.5.19` | `vllm-v0.29.0` | `megatron-bridge-v0.6.0` | `megatron-lm-core_v0.19.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [Multi-Token Prediction (MTP)](../../docs/glossary/mtp.md) | 18 | ✅ | ✅ | ✅ | ✅ |  | ✅ |
+| [YaRN RoPE scaling](../../docs/glossary/yarn-rope.md) | 17 |  |  |  |  |  |  |
+| [Multi-head Latent Attention (MLA)](../../docs/glossary/mla.md) | 10 | ✅ | ✅ | ✅ | ✅ |  |  |
+| [Reasoning effort](../../docs/glossary/reasoning-effort.md) | 10 |  |  |  |  |  |  |
+| [Grouped Query Attention (GQA)](../../docs/glossary/gqa.md) | 9 |  |  |  |  |  |  |
+| [Gated DeltaNet](../../docs/glossary/gated-deltanet.md) | 7 |  | ✅ | ✅ | ✅ | ✅ |  |
+| [Multimodal RoPE (mRoPE)](../../docs/glossary/mrope.md) | 6 |  |  |  |  |  |  |
+| [Speculative-decoding modules](../../docs/glossary/speculative-decoding.md) | 6 | ✅ | ✅ |  | ✅ |  |  |
+| [DeepSeek Sparse Attention (DSA)](../../docs/glossary/dsa.md) | 5 | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| [Fill-in-Middle (FIM)](../../docs/glossary/fim.md) | 5 |  |  |  |  |  |  |
+| [FP4 Quantization-Aware Training (MXFP4)](../../docs/glossary/fp4-qat.md) | 5 |  |  |  |  | ✅ |  |
+| [Native INT4 Quantization-Aware Training](../../docs/glossary/int4-qat.md) | 5 |  |  |  |  |  |  |
+| [Manifold-Constrained Hyper-Connections (mHC)](../../docs/glossary/mhc.md) | 5 | ✅ | ✅ | ✅ |  | ✅ |  |
+| [Compressed Sparse Attention + Heavily Compressed Attention](../../docs/glossary/csa-hca.md) | 3 |  |  | ✅ |  |  |  |
+| [Dual Chunk Attention (DCA)](../../docs/glossary/dual-chunk-attention.md) | 2 |  |  |  |  |  |  |
+| [Kimi Delta Attention (KDA)](../../docs/glossary/kda.md) | 2 | ✅ | ✅ |  |  |  |  |
+| [N-gram Embedding](../../docs/glossary/ngram-embedding.md) | 2 |  |  |  |  |  |  |
+| [Attention Residuals (AttnRes)](../../docs/glossary/attnres.md) | 1 |  |  |  |  |  |  |
+| [Causal Encoder-Decoder (CED)](../../docs/glossary/causal-encoder-decoder.md) | 1 |  |  |  |  |  |  |
+| [Compressed Sparse Attention 2 (CSA2)](../../docs/glossary/csa2.md) | 1 |  |  |  |  |  |  |
+| [Gated Residual (GR)](../../docs/glossary/gated-residual.md) | 1 |  |  |  |  |  |  |
+| [IndexShare (IndexCache)](../../docs/glossary/indexshare.md) | 1 | ✅ | ✅ | ✅ | ✅ |  |  |
+| [Qwen Sparse Attention (QSA)](../../docs/glossary/qsa.md) | 1 |  |  |  |  |  |  |
+| [Auxiliary-loss-free routing](../../docs/glossary/aux-loss-free-routing.md) | prose-only |  |  |  | ✅ |  |  |
+| [FP8 mixed precision (DeepSeek-V3 variant)](../../docs/glossary/fp8-mixed-precision.md) | prose-only |  |  |  | ✅ |  | ✅ |
+| [Group Relative Policy Optimization (GRPO)](../../docs/glossary/grpo.md) | prose-only |  |  |  | ✅ |  | ✅ |
+| [Muon optimizer](../../docs/glossary/muon.md) | prose-only |  |  | ✅ | ✅ | ✅ | ✅ |
+| [On-Policy Distillation (OPD)](../../docs/glossary/on-policy-distillation.md) | prose-only |  |  |  |  | ✅ | ✅ |
 
 ## Per-model details
 
@@ -139,6 +144,7 @@ or release notes state (`model_details[]`). A dash means not stated — not unsu
 | `qwen3.8-2.4t-a95b` | `vllm-v0.29.0` | `mtp` | — | — | — |
 | `qwen3.8-27b` | `vllm-v0.29.0` | `mtp` | — | — | — |
 | `qwen3.8-flash-next` | `vllm-v0.29.0` | `mtp` | `v0.29.0` | — | — |
+| `glm-5.2` | `megatron-bridge-v0.6.0` | — | `v0.6.0` | — | — |
 
 ## Integrations between tracked engines
 
@@ -147,7 +153,11 @@ Sources often disagree; they are listed side by side, not reconciled.
 
 | Snapshot | Relation | Counterpart | Version constraints |
 | --- | --- | --- | --- |
+| `megatron-bridge-v0.6.0` | `training_backend` | [`megatron-lm-core_v0.19.0`](../extracted/engines/megatron-lm-core_v0.19.0.md) | 3rdparty/Megatron-LM git submodule: commit cd4afffa648426a959dc7cb1e24b5ce7d0c3ff54 (Megatron-LM main, 2026-07-25), not the core_v0.19.0 tag<br>pyproject.toml: megatron-core[dev,mlm] installed from path 3rdparty/Megatron-LM<br>examples/models/deepseek_v4/README.md: DeepSeek-V4 pretraining tested with Megatron-LM dev commit 35f36c7c9dba plus PR #4839<br>examples/models/deepseek_v4/README.md: DeepSeek-V4 SFT validated on main2dev Megatron-LM commit ed6b1f65502aec7f2fe27e14a1245c29e435c2a6 |
+| `megatron-bridge-v0.6.0` | `used_by` | [`verl-v0.9.0`](../extracted/engines/verl-v0.9.0.md) | — |
+| `megatron-lm-core_v0.19.0` | `used_by` | [`megatron-bridge-v0.6.0`](../extracted/engines/megatron-bridge-v0.6.0.md) | — |
 | `veomni-v0.1.12` | `used_by` | [`verl-v0.9.0`](../extracted/engines/verl-v0.9.0.md) | — |
 | `verl-v0.9.0` | `rollout_backend` | [`vllm-v0.29.0`](../extracted/engines/vllm-v0.29.0.md) | setup.py extra: vllm>=0.18.0<br>docs/start/install.rst: vllm 0.18.0 and later versions are supported<br>docker/Dockerfile.stable.vllm: VLLM_VERSION=0.24.0<br>vllm_async_server.py: rollout routing replay requires vLLM >= 0.22.0 |
 | `verl-v0.9.0` | `rollout_backend` | [`sglang-v0.5.19`](../extracted/engines/sglang-v0.5.19.md) | setup.py extra: sglang[srt,openai]==0.5.8<br>docker/Dockerfile.stable.sglang: lmsysorg/sglang:v0.5.12<br>docs/workers/sglang_worker.rst: 'Currently 0.4.8' (stale)<br>async_sglang_server.py: weights CPU backup path needs sglang >= 0.5.6 |
 | `verl-v0.9.0` | `training_backend` | [`veomni-v0.1.12`](../extracted/engines/veomni-v0.1.12.md) | — |
+| `verl-v0.9.0` | `training_backend` | [`megatron-bridge-v0.6.0`](../extracted/engines/megatron-bridge-v0.6.0.md) | — |

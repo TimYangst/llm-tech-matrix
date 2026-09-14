@@ -2,7 +2,7 @@
 
 > English: [sglang-v0.5.19.md](./sglang-v0.5.19.md)
 
-*引擎 schema 版本： 2*
+*引擎 schema 版本： 3*
 
 ## 概览
 

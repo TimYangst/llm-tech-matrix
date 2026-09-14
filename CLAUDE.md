@@ -20,7 +20,7 @@ A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI
 - Naming, file layout, schema versioning: [`docs/conventions.md`](./docs/conventions.md)
 - Dev environment, lint, CI, AI review, PR conventions: [`docs/development.md`](./docs/development.md)
 - Per-model status: [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)
-- Engines track (vLLM / SGLang / verl / VeOmni): design [`docs/engines/overview.md`](./docs/engines/overview.md), schema [`docs/engines/schema.md`](./docs/engines/schema.md), status [`tasks/ENGINES.md`](./tasks/ENGINES.md)
+- Engines track (vLLM / SGLang / verl / VeOmni / Megatron-LM / Megatron-Bridge): design [`docs/engines/overview.md`](./docs/engines/overview.md), schema [`docs/engines/schema.md`](./docs/engines/schema.md), status [`tasks/ENGINES.md`](./tasks/ENGINES.md)
 
 ## Cardinal rules (load-bearing)
 

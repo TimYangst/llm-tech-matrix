@@ -2,7 +2,7 @@
 
 > English: [verl-v0.9.0.md](./verl-v0.9.0.md)
 
-*引擎 schema 版本： 2*
+*引擎 schema 版本： 3*
 
 ## 概览
 
@@ -108,7 +108,7 @@ _说明：_ Algorithms are the AdvantageEstimator enum values; DAPO is composed 
 | SGLang ([`sglang-v0.5.19`](./sglang-v0.5.19.md)) | `rollout_backend` | setup.py extra: sglang[srt,openai]==0.5.8<br>docker/Dockerfile.stable.sglang: lmsysorg/sglang:v0.5.12<br>docs/workers/sglang_worker.rst: 'Currently 0.4.8' (stale)<br>async_sglang_server.py: weights CPU backup path needs sglang >= 0.5.6 | Sources disagree (0.5.8 pin, 0.5.12 Docker base, 0.4.8 in docs); none matches the tracked snapshot sglang-v0.5.19. | [setup.py#L59](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py#L59), [Dockerfile.stable.sglang#L4](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docker/Dockerfile.stable.sglang#L4), [sglang_worker.rst#L27](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/workers/sglang_worker.rst#L27), [async_sglang_server.py#L390](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/rollout/sglang_rollout/async_sglang_server.py#L390) |
 | TensorRT-LLM | `rollout_backend` | setup.py extra: tensorrt-llm>=1.2.0rc6 | — | [setup.py#L56](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/setup.py#L56) |
 | VeOmni ([`veomni-v0.1.12`](./veomni-v0.1.12.md)) | `training_backend` | — | The `veomni` engine imports the external veomni package (registered for language_model and value_model on cuda and npu). No version pin was found in setup.py. | [transformer_impl.py#L25](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/veomni/transformer_impl.py#L25), [transformer_impl.py#L865](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/workers/engine/veomni/transformer_impl.py#L865) |
-| Megatron-Bridge / Megatron | `training_backend` | — | The megatron engine uses Megatron-Bridge by default; MTP training is only supported on the Megatron-Bridge + Megatron combination. | [megatron.yaml#L98](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L98), [mtp.md#L11](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md#L11) |
+| Megatron-Bridge / Megatron ([`megatron-bridge-v0.6.0`](./megatron-bridge-v0.6.0.md)) | `training_backend` | — | The megatron engine uses Megatron-Bridge by default; MTP training is only supported on the Megatron-Bridge + Megatron combination. verl states no Megatron-Bridge version; the megatron-bridge-v0.6.0 link is to the tracked snapshot, whose DeepSeek-V4 path in turn needs Megatron-LM dev-branch code. | [megatron.yaml#L98](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L98), [mtp.md#L11](https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md#L11) |
 
 ## 模型支持
 

@@ -1,6 +1,6 @@
 # Engines track: design
 
-Status: **E3 done** (vLLM, SGLang, verl and VeOmni snapshots for 2026-Q3). Engine schema v2 is implemented in
+Status: **E5 done** (2026-Q3 snapshots of vLLM, SGLang, verl, VeOmni, Megatron-LM and Megatron-Bridge; synthesis since E4). Engine schema v3 is implemented in
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py), with the
 field spec in [`schema.md`](./schema.md). The first record is
 [`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md). The draft schema section below
@@ -110,7 +110,7 @@ tasks/engines/<engine-slug>.md               per-snapshot notes and open questio
 - **Cite upstream, pinned to the snapshot commit.** Use
   `https://raw.githubusercontent.com/<org>/<repo>/<sha>/<path>` for files and GitHub release
   pages for release notes. Upstream repos: `vllm-project/vllm`, `sgl-project/sglang`,
-  `verl-project/verl`, `ByteDance-Seed/VeOmni`. Never cite a fork, and never cite a local
+  `verl-project/verl`, `ByteDance-Seed/VeOmni`, `NVIDIA/Megatron-LM`, `NVIDIA-NeMo/Megatron-Bridge`. Never cite a fork, and never cite a local
   path.
 - **Local checkouts are reading aids, not sources.** A sibling clone such as `../vllm` makes
   code search cheap, but it may be a fork, may lack tags, and may sit at an arbitrary
@@ -191,13 +191,14 @@ EngineRecord
 
 ## Phases
 
-| Phase | Deliverable                                                                                                      | Exit criteria                                  |
-| ----- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| E0    | This design; vision / roadmap / session-start / conventions updated; `tasks/ENGINES.md`                          | Merged                                         |
-| E1    | Pilot `vllm-v0.29.0`: engine schema, `extract-engine` skill, sourcing `engines/` target, renderer, CI validation | One record validates in CI; schema gaps listed |
-| E2    | `sglang-v0.5.19`, the same role as a cross-engine stress test                                                    | No schema field is vLLM-shaped                 |
-| E3    | `verl-v0.9.0` (rl role, integrations), then `veomni-v0.1.12` (training role)                                     | All three role subobjects exercised            |
-| E4    | "Implemented by" tables, support matrix, first adoption-lag report (registry slots dropped as unneeded)          | Matrix covers all extracted models             |
+| Phase | Deliverable                                                                                                                 | Exit criteria                                            |
+| ----- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| E0    | This design; vision / roadmap / session-start / conventions updated; `tasks/ENGINES.md`                                     | Merged                                                   |
+| E1    | Pilot `vllm-v0.29.0`: engine schema, `extract-engine` skill, sourcing `engines/` target, renderer, CI validation            | One record validates in CI; schema gaps listed           |
+| E2    | `sglang-v0.5.19`, the same role as a cross-engine stress test                                                               | No schema field is vLLM-shaped                           |
+| E3    | `verl-v0.9.0` (rl role, integrations), then `veomni-v0.1.12` (training role)                                                | All three role subobjects exercised                      |
+| E4    | "Implemented by" tables, support matrix, first adoption-lag report (registry slots dropped as unneeded)                     | Matrix covers all extracted models                       |
+| E5    | `megatron-lm-core_v0.19.0` (training + RL + inference, no model registry) and `megatron-bridge-v0.6.0` (HF bridge registry) | Both validate; the Megatron dependency chain is explicit |
 
 vLLM goes first because its `docs/design/` is the most complete. The pilot is where the
 schema gets tested against real material, just as DeepSeek-V3 was for models.

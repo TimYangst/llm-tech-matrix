@@ -42,6 +42,7 @@ ROLE_ORDER = {"inference": 0, "training": 1, "rl_post_training": 2}
 SUPPORT_LABEL = {
     "registered": "✅ registered",
     "model_specific": "🟡 model-specific",
+    "delegated": "↪ delegated",
     "not_found": "✗ not found",
 }
 GLOSSARY_TEXT = {
@@ -75,9 +76,10 @@ def load_engines(directory: Path | None = None) -> dict[str, dict]:
 
 
 def _engine_order(engines: dict[str, dict]) -> list[str]:
+    # Group by primary role (listed first), so a training library that also ships an inference
+    # stack sits with the training engines rather than between vLLM and SGLang.
     def key(slug: str) -> tuple:
-        roles = engines[slug]["metadata"]["roles"]
-        return (min(ROLE_ORDER[r] for r in roles), slug)
+        return (ROLE_ORDER[engines[slug]["metadata"]["roles"][0]], slug)
 
     return sorted(engines, key=key)
 
@@ -141,13 +143,15 @@ def render_support_matrix(
         "",
         "- ✅ **registered** — in the engine's built-in model registry",
         "- 🟡 **model-specific** — no registry entry, but code or docs written for this architecture / model_type",
+        "- ↪ **delegated** — the engine maps no HF architectures itself; the cell shows the named",
+        "  delegate snapshot's support for the model (e.g. Megatron-LM → Megatron-Bridge)",
         "- ✗ **not found** — neither, verified across the repository at the pinned commit",
         "- — the snapshot has no row for this model (refresh the snapshot)",
         "",
         "## Snapshots",
         "",
-        "| Snapshot | Roles | Release | Commit | Registered | Model-specific | Not found |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| Snapshot | Roles | Release | Commit | Registered | Model-specific | Delegated | Not found |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for e in order:
         rec = engines[e]
@@ -158,7 +162,7 @@ def render_support_matrix(
         lines.append(
             f"| [`{e}`](../extracted/engines/{e}.md) | {', '.join(meta['roles'])} | "
             f"{meta['release_date']} | `{meta['commit_sha'][:7]}` | {counts['registered']} | "
-            f"{counts['model_specific']} | {counts['not_found']} |"
+            f"{counts['model_specific']} | {counts['delegated']} | {counts['not_found']} |"
         )
 
     lines += [
@@ -183,7 +187,11 @@ def render_support_matrix(
                 continue
             row, detail = hit
             label = SUPPORT_LABEL[row["support"]]
-            if detail and detail.get("since_version", UNKNOWN) != UNKNOWN:
+            if row["support"] == "delegated":
+                target = by_engine.get(row["delegated_to"], {}).get(m)
+                shown = SUPPORT_LABEL[target[0]["support"]] if target else "—"
+                label = f"↪ `{row['delegated_to']}`: {shown}"
+            elif detail and detail.get("since_version", UNKNOWN) != UNKNOWN:
                 label += f" (since {detail['since_version']})"
             cells.append(label)
         lines.append(
@@ -286,6 +294,7 @@ ADOPTION_BUCKETS = {
     "missing": "Missing ≥1 month after release",
     "same_month": "Not found, same month",
     "predates": "Not found, model is newer",
+    "delegated": "Delegated to another engine",
     "undated": "Model date unknown",
 }
 
@@ -295,6 +304,8 @@ def _adoption_cell(
 ) -> tuple[str, str]:
     """(bucket, table cell) for one model at one engine snapshot."""
     meta = engine["metadata"]
+    if row["support"] == "delegated":
+        return "delegated", f"↪ `{row['delegated_to']}`"
     mi = _month_index(extraction["metadata"]["release_date"])
     ei = _month_index(meta["release_date"])
     supported = row["support"] != "not_found"
@@ -341,6 +352,8 @@ def render_adoption(extractions: dict[str, dict], engines: dict[str, dict]) -> s
         "- · **same month** — `not found`, released the same month as the model; with month-precision",
         "  model dates the order is unknown, so this is not counted as missing.",
         "- · **model newer** — `not found`, but the model came out after this release.",
+        "- ↪ **delegated** — the engine leaves HF model mapping to the named snapshot; read that",
+        "  column instead. Never counted as missing.",
         "- — the snapshot has no row for this model.",
         "",
         "## By model (newest first)",

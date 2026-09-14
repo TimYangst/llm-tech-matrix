@@ -2,7 +2,7 @@
 
 > English: [veomni-v0.1.12.md](./veomni-v0.1.12.md)
 
-*引擎 schema 版本： 2*
+*引擎 schema 版本： 3*
 
 ## 概览
 
