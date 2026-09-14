@@ -43,6 +43,18 @@ The attention dominates compute at million-token contexts. DeepSeek-V4 attacks t
 | DeepSeek-V4-Flash-0731                 | Indexer configuration byte-identical to the V4-Flash preview (`index_n_heads=64`, `index_head_dim=128`, `index_topk=512`); the official build is a post-training-only refresh, so CSA/HCA is unchanged. Serving now enables an FP4 indexer cache (vLLM `--attention-config '{"use_fp4_indexer_cache": true}'`).                                                                                                                                                                                                         |
 | DeepSeek-V4.1-Flash (replaced by CSA2) | **Replaced.** V4.1 drops the CSA/HCA alternation for pure [CSA2](./csa2.md): no heavily-compressed layers; encoder CSA2 layers use `m=2`, decoder layers `m=1` (uncompressed), and main KV, indexer K and top-k indices are shared across layers through Full / Reindex / Reuse modes. CSA2 also removes CSA's overlapping `2m` compression windows and the in-compressor absolute positional embedding. Indexer heads halved to 32 (V4-Flash: 64); top-k stays 512; the `n_win=128` SWA branch is kept in every layer. |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## Implemented by (engines)
+
+Generated from `technique_support[]` in the engine snapshots under [`data/extracted/engines/`](../../data/extracted/engines/) — do not edit. "Used by" above records models adopting the technique; this table records engines implementing it.
+
+| Engine snapshot                                                                    | Roles    | Implementation                                                                                                                                                  | Flags | Evidence                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`megatron-bridge-v0.6.0`](../../data/extracted/engines/megatron-bridge-v0.6.0.md) | training | DeepSeek-V4 bridge maps hybrid self-attention layers (CompressedSparseAttention with CSAIndexer and Compressor; per-layer compress ratios) to Megatron modules. | —     | [deepseek_v4_bridge.py#L59](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/51885cf132b2814188b6855c25a8588254274c2a/src/megatron/bridge/models/deepseek/deepseek_v4_bridge.py#L59), [deepseek_v4_bridge.py#L94](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/51885cf132b2814188b6855c25a8588254274c2a/src/megatron/bridge/models/deepseek/deepseek_v4_bridge.py#L94) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## Related techniques
 
 - [MLA (Multi-head Latent Attention)](./mla.md) — DeepSeek-V3's KV-compression approach (latent compression of K/V into `kv_lora_rank`-dim) that V4 replaces with the per-block compressors above. CSA/HCA shares MLA's "low-rank query latent" idea via `d_c`.

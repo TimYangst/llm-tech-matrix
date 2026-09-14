@@ -1,6 +1,6 @@
 ---
 name: extract-engine
-description: Record one engine release snapshot (vLLM, SGLang, verl, VeOmni) as data/extracted/engines/<engine>-<tag>.json, validated against src/llm_tech_matrix/engine_schema.py and rendered to .md / .zh.md. Use when the user asks to "snapshot vLLM", "do the sglang-v0.5.19 snapshot", "refresh the engine records", or similar engines-track work.
+description: Record one engine release snapshot (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) as data/extracted/engines/<engine>-<tag>.json, validated against src/llm_tech_matrix/engine_schema.py and rendered to .md / .zh.md. Use when the user asks to "snapshot vLLM", "do the sglang-v0.5.19 snapshot", "refresh the engine records", or similar engines-track work.
 ---
 
 # extract-engine
@@ -18,7 +18,8 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    for release-note claims). The schema rejects populated serving fields, parallelism
    entries, model rows or technique rows without evidence.
 3. **Pinned upstream only.** Resolve the tag to a SHA with the GitHub API and cite
-   `vllm-project/vllm`, `sgl-project/sglang`, `verl-project/verl` or `ByteDance-Seed/VeOmni`.
+   `vllm-project/vllm`, `sgl-project/sglang`, `verl-project/verl`, `ByteDance-Seed/VeOmni`,
+   `NVIDIA/Megatron-LM` (tags `core_vX.Y.Z`, on release branches) or `NVIDIA-NeMo/Megatron-Bridge`.
    Never a fork, never a local path, never `main`. Sibling checkouts (`../vllm`) are reading
    aids only, and may be forks at an arbitrary commit — `docs/design/hisparse.md` is on
    vLLM `main` but not in `v0.29.0`.
@@ -67,19 +68,24 @@ can join it with the model records. Read [`docs/engines/overview.md`](../../../d
    engine's native registry *and* its docs. Record one `model_support` row per architecture,
    including architectures that are **absent** (`support: not_found`, whole-file evidence).
    Absence is a snapshot fact, not a claim the model cannot run. Use `registered` for registry
-   entries and `model_specific` when there is no registry entry (or no registry, like verl) but
+   entries, `delegated` when the engine's sources hand HF model mapping to another tracked engine,
+   and `model_specific` when there is no registry entry (or no registry, like verl) but
    code keyed on the architecture or its model_type exists.
 
    Registries differ: vLLM has a static table (`registry.py`); SGLang collects `EntryClass`
    from every module under `srt/models/`, so register the modules that declare your
    architectures and prove absence with `git grep <arch> <commit-sha> -- <models dir> docs`
-   against a local upstream clone (reading the commit object, not the checkout). Record
+   against a local upstream clone (reading the commit object, not the checkout). Megatron-LM has
+   no HF-architecture registry at all: rows with an in-repo docs signal are `model_specific`,
+   and the rest are `delegated` with `delegated_to: megatron-bridge-<tag>` (evidence: the docs
+   sending HF conversion to Megatron-Bridge, after a whole-tree absence check). Record
    per-model facts — doc-stated parsers, `since_version` from release notes — in
    `model_details[]`, never on the architecture row.
 
 4. **Fill the record.** Each claimed role needs its subobject (`serving` / `training` / `rl`).
    Record version requirements on the counterpart engine in `integrations[].version_constraints`,
-   one entry per source, even when they disagree.
+   one entry per source, even when they disagree. Submodule pins count as a source: Megatron-Bridge
+   pins Megatron-LM by commit, not by release tag.
 
    **Details.** Keep list fields as literal registry contents; keep prose fields to
    what design docs state. Fill `model_details[]` (`reasoning_parser` / `tool_call_parser` /

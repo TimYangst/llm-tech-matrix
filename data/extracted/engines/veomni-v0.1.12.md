@@ -2,7 +2,7 @@
 
 > 中文版：[veomni-v0.1.12.zh.md](./veomni-v0.1.12.zh.md)
 
-*Engine schema version: 2*
+*Engine schema version: 3*
 
 ## Overview
 

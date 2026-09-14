@@ -36,6 +36,18 @@ DeepSeek-V3 通常还配一个非常小的序列内辅助损失（α = 0.0001）
 | GLM-5.3-Flash                           | 同样的 `noaux_tc` + sigmoid 路由被带入新的 `glm5_next` 架构，专家池从 **256 扩到 288**，而 top-k 仍是 8、单专家宽度仍是 2048（稀疏度因此从 3.1% 升到 2.8%）。config 里 `router_aux_loss_coef=0.001` 与 `noaux_tc` 并存；在无辅助损失路由下它并非主要的均衡机制。                                                                                                                                                                                                      |
 | DeepSeek-V4.1-Flash                     | **按模态分开的偏置。** 保留 `noaux_tc` + SqrtSoftplus 打分，但为文本 token 和图像 token 分别维护专家级校正偏置：每个 token 用自身模态的偏置选专家，输出仍按原始分数加权；两组偏置根据各自的专家负载独立更新（两者的偏置更新速度都是 0.001）。另保留权重 0.0001 的序列级均衡损失，防止单条序列内出现极端不均衡。                                                                                                                                                       |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                                               | 角色                                  | 实现方式                                                                                                                                                        | 参数                                                | 证据                                                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`megatron-lm-core_v0.19.0`](../../data/extracted/engines/megatron-lm-core_v0.19.0.md) | training, rl_post_training, inference | Quantile Balancing router (moe_router_load_balancing_type 'quantile_balancing'): a per-expert routing bias from quantile estimates replaces the auxiliary loss. | `moe_router_load_balancing_type=quantile_balancing` | [router.py#L220](https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/moe/router.py#L220), [release notes](https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [DeepSeekMoE](./deepseekmoe.md)

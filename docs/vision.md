@@ -31,7 +31,7 @@ Stable Diffusion family, Flux, Sora (inferred), Veo, Midjourney (inferred). Sche
 ### Engines — inference, training and RL systems (design stage)
 
 A second record type for the systems that run the models: inference engines (vLLM, SGLang),
-training frameworks (VeOmni) and RL post-training systems (verl). The value is the
+training frameworks (VeOmni, Megatron-LM / Megatron-Bridge) and RL post-training systems (verl). The value is the
 **model ↔ technique ↔ engine** triangle: which engine versions serve or train which extracted
 models, and how long a technique takes to go from a model release to engine support. Engine
 records are quarterly release snapshots, plus on-demand refreshes, in their own subtrees

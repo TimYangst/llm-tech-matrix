@@ -43,6 +43,18 @@
 | DeepSeek-V4-Flash-0731                 | indexer 配置与 V4-Flash 预览版逐字节相同（`index_n_heads=64`、`index_head_dim=128`、`index_topk=512`）；正式版只重跑了后训练，CSA/HCA 未变。部署侧新增 FP4 indexer cache（vLLM `--attention-config '{"use_fp4_indexer_cache": true}'`）。                                                                                                                                             |
 | DeepSeek-V4.1-Flash (replaced by CSA2) | **被取代。** V4.1 放弃 CSA/HCA 交替，改为纯 [CSA2](./csa2.zh.md)：不再有重度压缩层；encoder 的 CSA2 层 `m=2`，decoder 层 `m=1`（不压缩），main KV、indexer K 与 top-k 索引通过 Full / Reindex / Reuse 三种模式跨层共享。CSA2 还去掉了 CSA 重叠的 `2m` 压缩窗口和压缩器内部的绝对位置编码。indexer 头数减半到 32（V4-Flash 为 64）；top-k 仍为 512；每层保留 `n_win=128` 的 SWA 分支。 |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## 实现此技术的引擎
+
+由 [`data/extracted/engines/`](../../data/extracted/engines/) 中各引擎快照的 `technique_support[]` 自动生成，请勿手工编辑。上方表格记录采用该技术的模型，本表记录实现该技术的引擎。
+
+| 引擎快照                                                                           | 角色     | 实现方式                                                                                                                                                        | 参数 | 证据                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`megatron-bridge-v0.6.0`](../../data/extracted/engines/megatron-bridge-v0.6.0.md) | training | DeepSeek-V4 bridge maps hybrid self-attention layers (CompressedSparseAttention with CSAIndexer and Compressor; per-layer compress ratios) to Megatron modules. | —    | [deepseek_v4_bridge.py#L59](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/51885cf132b2814188b6855c25a8588254274c2a/src/megatron/bridge/models/deepseek/deepseek_v4_bridge.py#L59), [deepseek_v4_bridge.py#L94](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/51885cf132b2814188b6855c25a8588254274c2a/src/megatron/bridge/models/deepseek/deepseek_v4_bridge.py#L94) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## 相关技术
 
 - [MLA (Multi-head Latent Attention)](./mla.zh.md) — DeepSeek-V3 的 KV 压缩方案（把 K/V 压成 `kv_lora_rank` 维潜变量）；V4 用上述按块压缩取代之。CSA/HCA 通过 `d_c` 沿用了 MLA 的"低秩 query 潜变量"思路。

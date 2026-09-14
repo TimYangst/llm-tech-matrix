@@ -114,7 +114,7 @@ The contract is the JSON file. As long as `data/extracted/<model>.json` validate
 
 ## Engines track
 
-The engines track (vLLM, SGLang, verl, VeOmni) reuses all three layers and the same
+The engines track (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) reuses all three layers and the same
 contract, in parallel subtrees: `data/sources/engines/<slug>/` and
 `data/extracted/engines/<slug>.json`. It has its own schema and version. Every model-side
 glob is non-recursive, so the two tracks cannot interfere, and model and engine records meet

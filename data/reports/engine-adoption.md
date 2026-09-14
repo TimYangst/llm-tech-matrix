@@ -17,45 +17,49 @@ snapshot's release month minus the model's release month.
 - · **same month** — `not found`, released the same month as the model; with month-precision
   model dates the order is unknown, so this is not counted as missing.
 - · **model newer** — `not found`, but the model came out after this release.
+- ↪ **delegated** — the engine leaves HF model mapping to the named snapshot; read that
+  column instead. Never counted as missing.
 - — the snapshot has no row for this model.
 
 ## By model (newest first)
 
-| Model | Released | `sglang-v0.5.19` | `vllm-v0.29.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
-| --- | --- | --- | --- | --- | --- |
-| [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | 2026-09 | · same month | · same month | · same month | · model newer |
-| [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) | 2026-08 | ✗ missing at +1 mo | ✗ missing at +1 mo | ✗ missing at +1 mo | · same month |
-| [`qwen3.8-2.4t-a95b`](../extracted/qwen3.8-2.4t-a95b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
-| [`qwen3.8-27b`](../extracted/qwen3.8-27b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
-| [`qwen3.8-flash-next`](../extracted/qwen3.8-flash-next.md) | 2026-08 | ✗ missing at +1 mo | 🆕 added, +1 mo | ✗ missing at +1 mo | · same month |
-| [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✅ ≤ +1 mo |
-| [`kimi-k3`](../extracted/kimi-k3.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✗ missing at +2 mo | ✗ missing at +1 mo |
-| [`glm-5.2`](../extracted/glm-5.2.md) | 2026-06 | ✅ ≤ +3 mo | ✅ ≤ +3 mo | ✅ ≤ +3 mo | ✗ missing at +2 mo |
-| [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
-| [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
-| [`glm-5.1`](../extracted/glm-5.1.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✗ missing at +4 mo |
-| [`qwen3.6-27b`](../extracted/qwen3.6-27b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
-| [`qwen3.6-35b-a3b`](../extracted/qwen3.6-35b-a3b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
-| [`glm-5`](../extracted/glm-5.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✗ missing at +6 mo |
-| [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
-| [`qwen3.5-35b-a3b`](../extracted/qwen3.5-35b-a3b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
-| [`glm-4.7`](../extracted/glm-4.7.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✗ missing at +8 mo | ✅ ≤ +7 mo |
-| [`kimi-k2.5`](../extracted/kimi-k2.5.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✗ missing at +8 mo | ✗ missing at +7 mo |
-| [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) | 2025-09 | ✅ ≤ +12 mo | ✅ ≤ +12 mo | ✗ missing at +12 mo | ✗ missing at +11 mo |
-| [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
-| [`qwen3-32b`](../extracted/qwen3-32b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
-| [`deepseek-v3`](../extracted/deepseek-v3.md) | 2024-12 | ✅ ≤ +21 mo | ✅ ≤ +21 mo | ✅ ≤ +21 mo | ✅ ≤ +20 mo |
-| [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) |
-| [`kimi-k2.6`](../extracted/kimi-k2.6.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✗ (model undated) | ✗ (model undated) |
+| Model | Released | `sglang-v0.5.19` | `vllm-v0.29.0` | `megatron-bridge-v0.6.0` | `megatron-lm-core_v0.19.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | 2026-09 | · same month | · same month | · model newer | ↪ `megatron-bridge-v0.6.0` | · same month | · model newer |
+| [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) | 2026-08 | ✗ missing at +1 mo | ✗ missing at +1 mo | · same month | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +1 mo | · same month |
+| [`qwen3.8-2.4t-a95b`](../extracted/qwen3.8-2.4t-a95b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
+| [`qwen3.8-27b`](../extracted/qwen3.8-27b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
+| [`qwen3.8-flash-next`](../extracted/qwen3.8-flash-next.md) | 2026-08 | ✗ missing at +1 mo | 🆕 added, +1 mo | · same month | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +1 mo | · same month |
+| [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✅ ≤ +1 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +2 mo | ✅ ≤ +1 mo |
+| [`kimi-k3`](../extracted/kimi-k3.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✗ missing at +1 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +2 mo | ✗ missing at +1 mo |
+| [`glm-5.2`](../extracted/glm-5.2.md) | 2026-06 | ✅ ≤ +3 mo | ✅ ≤ +3 mo | 🆕 added, +2 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +3 mo | ✗ missing at +2 mo |
+| [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
+| [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
+| [`glm-5.1`](../extracted/glm-5.1.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✗ missing at +4 mo |
+| [`qwen3.6-27b`](../extracted/qwen3.6-27b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
+| [`qwen3.6-35b-a3b`](../extracted/qwen3.6-35b-a3b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
+| [`glm-5`](../extracted/glm-5.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✗ missing at +6 mo |
+| [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
+| [`qwen3.5-35b-a3b`](../extracted/qwen3.5-35b-a3b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
+| [`glm-4.7`](../extracted/glm-4.7.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✅ ≤ +7 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +8 mo | ✅ ≤ +7 mo |
+| [`kimi-k2.5`](../extracted/kimi-k2.5.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✅ ≤ +7 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +8 mo | ✗ missing at +7 mo |
+| [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) | 2025-09 | ✅ ≤ +12 mo | ✅ ≤ +12 mo | ✗ missing at +11 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +12 mo | ✗ missing at +11 mo |
+| [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo | ✅ ≤ +15 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
+| [`qwen3-32b`](../extracted/qwen3-32b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo | ✅ ≤ +15 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
+| [`deepseek-v3`](../extracted/deepseek-v3.md) | 2024-12 | ✅ ≤ +21 mo | ✅ ≤ +21 mo | ✅ ≤ +20 mo | ✅ ≤ +20 mo | ✅ ≤ +21 mo | ✅ ≤ +20 mo |
+| [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) |
+| [`kimi-k2.6`](../extracted/kimi-k2.6.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ↪ `megatron-bridge-v0.6.0` | ✗ (model undated) | ✗ (model undated) |
 
 ## By snapshot
 
-| Snapshot | Release | Added in this release | Supported, first version unknown | Missing ≥1 month after release | Not found, same month | Not found, model is newer | Model date unknown |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `sglang-v0.5.19` | 2026-09-05 | 2 | 17 | 2 | 1 | 0 | 2 |
-| `vllm-v0.29.0` | 2026-09-09 | 1 | 19 | 1 | 1 | 0 | 2 |
-| `veomni-v0.1.12` | 2026-09-09 | 0 | 15 | 6 | 1 | 0 | 2 |
-| `verl-v0.9.0` | 2026-08-14 | 0 | 13 | 6 | 2 | 1 | 2 |
+| Snapshot | Release | Added in this release | Supported, first version unknown | Missing ≥1 month after release | Not found, same month | Not found, model is newer | Delegated to another engine | Model date unknown |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `sglang-v0.5.19` | 2026-09-05 | 2 | 17 | 2 | 1 | 0 | 0 | 2 |
+| `vllm-v0.29.0` | 2026-09-09 | 1 | 19 | 1 | 1 | 0 | 0 | 2 |
+| `megatron-bridge-v0.6.0` | 2026-08-19 | 1 | 16 | 2 | 2 | 1 | 0 | 2 |
+| `megatron-lm-core_v0.19.0` | 2026-08-19 | 0 | 3 | 0 | 0 | 0 | 20 | 1 |
+| `veomni-v0.1.12` | 2026-09-09 | 0 | 15 | 6 | 1 | 0 | 0 | 2 |
+| `verl-v0.9.0` | 2026-08-14 | 0 | 13 | 6 | 2 | 1 | 0 | 2 |
 
 ## Still missing at least a month after release
 
@@ -64,10 +68,10 @@ generic path.
 
 - [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) (2026-08) — `sglang-v0.5.19` (+1 mo), `vllm-v0.29.0` (+1 mo), `veomni-v0.1.12` (+1 mo)
 - [`qwen3.8-flash-next`](../extracted/qwen3.8-flash-next.md) (2026-08) — `sglang-v0.5.19` (+1 mo), `veomni-v0.1.12` (+1 mo)
-- [`kimi-k3`](../extracted/kimi-k3.md) (2026-07) — `veomni-v0.1.12` (+2 mo), `verl-v0.9.0` (+1 mo)
+- [`kimi-k3`](../extracted/kimi-k3.md) (2026-07) — `megatron-bridge-v0.6.0` (+1 mo), `veomni-v0.1.12` (+2 mo), `verl-v0.9.0` (+1 mo)
 - [`glm-5.2`](../extracted/glm-5.2.md) (2026-06) — `verl-v0.9.0` (+2 mo)
 - [`glm-5.1`](../extracted/glm-5.1.md) (2026-04) — `verl-v0.9.0` (+4 mo)
 - [`glm-5`](../extracted/glm-5.md) (2026-02) — `verl-v0.9.0` (+6 mo)
 - [`glm-4.7`](../extracted/glm-4.7.md) (2026-01) — `veomni-v0.1.12` (+8 mo)
 - [`kimi-k2.5`](../extracted/kimi-k2.5.md) (2026-01) — `veomni-v0.1.12` (+8 mo), `verl-v0.9.0` (+7 mo)
-- [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) (2025-09) — `veomni-v0.1.12` (+12 mo), `verl-v0.9.0` (+11 mo)
+- [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) (2025-09) — `megatron-bridge-v0.6.0` (+11 mo), `veomni-v0.1.12` (+12 mo), `verl-v0.9.0` (+11 mo)

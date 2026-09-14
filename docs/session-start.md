@@ -87,7 +87,7 @@ In rough priority order:
 
 ### Engines track
 
-The engines track (vLLM, SGLang, verl, VeOmni) runs in parallel to the model queue and has
+The engines track (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) runs in parallel to the model queue and has
 its own status file. If the user asks for engine work, or the quarterly snapshot is due,
 start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
 [`docs/engines/overview.md`](./engines/overview.md) instead of the priority list above.

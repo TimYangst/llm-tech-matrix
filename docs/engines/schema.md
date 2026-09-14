@@ -1,4 +1,4 @@
-# Engine Snapshot Schema (engine schema v2)
+# Engine Snapshot Schema (engine schema v3)
 
 The contract for `data/extracted/engines/<slug>.json`. The executable version is
 [`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py); if the
@@ -34,6 +34,8 @@ v8). A record declares `engine_schema_version`.
 - `roles` — list of `"inference"` / `"training"` / `"rl_post_training"`. each role has exactly one subobject —
   `inference` → `serving`, `training` → `training`, `rl_post_training` → `rl` — present exactly
   when the role is claimed. Claim a role only when the snapshot's own sources document it.
+  List the primary role first: synthesis groups snapshots by it (Megatron-LM ships an inference
+  engine, but it is a training library, so `training` comes first).
 - `hardware` — platforms the snapshot's own sources name
 - `sources` — every URL in the snapshot's manifest
 
@@ -88,12 +90,20 @@ One row per HF architecture (`architectures[0]`), the join key to model records.
 - `support` (v2) — one of:
   - `registered`: in the engine's built-in model registry, whatever form it takes — vLLM's
     static `registry.py`, SGLang's `EntryClass` declarations, VeOmni's `MODELING_REGISTRY` keyed
-    by model_type;
+    by model_type, Megatron-Bridge's `register_bridge(source=<architecture>)`;
   - `model_specific`: no registry entry (or no registry at all, like verl), but code or docs
     written for this architecture or its model_type exist at the commit;
+  - `delegated` (v3): the engine maps no HF architectures itself, and its own sources name
+    another tracked engine that does. `delegated_to` holds that engine's snapshot slug (it must
+    exist, and must not be the record itself). Megatron-LM leaves HF conversion to
+    Megatron-Bridge. Delegation records responsibility, not a tested pairing: the delegate's
+    own row says whether the model is supported, and synthesis shows it through the delegation.
+    Use it only when the snapshot has no in-repo signal for the architecture (otherwise
+    `model_specific`), and verify the architecture string is absent tree-wide;
   - `not_found`: neither, verified across the whole repository at the commit. **Absent
     architectures get a row too**, with whole-file evidence; this is a snapshot fact, not a
     claim the model cannot run through a generic path (HF Transformers backends, FSDP).
+- `delegated_to` (v3) — engine snapshot slug; set exactly when `support` is `delegated`
 - `implementation` — module / class / patch that implements it
 - `documented` — covered by the engine's supported-models docs (docs can lag code; vLLM's are
   architecture-level, SGLang's family-level — say which in `notes`)

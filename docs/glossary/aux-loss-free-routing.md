@@ -46,6 +46,18 @@ the bias adjustment.
 | GLM-5.3-Flash                            | Same `noaux_tc` + sigmoid routing carried into the new `glm5_next` architecture, with the expert pool grown **256 → 288** while top-k stays 8 and per-expert width stays 2048 (so sparsity rises from 3.1% to 2.8%). A `router_aux_loss_coef=0.001` key sits alongside `noaux_tc`; under aux-loss-free routing it is not the primary balancing mechanism.                                                                                                                                                                                                                                                                                          |
 | DeepSeek-V4.1-Flash                      | **Per-modality bias sets.** `noaux_tc` with SqrtSoftplus scoring kept, but separate expert-wise correction biases for text and image tokens: each token selects experts with its own modality's biases while the original scores weight the outputs, and the two sets update independently from their own expert loads (bias update speed 0.001 for both). A 0.0001 sequence-level balance loss is retained against extreme within-sequence imbalance.                                                                                                                                                                                             |
 
+<!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
+
+## Implemented by (engines)
+
+Generated from `technique_support[]` in the engine snapshots under [`data/extracted/engines/`](../../data/extracted/engines/) — do not edit. "Used by" above records models adopting the technique; this table records engines implementing it.
+
+| Engine snapshot                                                                        | Roles                                 | Implementation                                                                                                                                                  | Flags                                               | Evidence                                                                                                                                                                                                                             |
+| -------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`megatron-lm-core_v0.19.0`](../../data/extracted/engines/megatron-lm-core_v0.19.0.md) | training, rl_post_training, inference | Quantile Balancing router (moe_router_load_balancing_type 'quantile_balancing'): a per-expert routing bias from quantile estimates replaces the auxiliary loss. | `moe_router_load_balancing_type=quantile_balancing` | [router.py#L220](https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/moe/router.py#L220), [release notes](https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0) |
+
+<!-- END GENERATED: implemented-by-engines -->
+
 ## Related techniques
 
 - [DeepSeekMoE](./deepseekmoe.md)

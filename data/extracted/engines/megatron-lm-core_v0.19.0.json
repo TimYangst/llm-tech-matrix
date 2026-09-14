@@ -1,0 +1,691 @@
+{
+  "engine_schema_version": 3,
+  "metadata": {
+    "name": "Megatron-LM",
+    "engine": "megatron-lm",
+    "organization": "NVIDIA",
+    "repository": "https://github.com/NVIDIA/Megatron-LM",
+    "license": "BSD-3-Clause (LICENSE file; bundled third-party code under Apache-2.0 and others)",
+    "release_tag": "core_v0.19.0",
+    "commit_sha": "5be9626709af2722333bf54797c954c09edeada3",
+    "release_date": "2026-08-19",
+    "snapshot_date": "2026-09-13",
+    "roles": [
+      "training",
+      "rl_post_training",
+      "inference"
+    ],
+    "hardware": [
+      "NVIDIA GPU"
+    ],
+    "sources": [
+      "https://api.github.com/repos/NVIDIA/Megatron-LM/releases/tags/core_v0.19.0",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/README.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/pyproject.toml",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/requirements.txt",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/get-started/overview.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_fsdp.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_rl.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/multi_token_prediction.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/multi_latent_attention.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/moe.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/context_parallel.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/dist_optimizer.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/docs/api-guide/router_replay.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/model_parallel_config.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/optimizer/emerging_optimizers.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/optimizer/muon.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/experimental_attention_variant/dsa.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/models/gpt/experimental_attention_variant_module_specs.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/ssm/gated_delta_net/gdn.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/moe/router.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/transformer_config.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/multi_latent_attention.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/rl/README.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/rl/rl_utils.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/README.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/apis/serve_config.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/contexts/kv_block_allocator.py",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/examples/megatron_fsdp/README.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md",
+      "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/5be9626709af2722333bf54797c954c09edeada3/LICENSE"
+    ]
+  },
+  "parallelism": {
+    "tensor": {
+      "supported": true,
+      "implementation": "tensor_model_parallel_size",
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L74",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/model_parallel_config.py#L55"
+      ]
+    },
+    "pipeline": {
+      "supported": true,
+      "implementation": "pipeline_model_parallel_size, with configurable pipeline layouts",
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L89",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2950"
+      ]
+    },
+    "data": {
+      "supported": true,
+      "implementation": "DDP, distributed optimizer (optimizer state sharded across DP ranks), Megatron-FSDP, torch FSDP2",
+      "notes": "Megatron-FSDP sharding strategies: no_shard, optim (ZeRO-1), optim_grads (ZeRO-2), optim_grads_params (ZeRO-3).",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L29",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L40",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L57",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/dist_optimizer.md#L12",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2997"
+      ]
+    },
+    "expert": {
+      "supported": true,
+      "implementation": "expert_model_parallel_size; token dispatchers include DeepEP, HybridEP and (new in 0.19.0) NCCL EP",
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L121",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/model_parallel_config.py#L127",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    "context": {
+      "supported": true,
+      "implementation": "context_parallel_size (cp_comm_type, default p2p)",
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L104",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L3054"
+      ]
+    },
+    "sequence": {
+      "supported": true,
+      "implementation": "sequence_parallel (activation partitioning alongside TP)",
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L217",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/model_parallel_config.py#L94"
+      ]
+    }
+  },
+  "serving": {
+    "api_surfaces": [
+      "MegatronLLM.generate (sync, offline)",
+      "MegatronAsyncLLM.serve: OpenAI-compatible HTTP (/v1/completions, /v1/chat/completions)"
+    ],
+    "scheduler": "DynamicInferenceEngine with dynamic batching; coordinator mode routes requests across data-parallel replicas and is required for HTTP serving.",
+    "kv_cache_management": "Block-based KV cache (KVBlockAllocator manages a pool of block IDs; block size set by --inference-dynamic-batching-block-size).",
+    "prefix_caching": "Optional (--inference-dynamic-batching-prefix-caching) with eviction and coordinator routing policies; 0.19.0 adds load-aware prefix-cache routing across workers.",
+    "disaggregation": "Foundations only in 0.19.0 (release notes): heterogeneous inference-shard specifications, multi-destination refit, KV/Mamba-state resharding and a NIXL copy backend.",
+    "speculative_decoding_methods": [
+      "mtp"
+    ],
+    "notes": "Megatron-RL uses this engine for rollouts, with refit copying weights from the training model (see rl.weight_sync); the README lists refit-oriented weight-update APIs as future work. The HTTP frontend is fixed to global rank 0, returns model 'EMPTY' and has no /v1/models endpoint; streaming and a `megatron serve` CLI are listed as future work. Response parsers are configurable (ServeConfig.parsers, --rl-inference-parsers) but no parser registry is among the sources, so none are listed.",
+    "evidence": {
+      "api_surfaces": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/README.md#L3",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/README.md#L28"
+      ],
+      "scheduler": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L1995",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/README.md#L3"
+      ],
+      "kv_cache_management": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/inference/contexts/kv_block_allocator.py#L14",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2020"
+      ],
+      "prefix_caching": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2078",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2085",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ],
+      "disaggregation": [
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ],
+      "speculative_decoding_methods": [
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    }
+  },
+  "training": {
+    "workloads": [
+      "pre-training (GPT, Mamba, hybrid, VLM)",
+      "RL post-training (Megatron-RL)",
+      "ModelOpt post-training (quantization, QAT, EAGLE3, pruning, distillation)"
+    ],
+    "backends": [
+      "ddp",
+      "megatron-fsdp",
+      "torch-fsdp2"
+    ],
+    "optimizers": [
+      "adam",
+      "sgd",
+      "muon",
+      "dist_muon",
+      "lion",
+      "soap",
+      "adaptive_muon"
+    ],
+    "mixed_precision": "FP16, BF16, FP8 and FP4. FP8 recipes run through Transformer Engine: delayed, tensorwise, blockwise, mxfp8 and custom; 0.19.0 adds MXFP8 training paths.",
+    "quantization_aware_training": "NVFP4 quantization-aware training through NVIDIA ModelOpt (examples/post_training/modelopt).",
+    "checkpointing": "Megatron checkpoints or distributed checkpoints (--use-dist-ckpt, --dist-ckpt-format), with optional fully parallel save.",
+    "kernels": "Transformer Engine for FP8/FP4 recipes and fused layers; DSA indexer and sparse-attention kernels in cuDNN and TileLang.",
+    "notes": "Megatron Core is the library (building blocks, parallelism, precision); Megatron-LM is the reference training scripts around it. Model architectures are generic composable specs (GPTModel, the new HybridModel, Mamba, T5, BERT, MIMO); converting HF checkpoints is delegated to Megatron-Bridge. GPTModel is being deprecated in favour of HybridModel. `dist_muon` is deprecated in favour of `muon` with the distributed optimizer.",
+    "evidence": {
+      "workloads": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/README.md#L6",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_rl.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L29"
+      ],
+      "backends": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/parallelism-guide.md#L29",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_fsdp.md#L14",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L3051"
+      ],
+      "optimizers": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2777"
+      ],
+      "mixed_precision": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/README.md#L20",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py#L743",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ],
+      "quantization_aware_training": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L57"
+      ],
+      "checkpointing": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2886",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2896"
+      ],
+      "kernels": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py#L744",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    }
+  },
+  "rl": {
+    "algorithms": [
+      "grpo"
+    ],
+    "rollout_backends": [
+      "megatron",
+      "openai",
+      "huggingface"
+    ],
+    "weight_sync": "Refit copies weights from the training model to the colocated inference model between rollout steps (--refit-method; default gloo over CPU). KV cache during training can persist, be offloaded or be recomputed (--rl-kv-cache-management-mode).",
+    "weight_sync_backends": [
+      "nccl",
+      "gloo",
+      "nvshmem"
+    ],
+    "reward": "Agents / environments receive an inference handle and return rollouts with rewards; examples include countdown, GSM8K, MATH and DAPO environments.",
+    "notes": "GRPO is the only advantage estimator (group size, prompts per step, clamp eps, KL beta, entropy weight, same-reward group filtering). The docs call Megatron-RL under active development and aimed at research teams, pointing production users to NeMo RL; megatron/rl/README.md (dated 08/27/2025) still says it is not yet usable by external users.",
+    "evidence": {
+      "algorithms": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/rl/rl_utils.py#L831",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2576"
+      ],
+      "rollout_backends": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_rl.md#L23"
+      ],
+      "weight_sync": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2698",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2622"
+      ],
+      "weight_sync_backends": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2699"
+      ],
+      "reward": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/megatron_rl.md#L33"
+      ]
+    }
+  },
+  "integrations": [
+    {
+      "name": "Megatron-Bridge",
+      "relation": "used_by",
+      "engine_slug": "megatron-bridge-v0.6.0",
+      "version_constraints": [],
+      "notes": "HF checkpoint conversion is delegated to Megatron-Bridge, which builds on Megatron Core. Megatron-Bridge v0.6.0 pins its own Megatron-LM submodule commit rather than this tag (see that record).",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16"
+      ]
+    },
+    {
+      "name": "Transformer Engine",
+      "relation": "kernel_library",
+      "version_constraints": [],
+      "notes": "Provides the FP8 recipes (DelayedScaling, Float8CurrentScaling, Float8BlockScaling, MXFP8BlockScaling); some recipes require minimum TE versions (e.g. blockwise needs TE >= 2.3.0.dev0).",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py#L743"
+      ]
+    },
+    {
+      "name": "NVIDIA ModelOpt",
+      "relation": "other",
+      "version_constraints": [
+        "pyproject.toml: nvidia-modelopt[torch]>=0.44"
+      ],
+      "notes": "Quantization, QAT, EAGLE3 draft training, pruning and distillation examples.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/pyproject.toml#L93",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L29"
+      ]
+    }
+  ],
+  "model_support": [
+    {
+      "hf_architecture": "DeepseekV3ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3",
+        "kimi-k2-thinking"
+      ],
+      "support": "model_specific",
+      "implementation": "Docs and example configs only: a Megatron-FSDP DeepSeek-V3 (671B) training example and ModelOpt configs for DeepSeek-R1 and Kimi-K2-Instruct (same architecture)",
+      "documented": true,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "No architecture registry exists in Megatron-LM; the string DeepseekV3ForCausalLM appears nowhere at the commit. ModelOpt converts the HF checkpoint on the fly; Kimi K2 Thinking itself is not named.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/megatron_fsdp/README.md#L68",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L31",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L34"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV32ForCausalLM",
+      "model_slugs": [
+        "deepseek-v3.2-exp"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The DSA attention variant cites DeepSeek-V3.2-Exp as its reference, but no model definition, config or example targets the model.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV4ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4-pro",
+        "deepseek-v4-flash",
+        "deepseek-v4-flash-0731"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Delegated to Megatron-Bridge, which registers DeepSeek-V4, but the Megatron Core code that bridge needs is not in this release: the 0.19.0 notes place DeepSeek-V4 (migrated to HybridModel) on the `dev` branch only, and neither the architecture string nor model_type deepseek_v4 appears in megatron/ at the tag.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    {
+      "hf_architecture": "DeepseekV41ForCausalLM",
+      "model_slugs": [
+        "deepseek-v4.1-flash"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "The model (2026-09) postdates this release (2026-08-19).",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Glm4MoeForCausalLM",
+      "model_slugs": [
+        "glm-4.7"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "GlmMoeDsaForCausalLM",
+      "model_slugs": [
+        "glm-5",
+        "glm-5.1",
+        "glm-5.2"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "No model definition, but the DSA implementation carries GLM-5 variants (indexer ReLU disabled for GLM5) and IndexShare, which GLM-5.2 introduced; the GLM-5 model is assembled in Megatron-Bridge.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Glm5NextForConditionalGeneration",
+      "model_slugs": [
+        "glm-5.3-flash"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK25ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k2.5",
+        "kimi-k2.6"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "KimiK3ForConditionalGeneration",
+      "model_slugs": [
+        "kimi-k3"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3ForCausalLM",
+      "model_slugs": [
+        "qwen3-32b"
+      ],
+      "support": "model_specific",
+      "implementation": "ModelOpt support-matrix entry and config (Qwen3-0.6B / 8B)",
+      "documented": true,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Docs-only signal; Qwen3-32B itself is not named.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L40"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3MoeForCausalLM",
+      "model_slugs": [
+        "qwen3-235b-a22b"
+      ],
+      "support": "model_specific",
+      "implementation": "ModelOpt support-matrix entry and config (Qwen3-30B-A3B / 235B-A22B)",
+      "documented": true,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Quantization is marked 'WAR' (workaround) for the MoE variants.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L41"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5ForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-27b",
+        "qwen3.6-27b",
+        "qwen3.8-27b"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "Megatron Core has a GatedDeltaNet layer, but Qwen3.5 is only wired up in Megatron-Bridge.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.5-35b-a3b",
+        "qwen3.6-35b-a3b"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen3_5MoeForCausalLM",
+      "model_slugs": [
+        "qwen3.8-2.4t-a95b"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    },
+    {
+      "hf_architecture": "Qwen4ExpForConditionalGeneration",
+      "model_slugs": [
+        "qwen3.8-flash-next"
+      ],
+      "support": "delegated",
+      "delegated_to": "megatron-bridge-v0.6.0",
+      "documented": false,
+      "features": {},
+      "speculative_decoding": [],
+      "model_details": [],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/models/llms.md#L16",
+        "https://github.com/NVIDIA/Megatron-LM/tree/5be9626709af2722333bf54797c954c09edeada3"
+      ]
+    }
+  ],
+  "technique_support": [
+    {
+      "glossary_slug": "dsa",
+      "implementation": "experimental_attention_variant 'dsa': lightning indexer + sparse MLA attention with an indexer KL loss; 0.19.0 adds backend-neutral CP and THD, pipeline-aware indexer-loss scaling and fused cuDNN / TileLang kernels.",
+      "flags": [
+        "experimental_attention_variant=dsa"
+      ],
+      "notes": "Cites DeepSeek-V3.2-Exp; also carries GLM-5 indexer variants.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/experimental_attention_variant/dsa.py#L407",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/models/gpt/experimental_attention_variant_module_specs.py#L143",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    {
+      "glossary_slug": "indexshare",
+      "implementation": "DSA index sharing: with index_topk_freq > 1, layers without their own top-k reuse a previous indexer layer's selection; pipeline splits are validated so shared indices stay on one stage.",
+      "flags": [
+        "dsa_indexer_topk_freq > 1"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/experimental_attention_variant/dsa.py#L1564",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/models/gpt/experimental_attention_variant_module_specs.py#L339",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    {
+      "glossary_slug": "mla",
+      "implementation": "Multi-Latent Attention (q/kv LoRA ranks, decoupled RoPE head dim, optional latent caching), now also in HybridModel.",
+      "flags": [
+        "--multi-latent-attention",
+        "--q-lora-rank",
+        "--kv-lora-rank"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/multi_latent_attention.md#L14",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L3383",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    {
+      "glossary_slug": "mtp",
+      "implementation": "DeepSeek-V3-style sequential MTP modules for GPTModel-style models (mtp_num_layers, mtp_loss_scaling_factor default 0.1); full-model CUDA graphs for MTP inference in 0.19.0.",
+      "flags": [
+        "mtp_num_layers"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/docs/user-guide/features/multi_token_prediction.md#L22",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/transformer_config.py#L68"
+      ]
+    },
+    {
+      "glossary_slug": "muon",
+      "implementation": "Muon family through the Emerging-Optimizers library (muon, adaptive_muon; lion or adam for scalar parameters), tensor-parallel aware (muon_tp_mode blockwise) and routed through the distributed optimizer.",
+      "flags": [
+        "--optimizer muon",
+        "--muon-tp-mode"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2777",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/optimizer/emerging_optimizers.py#L29",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2540"
+      ]
+    },
+    {
+      "glossary_slug": "gated-deltanet",
+      "implementation": "GatedDeltaNet layer selectable as the experimental attention variant 'gated_delta_net' in hybrid layer patterns.",
+      "flags": [
+        "experimental_attention_variant=gated_delta_net",
+        "--linear-attention-freq"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/ssm/gated_delta_net/gdn.py#L30",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/models/gpt/experimental_attention_variant_module_specs.py#L141"
+      ]
+    },
+    {
+      "glossary_slug": "aux-loss-free-routing",
+      "implementation": "Quantile Balancing router (moe_router_load_balancing_type 'quantile_balancing'): a per-expert routing bias from quantile estimates replaces the auxiliary loss.",
+      "flags": [
+        "moe_router_load_balancing_type=quantile_balancing"
+      ],
+      "notes": "A different bias estimator (dual coordinate-descent quantiles, optional EMA) from DeepSeek-V3's sign-step bias update.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/transformer/moe/router.py#L220",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    },
+    {
+      "glossary_slug": "grpo",
+      "implementation": "Megatron-RL GRPO: group-relative advantages over grpo_group_size samples per prompt, clipped ratio (grpo_clamp_eps_lower/upper), KL beta and entropy weight.",
+      "flags": [
+        "--perform-rl-step",
+        "--grpo-group-size"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/rl/rl_utils.py#L831",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/training/arguments.py#L2606"
+      ]
+    },
+    {
+      "glossary_slug": "fp8-mixed-precision",
+      "implementation": "FP8 training through Transformer Engine recipes, including block-wise scaling (Float8BlockScaling) alongside delayed, tensorwise and MXFP8.",
+      "flags": [
+        "fp8_recipe=blockwise"
+      ],
+      "notes": "Block-wise scaling is the fine-grained variant the glossary entry describes; the other recipes are per-tensor or microscaling.",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py#L743",
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/megatron/core/fp8_utils.py#L744"
+      ]
+    },
+    {
+      "glossary_slug": "speculative-decoding",
+      "implementation": "EAGLE3 draft-module training and export through ModelOpt examples; MTP speculative inference in the Megatron inference engine.",
+      "flags": [
+        "eagle3.sh (ModelOpt example)"
+      ],
+      "notes": "",
+      "evidence": [
+        "https://github.com/NVIDIA/Megatron-LM/blob/5be9626709af2722333bf54797c954c09edeada3/examples/post_training/modelopt/README.md#L29",
+        "https://github.com/NVIDIA/Megatron-LM/releases/tag/core_v0.19.0"
+      ]
+    }
+  ],
+  "open_questions": [
+    "DeepSeek-V4 support exists only on the `dev` branch (release notes: 'Deepseek v4 migrated to HybridModel on the `dev` branch'); nothing DeepSeek-V4-specific is in core_v0.19.0. verl's DeepSeek-V4 path (Megatron-Bridge + Megatron) and Megatron-Bridge's own DeepSeek-V4 recipes therefore depend on unreleased Megatron-LM code.",
+    "License: the LICENSE file is BSD-3-Clause for NVIDIA code (with Apache-2.0 and other licenses for bundled third-party files), while the README badge says Apache and GitHub's license detection reports NOASSERTION.",
+    "megatron/rl/README.md (status dated 08/27/2025) says Megatron-RL is not yet usable by external users, while docs/user-guide/features/megatron_rl.md presents it as usable for research with NeMo RL recommended for production. The rl_post_training role is recorded from the code at this tag (GRPO, refit backends), not from a production-readiness claim.",
+    "Megatron-LM maps no HF architectures (generic specs; docs/models/llms.md sends HF conversion to Megatron-Bridge), so rows without an in-repo signal are `delegated` to megatron-bridge-v0.6.0. Delegation records responsibility, not compatibility: Bridge v0.6.0 pins a Megatron-LM main commit, not this tag. The model_specific rows are documentation signals (Megatron-FSDP DeepSeek-V3 example, ModelOpt support matrix), not registry entries.",
+    "Megatron-Bridge v0.6.0 pins Megatron-LM as a submodule at a main-branch commit (cd4afff, 2026-07-25) instead of this release tag, and this tag is not an ancestor of main; which Megatron-LM version a Bridge user actually runs depends on the container.",
+    "CSA/HCA and mHC (DeepSeek-V4) do not appear in megatron/ at this tag; Megatron-Bridge's DeepSeek-V4 README credits them to Megatron-LM PRs available on dev."
+  ]
+}

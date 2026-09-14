@@ -1,5 +1,5 @@
 {
-  "engine_schema_version": 2,
+  "engine_schema_version": 3,
   "metadata": {
     "name": "verl",
     "engine": "verl",
@@ -346,8 +346,9 @@
     {
       "name": "Megatron-Bridge / Megatron",
       "relation": "training_backend",
+      "engine_slug": "megatron-bridge-v0.6.0",
       "version_constraints": [],
-      "notes": "The megatron engine uses Megatron-Bridge by default; MTP training is only supported on the Megatron-Bridge + Megatron combination.",
+      "notes": "The megatron engine uses Megatron-Bridge by default; MTP training is only supported on the Megatron-Bridge + Megatron combination. verl states no Megatron-Bridge version; the megatron-bridge-v0.6.0 link is to the tracked snapshot, whose DeepSeek-V4 path in turn needs Megatron-LM dev-branch code.",
       "evidence": [
         "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/verl/trainer/config/engine/megatron.yaml#L98",
         "https://github.com/verl-project/verl/blob/483b8a009ba3a97563edee3a19887e4862b8094a/docs/advance/mtp.md#L11"

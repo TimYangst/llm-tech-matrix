@@ -1,4 +1,4 @@
-"""Pydantic models for the engine snapshot schema (engine schema v2).
+"""Pydantic models for the engine snapshot schema (engine schema v3).
 
 Engines (vLLM, SGLang, verl, VeOmni) are a second record type, parallel to the model
 records validated by `schema.py`. Records live at `data/extracted/engines/<slug>.json`.
@@ -22,7 +22,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ENGINE_SCHEMA_VERSION = 2
+ENGINE_SCHEMA_VERSION = 3
 UNKNOWN = "[Unknown/Not Disclosed]"
 
 EngineRole = Literal["inference", "training", "rl_post_training"]
@@ -36,7 +36,7 @@ ROLE_SUBOBJECTS: dict[str, str] = {
 IntegrationRelation = Literal[
     "kernel_library", "kv_transfer", "rollout_backend", "training_backend", "used_by", "other"
 ]
-SupportLevel = Literal["registered", "model_specific", "not_found"]
+SupportLevel = Literal["registered", "model_specific", "delegated", "not_found"]
 
 
 class _Strict(BaseModel):
@@ -257,6 +257,9 @@ class ModelSupport(_Strict):
       `MODELING_REGISTRY` keyed by model_type.
     - `model_specific` — no registry entry (or the engine has no registry, like verl), but the
       snapshot carries code or docs written for this architecture / its model_type.
+    - `delegated` (v3) — the engine does not map HF architectures itself and its own sources
+      name another tracked engine that does; `delegated_to` is that engine's snapshot slug.
+      Megatron-LM leaves HF conversion to Megatron-Bridge. Synthesis reads the delegate's row.
     - `not_found` — neither. This is a fact about the snapshot, not a claim the model cannot run:
       generic loading paths (HF Transformers backends, FSDP on any HF model) may still work.
     """
@@ -267,6 +270,11 @@ class ModelSupport(_Strict):
         description="data/extracted/<slug>.json records using this architecture",
     )
     support: SupportLevel
+    delegated_to: str | None = Field(
+        default=None,
+        min_length=1,
+        description="Engine snapshot slug that maps this architecture; set exactly when support is 'delegated'",
+    )
     implementation: str = Field(
         default=UNKNOWN,
         description="Module / class / patch that implements it; UNKNOWN when not found",
@@ -335,6 +343,10 @@ class EngineRecord(_Strict):
         if errors:
             raise ValueError("; ".join(errors))
         for row in self.model_support:
+            if (row.support == "delegated") != (row.delegated_to is not None):
+                raise ValueError(
+                    f"{row.hf_architecture}: `delegated_to` must be set exactly when support is 'delegated'"
+                )
             slugs = [d.model_slug for d in row.model_details]
             stray = sorted(set(slugs) - set(row.model_slugs))
             if stray:

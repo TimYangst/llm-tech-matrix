@@ -2,7 +2,7 @@
 
 > 中文版：[sglang-v0.5.19.zh.md](./sglang-v0.5.19.zh.md)
 
-*Engine schema version: 2*
+*Engine schema version: 3*
 
 ## Overview
 
