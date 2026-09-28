@@ -9,9 +9,9 @@
 
 ## Description
 
-[DSA](./dsa.md) cuts core attention from `O(L²)` to `O(Lk)` with a lightweight *lightning
+[DSA](./dsa.md) cuts core attention from $`O(L^2)`$ to $`O(Lk)`$ with a lightweight *lightning
 indexer* that picks the top-k relevant tokens per query. But the indexer itself is still
-`O(L²)`, and it runs independently at every layer — so as context grows, the mechanism
+$`O(L^2)`$, and it runs independently at every layer — so as context grows, the mechanism
 introduced to remove the quadratic cost becomes the quadratic cost.
 
 IndexCache's observation is that this per-layer work is largely redundant: **consecutive

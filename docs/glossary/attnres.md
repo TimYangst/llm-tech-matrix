@@ -10,36 +10,39 @@
 ## Description
 
 A standard residual connection compresses everything the network has computed so far into a
-single state `h_l` — a bottleneck the AttnRes paper explicitly compares to an RNN over time.
+single state $`h_l`$ — a bottleneck the AttnRes paper explicitly compares to an RNN over time.
 The Transformer already solved that problem along the *sequence* axis by replacing recurrence
 with attention. AttnRes applies the same move along the *depth* axis.
 
-Each layer `l` holds a **learnable pseudo-query** `q_l = w_l ∈ R^d` (static per layer). The keys
+Each layer $`l`$ holds a **learnable pseudo-query** $`q_l = w_l \in \mathbb{R}^d`$ (static per layer). The keys
 and values are the actual outputs of all preceding layers, with the token embedding as source 0
 so it is always reachable:
 
+```math
+\alpha_{i \to l} = \frac{\phi(q_l, k_i)}{\sum_{j=0}^{l-1} \phi(q_l, k_j)}, \qquad \phi(q, k) = \exp(q^\top \mathrm{RMSNorm}(k))
 ```
-α_{i→l} = φ(q_l, k_i) / Σ_j φ(q_l, k_j),   φ(q,k) = exp(qᵀ · RMSNorm(k))
-h_l = Σ_{i<l} α_{i→l} · v_i
+
+```math
+h_l = \sum_{i=0}^{l-1} \alpha_{i \to l} \cdot v_i
 ```
 
 The RMSNorm on keys is load-bearing: without it, layers with large-magnitude outputs would
 dominate the depth-attention weights regardless of relevance. Note that although the query is
 static, the weights are input-dependent through the keys — so the source selection *is* dynamic.
 
-**Block AttnRes is what actually ships.** Full AttnRes costs O(L²d) arithmetic (affordable at
-L < 100) but O(Ld) memory and cross-stage pipeline communication to keep every layer output
+**Block AttnRes is what actually ships.** Full AttnRes costs $`O(L^2 d)`$ arithmetic (affordable at
+$`L < 100`$) but $`O(Ld)`$ memory and cross-stage pipeline communication to keep every layer output
 alive. The block variant partitions L layers into N blocks; within a block, layer outputs are
-summed into one block representation `b_n` (with `b_0` = the token embedding), and full attention
+summed into one block representation $`b_n`$ (with $`b_0`$ = the token embedding), and full attention
 runs only over the N block-level representations — the first layer of block n sees
-`[b_0 … b_{n−1}]`, later layers additionally see the running partial sum. Memory and
-communication drop from O(Ld) to O(Nd), inference-time state becomes bounded, and parallel
+$`[b_0, b_1, \dots, b_{n-1}]`$, later layers additionally see the running partial sum. Memory and
+communication drop from $`O(Ld)`$ to $`O(Nd)`$, inference-time state becomes bounded, and parallel
 inter-block results can be merged with sequential intra-block partial sums via online softmax.
-The paper reports N ≈ 8 recovers most of the benefit across model scales.
+The paper reports $`N \approx 8`$ recovers most of the benefit across model scales.
 
 Contrast with [mHC](./mhc.md), the other post-2025 attack on the residual stream: mHC *widens*
-the stream into `R^{n_hc × d}` and constrains the inter-layer mapping to doubly stochastic
-matrices; AttnRes keeps the stream at width `d` and instead makes **which prior layers you read**
+the stream into $`\mathbb{R}^{n_{\mathrm{hc}} \times d}`$ and constrains the inter-layer mapping to doubly stochastic
+matrices; AttnRes keeps the stream at width $`d`$ and instead makes **which prior layers you read**
 data-dependent. Both are "the residual connection is a bottleneck" arguments arriving at
 different answers.
 

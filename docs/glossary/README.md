@@ -15,6 +15,8 @@ by collecting cross-model adoption in one place.
 
 1. Copy [`_template.md`](./_template.md) to `<slug>.md` (kebab-case).
 2. Fill it in. Keep it short — link to the canonical paper rather than re-explaining.
+   Formulas are written as LaTeX, following
+   [Math notation](../conventions.md#math-notation).
 3. Add a row to the relevant section below.
 4. When extracting a new model that uses the technique, add a row to the entry's
    "Used by" table.

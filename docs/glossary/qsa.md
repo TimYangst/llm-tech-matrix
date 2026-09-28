@@ -12,19 +12,19 @@
 [DSA](./dsa.md) made sparse attention retrofittable by training a lightweight indexer to
 imitate the model's own attention distribution, then attending only to the indexer's
 top-k tokens. QSA keeps that structure and attacks what DSA left on the table: **the
-indexer is itself O(n²)**, so as context grows the scoring path becomes the bottleneck it
+indexer is itself $`O(n^2)`$**, so as context grows the scoring path becomes the bottleneck it
 was introduced to remove.
 
 QSA's fix is to score *compressed blocks* rather than tokens. Keys are partitioned into
-non-overlapping micro-blocks of `r` tokens and average-pooled into one representative key
+non-overlapping micro-blocks of $`r`$ tokens and average-pooled into one representative key
 per block — crucially **before** positional encoding, so each block is first summarized as
 content and only then assigned a single block-level position, rather than averaging
 representations that sit at different rotary phases. A multi-query indexer (H query heads,
-one shared key head) then scores each block with `I_ib = Σ_h ReLU(⟨q_i^h, k̄_b⟩)` under a
-block-causal mask, and each query takes the top `⌈K/r⌉` blocks. Selected blocks expand back
-to token indices, truncate to the token budget `K`, and union with the always-included tail
-tokens of the final incomplete block. Compressing by `r` before scoring drops indexing from
-`O(n²)` to `O(n²/r)`.
+one shared key head) then scores each block with $`I_{ib} = \sum_h \mathrm{ReLU}(\langle q_i^h, \bar{k}_b \rangle)`$ under a
+block-causal mask, and each query takes the top $`\lceil K/r \rceil`$ blocks. Selected blocks expand back
+to token indices, truncate to the token budget $`K`$, and union with the always-included tail
+tokens of the final incomplete block. Compressing by $`r`$ before scoring drops indexing from
+$`O(n^2)`$ to $`O(n^2/r)`$.
 
 Training is a two-stage retrofit at continued-pretraining time, inherited in shape from
 DSA: **dense distillation** trains the indexer alone by KL against the backbone's own

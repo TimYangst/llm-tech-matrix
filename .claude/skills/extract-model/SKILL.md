@@ -128,6 +128,7 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 - **Cross-layer sharing (v8).** If some layers reuse KV, indexer keys or top-k indices computed by another layer (IndexShare, CSA2, YOCO-style encoder-decoder KV), record each relation in `attention.cross_layer_sharing[]` with source/consumer layer ids — not only in `sparse_attention` prose.
 - **Memory tables vs auxiliary modules (v8).** Lookup-addressed tables inside the forward pass (n-gram embeddings, Engram) go in `architecture.memory_modules[]` with their own `params`; `auxiliary_modules[]` is only for attachments outside the forward pass (speculative-decoding drafts, shipped MTP heads).
 - **Closed models.** It's tempting to fill GPT-4 / Claude architecture from leaks. Resist — those go in `inferred_fields`, not the primary fields.
+- **Formulas.** Write equations in free-text values (and glossary pages) as code-delimited LaTeX — inline as dollar-backtick spans, display as `math` fenced blocks — never as ASCII/Unicode pseudo-math or bare `$...$`. Rules and examples: [`docs/conventions.md`](../../../docs/conventions.md#math-notation). Transliterate the source's notation; don't guess at typesetting the source doesn't show.
 
 ## When to push back on the user
 
