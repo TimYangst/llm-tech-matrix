@@ -4,18 +4,18 @@
 
 **Slug:** `mhc`
 **类别：** other（残差流拓扑）
-**一句话概括：** 把标准残差连接替换为宽度 `n_hc` 的超连接残差流，并通过 Sinkhorn-Knopp 把层间混合矩阵 `B` 约束在双随机矩阵流形上，从而保证 `∥B∥₂ ≤ 1`、深层堆叠时信号传播非膨胀且数值稳定。
+**一句话概括：** 把标准残差连接替换为宽度 `n_hc` 的超连接残差流，并通过 Sinkhorn-Knopp 把层间混合矩阵 `B` 约束在双随机矩阵流形上，从而保证 $`\lVert B \rVert_2 \le 1`$、深层堆叠时信号传播非膨胀且数值稳定。
 **首次提出：** 超连接（Hyper-Connections）由 Zhu et al., 2025 提出；流形约束 + Sinkhorn 投影由专门的 mHC 论文（Xie et al., 2026）引入，DeepSeek-V4 第 2.2 节直接引用。
 
 ## 概述
 
-标准 Transformer 的残差流是 `R^d` 维。**Hyper-Connections (HC)** 把它扩展到 `R^(n_hc × d)`，并在每层引入三个小线性映射：
-`X_{l+1} = B_l · X_l + C_l · F_l(A_l · X_l)`
-其中 `A_l ∈ R^(1×n_hc)` 把残差投影成层输入，`F_l` 是该层算子（注意力或 MoE），`C_l ∈ R^(n_hc×1)` 把输出写回，`B_l ∈ R^(n_hc×n_hc)` 在 `n_hc` 个槽位之间混合残差流自身。它把残差宽度与隐藏维度解耦，几乎无额外算力开销，但堆叠多层 HC 时数值稳定性较差。
+标准 Transformer 的残差流是 $`\mathbb{R}^d`$ 维。**Hyper-Connections (HC)** 把它扩展到 $`\mathbb{R}^{n_{\mathrm{hc}} \times d}`$，并在每层引入三个小线性映射：
+$`X_{l+1} = B_l \cdot X_l + C_l \cdot F_l(A_l \cdot X_l)`$
+其中 $`A_l \in \mathbb{R}^{1 \times n_{\mathrm{hc}}}`$ 把残差投影成层输入，$`F_l`$ 是该层算子（注意力或 MoE），$`C_l \in \mathbb{R}^{n_{\mathrm{hc}} \times 1}`$ 把输出写回，$`B_l \in \mathbb{R}^{n_{\mathrm{hc}} \times n_{\mathrm{hc}}}`$ 在 `n_hc` 个槽位之间混合残差流自身。它把残差宽度与隐藏维度解耦，几乎无额外算力开销，但堆叠多层 HC 时数值稳定性较差。
 
-**mHC 的贡献**是把 `B_l` 约束到双随机矩阵流形（Birkhoff 多面体）上：先产生未约束的 `B̃_l`，取 `M^(0) = exp(B̃_l)`，再做 `t_max ≈ 20` 次 Sinkhorn-Knopp 行列归一化迭代，收敛到行和、列和都为 1 的 `B_l`。这保证了 `∥B_l∥₂ ≤ 1`（前向、反向均非膨胀），且该流形对乘法封闭，深层堆叠依旧稳定。`A_l`、`C_l` 额外用 Sigmoid 约束为非负且有界（`A = σ(Ã)`，`C = 2·σ(C̃)`）。
+**mHC 的贡献**是把 $`B_l`$ 约束到双随机矩阵流形（Birkhoff 多面体）上：先产生未约束的 $`\tilde{B}_l`$，取 $`M^{(0)} = \exp(\tilde{B}_l)`$，再做 $`t_{\max} \approx 20`$ 次 Sinkhorn-Knopp 行列归一化迭代，收敛到行和、列和都为 1 的 $`B_l`$。这保证了 $`\lVert B_l \rVert_2 \le 1`$（前向、反向均非膨胀），且该流形对乘法封闭，深层堆叠依旧稳定。$`A_l`$、$`C_l`$ 额外用 Sigmoid 约束为非负且有界（$`A = \sigma(\tilde{A})`$，$`C = 2 \cdot \sigma(\tilde{C})`$）。
 
-映射采用动态参数化：原始 `Ã, B̃, C̃` 由静态可学偏置加上输入相关项 `α·RMSNorm(vec(X_l))·W` 组成，使残差混合可以随 token 自适应。DeepSeek-V4 在 1F1B 重叠流水线上 mHC 的实际墙钟开销被压在 ~6.7%，得益于融合 kernel 与"大量重算 + 极少存储"的检查点策略。
+映射采用动态参数化：原始 $`\tilde{A}, \tilde{B}, \tilde{C}`$ 由静态可学偏置加上输入相关项 $`\alpha \cdot \mathrm{RMSNorm}(\mathrm{vec}(X_l)) \cdot W`$ 组成，使残差混合可以随 token 自适应。DeepSeek-V4 在 1F1B 重叠流水线上 mHC 的实际墙钟开销被压在 ~6.7%，得益于融合 kernel 与"大量重算 + 极少存储"的检查点策略。
 
 ## 参考资料
 
@@ -32,7 +32,7 @@
 | DeepSeek-V4-Flash-0731        | backbone 的 mHC 配置与预览版相同（`hc_mult=4`、`hc_sinkhorn_iters=20`、`hc_eps=1e-6`）。新增的关联点：附带的 **DSpark 草稿 backbone 同样使用 mHC**（DSpark 论文 §5.1 —— 「三层 MoE，带 mHC 与窗口 128 的滑窗注意力」），因此目标模型与草稿共享残差拓扑。见[投机解码](./speculative-decoding.zh.md)。                                                                                                                                                                                                                                                                      |
 | Qwen3.8-Flash-Next（经由 GR） | 同一家族、不同的容量分配——见 [门控残差](./gated-residual.zh.md)。Qwen 保留 4 分支加宽残差流，但把*读*做成逐元素、数据相关的，同时**整个删掉 `H_res`**，依据是消融发现：一旦读和写足够有表达力，混合算子「不带来显著改进」。这也顺带去掉了 mHC 的双随机约束机制。25B-A3B 规模下两者 loss/benchmark 相当（mHC 动态 1.594 / 54.47 vs GR 1.590 / 54.66），GR 赢在效率与稳定性。                                                                                                                                                                                               |
 | GLM-5.3-Flash                 | **第二家上 mHC 的厂商。** `mhc: true`、`hc_mult: 4`（残差流加宽 4 倍）、`hc_sinkhorn_iters: 20`、`hc_eps: 1e-06`——Z.AI 保留了 Sinkhorn-Knopp 双随机约束，而 Qwen 的 [门控残差](./gated-residual.zh.md) 是刻意把它删掉的。README 原文：「采用流形约束超连接（mHC）以进一步提升扩展效率」。FP8 的 `modules_to_not_convert` 列表暴露了实现细节：一个 `hyper_connection` 模块，外加每层的 `hc_attn_base/fn/scale` 与 `hc_ffn_base/fn/scale` 张量，全部排除在量化之外——即每层的注意力子层和 FFN 子层各有一个独立的 mHC 块，与 DeepSeek-V4 的结构一致。算子是否数据相关未披露。 |
-| DeepSeek-V4.1-Flash           | **Single-Pass mHC。** n_hc=4、Sinkhorn-Knopp 20 次迭代不变。输入混合系数整体后移一个 block——`X_{l+1} = B_l X_l + C_l F_l(A_{l-1} X_l)`——于是隐藏维的每个 tile 可以立即同时用于混合和系数预测，性能损失「可以忽略」。预训练仍用多 kernel 实现；部署时把残差更新、输入混合、系数预测、pre-norm 和 FP8 转换融合进单个 **Mega-mHC** kernel，达到理想的 (n+1)d 次读 + (n+1)d 次写，激活内存流量比 V4 的实现减半。                                                                                                                                                              |
+| DeepSeek-V4.1-Flash           | **Single-Pass mHC。** n_hc=4、Sinkhorn-Knopp 20 次迭代不变。输入混合系数整体后移一个 block——$`X_{l+1} = B_l X_l + C_l F_l(A_{l-1} X_l)`$——于是隐藏维的每个 tile 可以立即同时用于混合和系数预测，性能损失「可以忽略」。预训练仍用多 kernel 实现；部署时把残差更新、输入混合、系数预测、pre-norm 和 FP8 转换融合进单个 **Mega-mHC** kernel，达到理想的 (n+1)d 次读 + (n+1)d 次写，激活内存流量比 V4 的实现减半。                                                                                                                                                            |
 
 <!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
 

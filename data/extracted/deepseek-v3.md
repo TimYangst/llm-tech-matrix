@@ -92,7 +92,7 @@ RoPE scaling:
 | Shared experts | 1 |
 | Per-expert intermediate size | 2048 |
 
-**Routing:** Auxiliary-loss-free (DeepSeek-V3 / noaux_tc): sigmoid affinity scores per expert, plus a learnable per-expert bias that is dynamically adjusted based on per-step expert load (bias update speed gamma=0.001 for first 14.3T tokens, 0.0 for last 500B). Top-K selection uses (affinity + bias); gating value uses raw affinity. 8 expert groups; each token routed to top-4 groups, then to at most M=4 nodes (node-limited routing). Complementary sequence-wise balance loss with alpha=0.0001. No token dropping in train or inference.
+**Routing:** Auxiliary-loss-free (DeepSeek-V3 / noaux_tc): sigmoid affinity scores per expert, plus a learnable per-expert bias that is dynamically adjusted based on per-step expert load (bias update speed $`\gamma = 0.001`$ for first 14.3T tokens, 0.0 for last 500B). Top-K selection uses (affinity + bias); gating value uses raw affinity. 8 expert groups; each token routed to top-4 groups, then to at most M=4 nodes (node-limited routing). Complementary sequence-wise balance loss with $`\alpha = 0.0001`$. No token dropping in train or inference.
 
 **Layer partition:** First 3 of 61 layers are dense (intermediate_size=18432); remaining 58 layers are MoE (per-expert intermediate_size=2048).
 
@@ -127,7 +127,7 @@ RoPE scaling:
 | | |
 |---|---|
 | Depth (D) | 1 |
-| Loss weight schedule | lambda=0.3 for first 10T tokens, 0.1 for remaining 4.8T tokens |
+| Loss weight schedule | $`\lambda = 0.3`$ for first 10T tokens, 0.1 for remaining 4.8T tokens |
 
 _Shared modules:_ Embedding layer and output head are shared with the main model. Under DualPipe scheduling, the shallowest layers (with embedding) and deepest layers (with output head) are co-located on the same PP rank to enable physical parameter and gradient sharing between MTP modules and the main model. MTP modules can be discarded for standard inference, or repurposed for speculative decoding.
 

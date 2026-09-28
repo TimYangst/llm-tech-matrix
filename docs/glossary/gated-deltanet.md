@@ -10,14 +10,14 @@
 ## Description
 
 Linear attention replaces the softmax-attention dot product with a kernelized form
-that admits a constant-size recurrent state, dropping the per-token cost from O(N) at
-position N to O(1) — but vanilla linear attention loses recall on long contexts because
+that admits a constant-size recurrent state, dropping the per-token cost from $`O(N)`$ at
+position N to $`O(1)`$ — but vanilla linear attention loses recall on long contexts because
 the state cannot selectively forget stale keys.
 
 Gated DeltaNet combines two ideas:
 
 - **Delta rule** (DeltaNet, Yang et al. 2024): each step updates the recurrent state
-  by a *correction* `Δ = β·(v − Sₜ k) kᵀ` rather than an outer-product `vkᵀ`. This
+  by a *correction* $`\Delta = \beta \cdot (v - S_t k) k^\top`$ rather than an outer-product $`v k^\top`$. This
   performs an online linear-regression-style fit of values to keys, letting newer
   keys overwrite older ones at the same address rather than accumulating noise.
 - **Output gating**: a sigmoid (or swish-gated) per-channel gate is applied to the
@@ -26,7 +26,7 @@ Gated DeltaNet combines two ideas:
 
 In transformer stacks, Gated DeltaNet is typically interleaved with a small number of
 full-softmax-attention layers (the "globally-correct" channel), so the model gets the
-near-O(1) cost of recurrent layers on most steps with the long-range recall of softmax
+near-$`O(1)`$ cost of recurrent layers on most steps with the long-range recall of softmax
 on a few. This is the layout Qwen3.5 adopts: 3 Gated DeltaNet layers per 1 Gated
 Attention layer, repeated 16 times across a 64-layer stack.
 

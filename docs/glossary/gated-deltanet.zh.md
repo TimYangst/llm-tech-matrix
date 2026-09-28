@@ -9,14 +9,14 @@
 
 ## 概述
 
-线性注意力把 softmax 注意力的点积换成核化形式，从而允许一个常数大小的递归状态——把 N 位置处的单 token 成本从 O(N) 降到 O(1)。但朴素线性注意力在长上下文里检索能力下降，原因是 state 无法选择性地遗忘陈旧的 key。
+线性注意力把 softmax 注意力的点积换成核化形式，从而允许一个常数大小的递归状态——把 N 位置处的单 token 成本从 $`O(N)`$ 降到 $`O(1)`$。但朴素线性注意力在长上下文里检索能力下降，原因是 state 无法选择性地遗忘陈旧的 key。
 
 Gated DeltaNet 结合了两个想法：
 
-- **Delta rule**（DeltaNet, Yang et al. 2024）：每一步用一个*校正* `Δ = β·(v − Sₜ k) kᵀ` 来更新递归状态，而不是外积 `vkᵀ`。这相当于在线对 value 关于 key 做线性回归式拟合，使新的 key 能在同一"地址"上覆盖旧的 key，而不是不断累加噪声。
+- **Delta rule**（DeltaNet, Yang et al. 2024）：每一步用一个*校正* $`\Delta = \beta \cdot (v - S_t k) k^\top`$ 来更新递归状态，而不是外积 $`v k^\top`$。这相当于在线对 value 关于 key 做线性回归式拟合，使新的 key 能在同一"地址"上覆盖旧的 key，而不是不断累加噪声。
 - **输出门控**：用 sigmoid（或 swish-gated）的逐通道门作用在注意力输出上，与现代 SSM（Mamba2）中的门控相呼应。门会压制那些 state 已经不再相关的通道，恢复选择性遗忘能力。
 
-在 transformer 堆叠中，Gated DeltaNet 通常和少量 full softmax 注意力层（"全局正确"通道）交错使用——这样大多数步用接近 O(1) 的递归层，少量步用 softmax 提供长程检索。Qwen3.5 就采用这种布局：每 1 个 Gated Attention 层之间穿插 3 个 Gated DeltaNet 层，在 64 层堆叠中重复 16 次。
+在 transformer 堆叠中，Gated DeltaNet 通常和少量 full softmax 注意力层（"全局正确"通道）交错使用——这样大多数步用接近 $`O(1)`$ 的递归层，少量步用 softmax 提供长程检索。Qwen3.5 就采用这种布局：每 1 个 Gated Attention 层之间穿插 3 个 Gated DeltaNet 层，在 64 层堆叠中重复 16 次。
 
 ## 参考资料
 

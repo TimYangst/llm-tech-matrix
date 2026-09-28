@@ -132,7 +132,7 @@ K2.5 inherits the K2 training infrastructure with one multimodal addition: Decou
 
 **SFT：** Zero-vision SFT (paper §1, §2.2): text-only SFT alone is sufficient to activate visual reasoning and tool use, because the joint pre-training already establishes strong vision-text alignment. Adding human-designed visual SFT trajectories was found to hurt generalization. SFT data is synthesized by running K2, K2-Thinking, and an internal suite of proprietary expert models, with domain-specialized pipelines combining human annotation, prompt engineering, and multi-stage verification (paper §4.4.1). Output emphasizes interactive reasoning and precise tool calling.
 
-**RL 方法：** Token-level clip RL with MuonClip optimizer (paper §4.4.2 eq. 1). Departs from K1.5 by introducing a token-level log-ratio gradient-mask: tokens whose log-ratio policy/old falls outside [α, β] have their gradients zeroed, regardless of advantage sign — a stricter off-policy bound than PPO clipping. KL-style regulariser τ on log-ratio retained. Joint text+vision RL is run on the same backbone, plus Parallel-Agent RL (PARL) for Agent Swarm: orchestrator updated, sub-agents frozen, sub-agent trajectories excluded from the loss to avoid credit-assignment ambiguity.
+**RL 方法：** Token-level clip RL with MuonClip optimizer (paper §4.4.2 eq. 1). Departs from K1.5 by introducing a token-level log-ratio gradient-mask: tokens whose log-ratio policy/old falls outside $`[\alpha, \beta]`$ have their gradients zeroed, regardless of advantage sign — a stricter off-policy bound than PPO clipping. KL-style regulariser $`\tau`$ on log-ratio retained. Joint text+vision RL is run on the same backbone, plus Parallel-Agent RL (PARL) for Agent Swarm: orchestrator updated, sub-agents frozen, sub-agent trajectories excluded from the loss to avoid credit-assignment ambiguity.
 
 **RLAIF：** `[Unknown/Not Disclosed]`
 
@@ -194,7 +194,7 @@ _说明：_ K2.5 inherits its tool-call wire format from Kimi K2 (README §6: 'I
 
 _说明：_ Checkpoints can be unpacked to FP8/BF16 via the official compressed-tensors repo for higher-precision deployment.
 
-**稳定性 trick：** QK-Clip — applied throughout MuonClip pre-training and post-training, prevents the attention-logit explosion historically observed with Muon on large transformers. Token-level log-ratio gradient masking (paper §4.4.2 eq. 1) is described explicitly as a stability mechanism for long-horizon multi-step tool-use RL: tokens whose policy-vs-old log-ratio falls outside [α, β] have their gradients zeroed, bounding off-policy drift regardless of advantage sign.
+**稳定性 trick：** QK-Clip — applied throughout MuonClip pre-training and post-training, prevents the attention-logit explosion historically observed with Muon on large transformers. Token-level log-ratio gradient masking (paper §4.4.2 eq. 1) is described explicitly as a stability mechanism for long-horizon multi-step tool-use RL: tokens whose policy-vs-old log-ratio falls outside $`[\alpha, \beta]`$ have their gradients zeroed, bounding off-policy drift regardless of advantage sign.
 
 ## 多模态
 

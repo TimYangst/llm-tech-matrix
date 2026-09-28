@@ -16,11 +16,11 @@ but, per the report, adds structural changes "to enhance both the overall KV cac
 and the computational depth of KV generation".
 
 The bottom `L/2` layers are the **causal encoder**. For **global** attention, each decoder
-layer `l > L/2` does not derive KV from its own hidden state; its KV entries `C_l` and
-compression weights `Z_l` are projected from the final encoder hidden state `H_{L/2}` with
-layer-dependent weights: `C_l = H_{L/2} W^KV_l`, `Z_l = H_{L/2} W^Z_l`. The decoder's global
+layer $`l > L/2`$ does not derive KV from its own hidden state; its KV entries $`C_l`$ and
+compression weights $`Z_l`$ are projected from the final encoder hidden state $`H_{L/2}`$ with
+layer-dependent weights: $`C_l = H_{L/2} W^{KV}_l`$, $`Z_l = H_{L/2} W^{Z}_l`$. The decoder's global
 KV for the whole prompt can therefore be obtained by running only the encoder. The report
-gives prefill complexity as going from `O(NL)` to about `O(NL/2)`.
+gives prefill complexity as going from $`O(NL)`$ to about $`O(NL/2)`$.
 
 For **sliding-window** attention, CED deliberately does *not* share: every layer, including
 decoder layers, computes local KV from its own hidden state. That preserves depth in local

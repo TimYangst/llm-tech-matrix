@@ -16,14 +16,14 @@ more expressive (highway networks), or *widen the stream itself* into several pa
 branches (AltUp, [Hyper-Connections](./mhc.md)). GR's premise is that they are
 complementary: widening adds capacity, and a richer read decides how that capacity is spent.
 
-GR keeps `n_r = 4` branches and asks where the added expressiveness actually pays. The
+GR keeps $`n_r = 4`$ branches and asks where the added expressiveness actually pays. The
 ablation's answer is unusually clean, and it is where GR diverges from HC/mHC:
 
 - **Read granularity matters; write granularity does not.** Refining the read from one
   scalar per branch to one weight per branch *and channel* helps; the same refinement of
   the write "gives almost nothing". So GR's read is elementwise and its write stays a
   per-branch scalar.
-- **`H_res` earns nothing.** Once read and write are expressive enough, the `n_r × n_r`
+- **`H_res` earns nothing.** Once read and write are expressive enough, the $`n_r \times n_r`$
   inter-branch mixing operator — the component HC puts its capacity into, and which mHC
   further constrains to a doubly-stochastic manifold — "brings no significant improvement".
   GR drops it. That removes a full read of the residual state per block (the dominant
@@ -57,12 +57,12 @@ recommend a higher learning rate and batch size.
 
 ## Used by
 
-| Model              | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Qwen3.8-Flash-Next | `n_r = 4` branches (`hc_count=4`), low-rank bottleneck of `d/8 = 320` (`hc_lowrank=320`), a **separate GR module for the attention block and the MLP block of every layer**. Read: per-branch RMSNorm with its own gain → elementwise sigmoid gate predicted from all branches → mean of gated branches. Write: `s = 2·σ(W_w vec(R̂))`, one scalar per branch. No static term, no special init. Ablation at 25B-A3B / 560B tokens: pre-norm 1.617 loss / 50.91 avg → mHC static 1.596 / 52.49 → mHC dynamic 1.594 / 54.47 → **GR 1.590 / 54.66**. Residual state supports FP8 storage at inference to contain the memory traffic of 4 branches. |
+| Model              | Variation / details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Qwen3.8-Flash-Next | $`n_r = 4`$ branches (`hc_count=4`), low-rank bottleneck of `d/8 = 320` (`hc_lowrank=320`), a **separate GR module for the attention block and the MLP block of every layer**. Read: per-branch RMSNorm with its own gain → elementwise sigmoid gate predicted from all branches → mean of gated branches. Write: $`s = 2 \cdot \sigma(W_w \, \mathrm{vec}(\hat{R}))`$, one scalar per branch. No static term, no special init. Ablation at 25B-A3B / 560B tokens: pre-norm 1.617 loss / 50.91 avg → mHC static 1.596 / 52.49 → mHC dynamic 1.594 / 54.47 → **GR 1.590 / 54.66**. Residual state supports FP8 storage at inference to contain the memory traffic of 4 branches. |
 
 ## Related techniques
 
 - [mHC / Hyper-Connections](./mhc.md) — the same family. HC and mHC keep scalar read/write and spend capacity on `H_res`; GR spends it on the read and deletes `H_res`. At 25B-A3B the two are comparable in quality, and GR wins on efficiency and stability.
-- [AttnRes](./attnres.md) — Kimi K3's alternative, which uses softmax attention over earlier layers' outputs to form each sublayer's read. Head-to-head at 28 layers, full AttnRes reaches 1.762 loss and GR (`n_r=4`) matches it at 1.762.
+- [AttnRes](./attnres.md) — Kimi K3's alternative, which uses softmax attention over earlier layers' outputs to form each sublayer's read. Head-to-head at 28 layers, full AttnRes reaches 1.762 loss and GR ($`n_r = 4`$) matches it at 1.762.
 - [Muon](./muon.md) — GR's two low-rank projections are deliberately excluded from Muon and kept on AdamW, because of their very elongated shapes.

@@ -9,7 +9,7 @@
 ## 添加新条目
 
 1. 复制 [`_template.md`](./_template.md)（英文）或 [`_template.zh.md`](./_template.zh.md)（中文）为 `<slug>.md` / `<slug>.zh.md`（kebab-case）。每个新条目都应该同时有英文版和中文版。
-2. 填写内容。保持简短——能链到原论文就别复述论文。
+2. 填写内容。保持简短——能链到原论文就别复述论文。公式一律写成 LaTeX，写法见 [Math notation](../conventions.md#math-notation)。
 3. 在下方相关分类的索引里加一行。
 4. 抽取一个新模型且它使用了这项技术时，给该条目的 "Used by" / "使用此技术的模型" 表格加一行。
 

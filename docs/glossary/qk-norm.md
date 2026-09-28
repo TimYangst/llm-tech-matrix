@@ -12,7 +12,7 @@
 In standard attention, raw query and key projections can grow to large magnitudes
 during training, producing attention logits whose softmax saturates and gradients
 collapse. QK-Norm inserts a normalization op on Q and K (per-head, before computing
-`Q · K^T / √d`), so the logit magnitude is bounded by construction. The fix is cheap
+$`Q \cdot K^\top / \sqrt{d}`$), so the logit magnitude is bounded by construction. The fix is cheap
 (one extra norm per attention) and removes a class of training instabilities that
 otherwise force tricks like attention scaling, embedding clipping, or Q/KV biases.
 

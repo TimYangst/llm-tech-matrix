@@ -83,7 +83,7 @@ GLM-4.5 ARC paper does not detail inter-stage pipeline parallelism layout. Infer
 | | |
 |---|---|
 | Optimizer | Muon optimizer (paper §2.4) — applied to all parameters except word embedding, bias, and RMSNorm weights. Hyperparameters: Newton-Schulz iteration steps N=5, momentum µ=0.95, update RMS scaled to 0.2. Paper notes Muon accelerates convergence and tolerates larger batch sizes vs the AdamW baseline. |
-| Total training tokens | 23T total per GLM-4.5 ARC paper (15T main pre-training + 8T mid-training: 7T code-and-reasoning continual pre-training + 500B repo-level code + 500B synthetic reasoning + 100B long-context-and-agent — paper Figure 3). The GLM-5 README intro states GLM-4.5's pre-training corpus was 23T (now scaled to 28.5T for GLM-5), confirming 23T applies to the GLM-4.5/4.6/4.7 generation. Loss-free balance bias update rate transitions at the 15T-token boundary. MTP loss weight λ also schedule-transitions at 15T tokens (0.3 → 0.1). |
+| Total training tokens | 23T total per GLM-4.5 ARC paper (15T main pre-training + 8T mid-training: 7T code-and-reasoning continual pre-training + 500B repo-level code + 500B synthetic reasoning + 100B long-context-and-agent — paper Figure 3). The GLM-5 README intro states GLM-4.5's pre-training corpus was 23T (now scaled to 28.5T for GLM-5), confirming 23T applies to the GLM-4.5/4.6/4.7 generation. Loss-free balance bias update rate transitions at the 15T-token boundary. MTP loss weight $`\lambda`$ also schedule-transitions at 15T tokens (0.3 → 0.1). |
 
 **LR schedule:** Cosine decay (paper §2.4) — chosen over warmup-stable-decay (WSD) after early experiments showed WSD-trained models underfit on SimpleQA / MMLU. Warmup from 0 to peak 2.5e-4, then decay to 2.5e-5 sustained until the end of mid-training. Batch size warmup 16M → 64M tokens over the first 500B tokens, constant thereafter. Weight decay 0.1, no dropout. RoPE base frequency adjusted from 10000 → 1000000 when extending sequence length to 32K (paper §2.4).
 
@@ -96,7 +96,7 @@ GLM-4.5 ARC paper does not detail inter-stage pipeline parallelism layout. Infer
 | | |
 |---|---|
 | Depth (D) | 1 |
-| Loss weight schedule | MTP loss weight λ = 0.3 for the first 15T tokens, then 0.1 for the remaining tokens (paper §2.4). |
+| Loss weight schedule | MTP loss weight $`\lambda = 0.3`$ for the first 15T tokens, then 0.1 for the remaining tokens (paper §2.4). |
 
 _Shared modules:_ 1 MTP layer (paper Table 1; config num_nextn_predict_layers=1) added as an MoE layer, shares the main model's vocabulary. Paper §2.1: 'we add an MoE layer as the MTP (Multi-Token Prediction) layer to support speculative decoding during inference'. Inference: speculative decoding via `--speculative-config.method mtp --speculative-config.num_speculative_tokens 1` (vLLM) or EAGLE 3-step (SGLang).
 

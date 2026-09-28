@@ -92,6 +92,27 @@ If a value is **public-but-not-officially-confirmed** (leaks, papers reverse-eng
 - An entry is added to `inferred_fields` with `{field, basis, confidence}`.
 - Synthesis tools can opt into using inferred values, but the default is to ignore them.
 
+## Math notation
+
+Formulas are written as LaTeX in GitHub's two *code-delimited* math forms, which GitHub renders with MathJax. This applies to glossary pages and to free-text string values in `data/extracted/*.json` (the renderer passes them through unchanged, so the rendered `.md` / `.zh.md` pick them up).
+
+````markdown
+Inline: the state $`S_t \in \mathbb{R}^{d_k \times d_v}`$ is updated once per token.
+
+Display:
+
+```math
+S_t = (I - \beta_t k_t k_t^\top) \cdot \mathrm{Diag}(\alpha_t) \cdot S_{t-1} + \beta_t k_t v_t^\top
+```
+````
+
+- **Never use bare `$...$` or `$$...$$`.** Markdown processes the content first, so `_` and `*` turn into emphasis unless escaped as `\_`, and `mdformat` rewrites the backslashes. Inside the code-delimited forms the LaTeX is passed through verbatim: write `_`, `^` and `\` normally, with no escaping.
+- **No `|` inside math.** It splits table cells. Use `\lVert x \rVert`, `\mid`, `\parallel`.
+- **ASCII only inside math.** Write `\beta`, `\sum`, `\top`, `\le` — not `β`, `Σ`, `ᵀ`, `≤`. Multi-letter names go in `\mathrm{...}` (`\mathrm{RMSNorm}`, `g_{\min}`, `\pi_{\mathrm{train}}`).
+- **Config keys and code stay code.** `index_topk=2048`, `config.hc_mult`, CLI flags and `name=value` dimension listings remain plain code spans or text. Math is for the paper's notation.
+- **Transliterate, don't reconstruct.** Carry the source's notation over symbol-for-symbol. If the typesetting cannot be recovered from the source (is `n_I_h` a subscript or a superscript?), leave it as written rather than guessing — the no-hallucination rule covers notation too.
+- In JSON, backslashes are escaped as usual: `\beta_t` is stored as `\\beta_t`. Adding math markup to an existing string is not a schema change.
+
 ## Schema changelog
 
 Schema changes are recorded here, newest first. The Pydantic models in `src/llm_tech_matrix/schema.py` carry a `schema_version: int` field — bump it on any change (breaking or backwards-compatible). On every bump, migrate **all** `data/extracted/*.json` files in the same commit so `scripts/validate_extractions.py` (the CI gate) stays green; for backwards-compat additions the migration is a one-line `schema_version` bump.

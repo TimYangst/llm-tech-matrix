@@ -10,7 +10,7 @@
 ## Description
 
 The report frames long-context KV cost as three multiplicative dimensions: **entry size**
-(fewer KV heads, as in GQA, or a shared latent, as in MLA), **sequence** (compress every `m`
+(fewer KV heads, as in GQA, or a shared latent, as in MLA), **sequence** (compress every $`m`$
 tokens into one entry, as CSA/HCA do) and **layer** (let some layers reuse others' caches
 or selections). Prior work touched the layer dimension piecemeal — IndexCache reuses only
 top-k indices ([IndexShare](./indexshare.md)), and other work shares KV or routing — but,
@@ -31,7 +31,7 @@ Cache sharing and index reuse are thus **decoupled**, which is the key differenc
 index-only reuse: sharing main KV actually shrinks storage, while reusing indices only
 saves indexer compute.
 
-**Simplified compressor.** CSA2 removes CSA's overlapping `2m`-entry compression windows
+**Simplified compressor.** CSA2 removes CSA's overlapping $`2m`$-entry compression windows
 and the absolute positional embedding inside the compressor, and derives indexer K by
 projecting main KV instead of from a separate compression path. A compression ratio of
 `m=1` (uncompressed main KV) is a legal special case.

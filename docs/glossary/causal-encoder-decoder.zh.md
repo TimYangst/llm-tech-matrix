@@ -12,7 +12,7 @@
 
 Agent 工作负载是输入密集型的：每次工具调用返回的文本都要 prefill，而缓存未命中会让 prefill 很贵。YOCO 让上半部分的层直接共享下半部分产出的 KV 缓存，从而减少 prefill。CED 保留了这个思路，但按报告的说法做了结构性改动，"同时提升整体 KV 缓存容量和 KV 生成的计算深度"。
 
-底部 `L/2` 层是**因果编码器（causal encoder）**。对于**全局**注意力，每个 decoder 层 `l > L/2` 都不从自己的隐状态推导 KV；它的 KV 条目 `C_l` 与压缩权重 `Z_l` 由编码器最后一层的隐状态 `H_{L/2}` 经层相关的权重投影得到：`C_l = H_{L/2} W^KV_l`、`Z_l = H_{L/2} W^Z_l`。因此整段 prompt 的 decoder 全局 KV 只需跑编码器就能得到。报告给出的 prefill 复杂度从 `O(NL)` 降到约 `O(NL/2)`。
+底部 `L/2` 层是**因果编码器（causal encoder）**。对于**全局**注意力，每个 decoder 层 $`l > L/2`$ 都不从自己的隐状态推导 KV；它的 KV 条目 $`C_l`$ 与压缩权重 $`Z_l`$ 由编码器最后一层的隐状态 $`H_{L/2}`$ 经层相关的权重投影得到：$`C_l = H_{L/2} W^{KV}_l`$、$`Z_l = H_{L/2} W^{Z}_l`$。因此整段 prompt 的 decoder 全局 KV 只需跑编码器就能得到。报告给出的 prefill 复杂度从 $`O(NL)`$ 降到约 $`O(NL/2)`$。
 
 对于**滑窗**注意力，CED 刻意*不*共享：每一层（包括 decoder 层）都从自己的隐状态计算局部 KV。这保住了局部 KV 生成的深度，但也意味着最初几步 decode 需要的 decoder SWA KV，严格来说得把 `n_win × L/2` 个 prompt token 在 decoder 里重放一遍。CED 用 **SWA 有界重放（SWA Bounded Replay）** 来解决：
 
