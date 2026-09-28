@@ -13,7 +13,7 @@
 
 $`N`$ 个教师专家 $`\{\pi_{E_1}, \dots, \pi_{E_N}\}`$ 的目标函数：
 
-$`L_{\mathrm{OPD}}(\theta) = \sum_i w_i \cdot D_{\mathrm{KL}}(\pi_\theta \parallel \pi_{E_i})`$
+$`\mathcal{L}_{\mathrm{OPD}}(\theta) = \sum_{i=1}^{N} w_i \cdot D_{\mathrm{KL}}(\pi_\theta \parallel \pi_{E_i})`$
 
 其中 $`\pi_\theta`$ 是学生，$`w_i`$ 是各教师权重，反向 KL 在学生采样的轨迹上计算。反向 KL（相对于正向 KL）会惩罚学生在教师概率低的位置放置质量——鼓励学生集中在教师真正一致的区域。
 

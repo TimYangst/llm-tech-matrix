@@ -32,7 +32,7 @@ within weeks of each other — and both did it by **repurposing or replacing the
 a backbone block — which is exactly the structure of a pre-trained MTP layer, so K3 fine-tunes
 its MTP layer into a draft with the target frozen. The draft input fuses low/mid/high-level
 target features (K3 takes the outputs of the 1st, 4th and final [AttnRes](./attnres.md) blocks),
-concatenated and projected by a bias-free `W_E3` initialized as `[0 0 I]` so it starts equal to
+concatenated and projected by a bias-free $`W_{\mathrm{E3}}`$ initialized as `[0 0 I]` so it starts equal to
 the high-level feature the MTP layer was pre-trained on. Trained unrolled 7 steps on the
 likelihood-based LK loss — the negative log of the acceptance rate itself — rather than a KL
 surrogate, because minimizing KL does not maximize acceptance for a capacity-limited draft.
@@ -51,7 +51,7 @@ parallel and adds a cheap sequential module on top:
 - **Confidence-scheduled verification** — a head $`c_k = \sigma(w^\top [h_k; W_1[x_{k-1}]])`$ predicts the
   *conditional* probability that draft token k survives verification given all preceding ones
   were accepted, supervised by the analytical per-step acceptance rate
-  $`c^*_k = 1 - \tfrac{1}{2} \lVert p_{\mathrm{draft}} - p_{\mathrm{target}} \rVert`$. A hardware-aware scheduler then verifies the full block
+  $`c^*_k = 1 - \tfrac{1}{2} \lVert p^d_k - p^t_k \rVert_1`$. A hardware-aware scheduler then verifies the full block
   under light load and only the confident prefix under heavy load — because under
   high concurrency, verifying tokens with high rejection risk occupies batch capacity that could
   serve other requests.

@@ -19,11 +19,11 @@ and values are the actual outputs of all preceding layers, with the token embedd
 so it is always reachable:
 
 ```math
-\alpha_{i \to l} = \frac{\phi(q_l, k_i)}{\sum_j \phi(q_l, k_j)}, \qquad \phi(q, k) = \exp(q^\top \cdot \mathrm{RMSNorm}(k))
+\alpha_{i \to l} = \frac{\phi(q_l, k_i)}{\sum_{j=0}^{l-1} \phi(q_l, k_j)}, \qquad \phi(q, k) = \exp(q^\top \mathrm{RMSNorm}(k))
 ```
 
 ```math
-h_l = \sum_{i<l} \alpha_{i \to l} \cdot v_i
+h_l = \sum_{i=0}^{l-1} \alpha_{i \to l} \cdot v_i
 ```
 
 The RMSNorm on keys is load-bearing: without it, layers with large-magnitude outputs would
@@ -35,7 +35,7 @@ $`L < 100`$) but $`O(Ld)`$ memory and cross-stage pipeline communication to keep
 alive. The block variant partitions L layers into N blocks; within a block, layer outputs are
 summed into one block representation $`b_n`$ (with $`b_0`$ = the token embedding), and full attention
 runs only over the N block-level representations — the first layer of block n sees
-$`[b_0 \dots b_{n-1}]`$, later layers additionally see the running partial sum. Memory and
+$`[b_0, b_1, \dots, b_{n-1}]`$, later layers additionally see the running partial sum. Memory and
 communication drop from $`O(Ld)`$ to $`O(Nd)`$, inference-time state becomes bounded, and parallel
 inter-block results can be merged with sequential intra-block partial sums via online softmax.
 The paper reports $`N \approx 8`$ recovers most of the benefit across model scales.

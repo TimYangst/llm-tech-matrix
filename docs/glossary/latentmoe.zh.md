@@ -14,11 +14,11 @@
 共享专家保留全宽通路承担通用变换，而路由专家在宽度为 $`\ell`$ 的紧凑潜空间中运算。
 
 ```math
-u = \sum_{i \in \text{Top-}k(x)} p_i \cdot E_{\mathrm{routed},i}(W_{\mathrm{down}} \cdot x)
+u = \sum_{i \in \mathcal{T}_k(x)} p_i E_i^{\mathrm{routed}}(W^{\downarrow} x)
 ```
 
 ```math
-y = \sum_j E_{\mathrm{shared},j}(x) + W_{\mathrm{up}} \cdot \mathrm{RMSNorm}(u)
+y = \sum_j E_j^{\mathrm{shared}}(x) + W^{\uparrow} \mathrm{RMSNorm}(u)
 ```
 
 - $`u`$ — 路由分支，宽度 $`\ell`$
@@ -30,16 +30,16 @@ Kimi K3 取 $`\ell = 3584 = 0.5 \times d`$，做到 **896 个路由专家、每 
 如此稀疏度会放大两种失效模式，"Stable" 正是对应的三项修补：
 
 1. **上投影前加 RMSNorm**（Normalized LatentMoE，`latent_moe_use_norm=true`）。
-   聚合后的路由表示 $`u`$ 的尺度会随命中哪些专家及其路由权重而波动；在 $`W_{\mathrm{up}}`$ 之前归一化，
+   聚合后的路由表示 $`u`$ 的尺度会随命中哪些专家及其路由权重而波动；在 $`W^{\uparrow}`$ 之前归一化，
    可让路由分支在与全宽共享分支合流前对这种尺度波动脱敏。除稳定性外，它还稳定地改善了验证 loss 与下游指标。
-2. **SiTU-GLU**（Sigmoid Tanh Unit GLU）取代 SwiGLU。路由通路把 $`W_{\mathrm{down}}`$、门控多分支专家 FFN 与 $`W_{\mathrm{up}}`$
+2. **SiTU-GLU**（Sigmoid Tanh Unit GLU）取代 SwiGLU。路由通路把 $`W^{\downarrow}`$、门控多分支专家 FFN 与 $`W^{\uparrow}`$
    串成近四次连续矩阵乘；这种病态结构在 2.8T 规模下会让内部激活爆炸，而 SwiGLU 的两个乘性因子都无界。
-   SiTU-GLU 对 Swish 门的线性因子**以及**上分支各自施加平滑截断 $`\mathrm{softcap}(x, \beta) = \beta \cdot \tanh(x/\beta)`$：
-   $`\text{SiTU-GLU}(x) = [\beta_1 \cdot \tanh(W_g x / \beta_1) \odot \sigma(W_g x)] \odot [\beta_2 \cdot \tanh(W_u x / \beta_2)]`$。
+   SiTU-GLU 对 Swish 门的线性因子**以及**上分支各自施加平滑截断 $`\mathrm{softcap}(x, \beta) = \beta \tanh(x/\beta)`$：
+   $`\text{SiTU-GLU}(x) = [\beta_1 \tanh(W_g x / \beta_1) \odot \mathrm{Sigmoid}(W_g x)] \odot [\beta_2 \tanh(W_u x / \beta_2)]`$。
    K3 取 $`\beta_1 = 4`$（门）、$`\beta_2 = 25`$（上分支），输出上界为 $`\beta_1 \beta_2 = 100`$。原点附近它贴合 SwiGLU；
    幅值大时则饱和，而不是在低精度下发散。
 3. **Quantile Balancing（QB）**，替换 aux-loss-free 路由中的定步长 bias 更新。基础方案见
-   [auxiliary-loss-free routing](./aux-loss-free-routing.zh.md)。原始更新 $`b \leftarrow b + \gamma \cdot \mathrm{sign}(\mathrm{mean\_load} - \mathrm{load})`$
+   [auxiliary-loss-free routing](./aux-loss-free-routing.zh.md)。原始更新 $`b_j^{(t+1)} = b_j^{(t)} + \gamma \, \mathrm{sign}(\bar{\ell} - \ell_j^{(t)})`$（$`\bar{\ell}`$ 为平均负载，$`\ell_j`$ 为专家 $`j`$ 的负载）
    要在"适应太慢"与"负载振荡"之间权衡，而在每层约 $`10^3`$ 个专家的规模下两端都不好用。
    QB 改为直接从**与目标负载 $`q = mk/n`$ 匹配的 router 分数分位数**推出每个专家的 bias：
    路由改用带 bias 分数上的 Top-(k+1)，第 (k+1) 项顺带给出每个 token 的门限 $`\alpha_i`$，

@@ -14,9 +14,9 @@
 **Compressed Sparse Attention (CSA)：**
 
 1. **Token 级压缩。** 每 `m=4` 个相邻 token 通过两个交错的 softmax 加权压缩器（重叠窗口，$`2m`$ 个原始 entry 产出 `n/m` 个 entry）压成一个 KV entry。
-2. **稀疏选择。** "Lightning Indexer" 用 `n_I_h=64` 个 indexer query head（head_dim `c_I=128`），按 $`\mathrm{ReLU}(q \cdot K_{\mathrm{indexer}})`$ 给每个 token 排压缩块得分。query 侧低秩潜变量 $`c^Q_t = h_t \cdot W^{DQ}`$（维度 $`d_c`$）与主注意力 query 共享，节省 query 侧一半算量。
-3. **稀疏 Multi-Query 注意力。** 选 top-k=`{512 (Flash) | 1024 (Pro)}` 个压缩 entry，加上 `n_win=128` 个未压缩近期 token 的滑动窗分支（弥补压缩平滑掉的局部细粒度依赖），核心注意力是单 KV head 的 MQA。
-4. **分组输出投影。** $`n_h`$ 个 query head 输出按 `g={8|16}` 分组；每组投到 `d_g=1024` 后拼接，再投到 `hidden_dim`。比直接 $`c \cdot n_h \times d`$ 投影便宜得多。
+2. **稀疏选择。** "Lightning Indexer" 用 $`n_h^I = 64`$ 个 indexer query head（head_dim $`c^I = 128`$），按 $`\mathrm{ReLU}(q^I_{t,h} \cdot K^{\mathrm{IComp}}_s)`$ 给每个 token 排压缩块得分。query 侧低秩潜变量 $`c^Q_t = h_t \cdot W^{DQ}`$（维度 $`d_c`$）与主注意力 query 共享，节省 query 侧一半算量。
+3. **稀疏 Multi-Query 注意力。** 选 top-k=`{512 (Flash) | 1024 (Pro)}` 个压缩 entry，加上 $`n_{\mathrm{win}} = 128`$ 个未压缩近期 token 的滑动窗分支（弥补压缩平滑掉的局部细粒度依赖），核心注意力是单 KV head 的 MQA。
+4. **分组输出投影。** $`n_h`$ 个 query head 输出按 $`g \in \{8, 16\}`$ 分组；每组投到 $`d_g = 1024`$ 后拼接，再投到 `hidden_dim`。比直接 $`c \cdot n_h \times d`$ 投影便宜得多。
 
 **Heavily Compressed Attention (HCA)：**
 
@@ -24,7 +24,7 @@
 - 没有 lightning indexer，对全部 $`n/m'`$ 个压缩 entry 做 dense MQA。
 - 与 CSA 共享 shared-KV MQA、分组输出投影、滑动窗分支。
 
-**混合层布局。** V4-Pro：第 0、1 层纯 HCA，第 2–60 层 CSA(m=4) / HCA(m'=128) 交替。V4-Flash：第 0、1 层纯 SWA（不压缩），第 2–42 层 CSA / HCA 交替。KV cache block 大小 = `lcm(m, m')=128` 个原始 token，每块产生 32 个 CSA 压缩 entry 和 1 个 HCA 压缩 entry。
+**混合层布局。** V4-Pro：第 0、1 层纯 HCA，第 2–60 层 CSA($`m = 4`$) / HCA($`m' = 128`$) 交替。V4-Flash：第 0、1 层纯 SWA（不压缩），第 2–42 层 CSA / HCA 交替。KV cache block 大小 = `lcm(m, m')=128` 个原始 token，每块产生 32 个 CSA 压缩 entry 和 1 个 HCA 压缩 entry。
 
 **其他技巧**（论文第 2.3.3 节）：每个 Q / K / V 向量的最后 64 维做 partial RoPE；核心注意力输出的最后 64 维以位置 `-i` 再做一次 RoPE 以在 KV 聚合中保留相对位置语义；核心注意力前对每个 query head 与单一共享 KV head 各做一次 RMSNorm（替代 QK-Clip）；每个 head 加可学的 attention sink logit 进 softmax 分母。
 
@@ -36,12 +36,12 @@
 
 ## 使用此技术的模型
 
-| 模型                                   | 变体 / 细节                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DeepSeek-V4-Pro                        | n_h=128 query head / head_dim=512 / KV head=1。CSA：m=4，top-k=1024，indexer (n_I_h=64, c_I=128)。HCA：m'=128。Query 潜变量 d_c=1536，输出分组 g=16 × d_g=1024，滑动窗 n_win=128。第 0、1 层纯 HCA；第 2–60 层 CSA/HCA 交替。                                                                                                                                                           |
-| DeepSeek-V4-Flash                      | n_h=64 query head / head_dim=512 / KV head=1。CSA：m=4，top-k=512，indexer (n_I_h=64, c_I=128)。HCA：m'=128。Query 潜变量 d_c=1024，输出分组 g=8 × d_g=1024，滑动窗 n_win=128。第 0、1 层纯 SWA（不压缩）；第 2–42 层 CSA/HCA 交替。                                                                                                                                                    |
-| DeepSeek-V4-Flash-0731                 | indexer 配置与 V4-Flash 预览版逐字节相同（`index_n_heads=64`、`index_head_dim=128`、`index_topk=512`）；正式版只重跑了后训练，CSA/HCA 未变。部署侧新增 FP4 indexer cache（vLLM `--attention-config '{"use_fp4_indexer_cache": true}'`）。                                                                                                                                               |
-| DeepSeek-V4.1-Flash (replaced by CSA2) | **被取代。** V4.1 放弃 CSA/HCA 交替，改为纯 [CSA2](./csa2.zh.md)：不再有重度压缩层；encoder 的 CSA2 层 `m=2`，decoder 层 `m=1`（不压缩），main KV、indexer K 与 top-k 索引通过 Full / Reindex / Reuse 三种模式跨层共享。CSA2 还去掉了 CSA 重叠的 $`2m`$ 压缩窗口和压缩器内部的绝对位置编码。indexer 头数减半到 32（V4-Flash 为 64）；top-k 仍为 512；每层保留 `n_win=128` 的 SWA 分支。 |
+| 模型                                   | 变体 / 细节                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| DeepSeek-V4-Pro                        | $`n_h = 128`$ query head / head_dim=512 / KV head=1。CSA：$`m = 4`$，top-k=1024，indexer ($`n_h^I = 64`$, $`c^I = 128`$)。HCA：$`m' = 128`$。Query 潜变量 $`d_c = 1536`$，输出分组 $`g = 16`$ × $`d_g = 1024`$，滑动窗 $`n_{\mathrm{win}} = 128`$。第 0、1 层纯 HCA；第 2–60 层 CSA/HCA 交替。                                                                                                         |
+| DeepSeek-V4-Flash                      | $`n_h = 64`$ query head / head_dim=512 / KV head=1。CSA：$`m = 4`$，top-k=512，indexer ($`n_h^I = 64`$, $`c^I = 128`$)。HCA：$`m' = 128`$。Query 潜变量 $`d_c = 1024`$，输出分组 $`g = 8`$ × $`d_g = 1024`$，滑动窗 $`n_{\mathrm{win}} = 128`$。第 0、1 层纯 SWA（不压缩）；第 2–42 层 CSA/HCA 交替。                                                                                                  |
+| DeepSeek-V4-Flash-0731                 | indexer 配置与 V4-Flash 预览版逐字节相同（`index_n_heads=64`、`index_head_dim=128`、`index_topk=512`）；正式版只重跑了后训练，CSA/HCA 未变。部署侧新增 FP4 indexer cache（vLLM `--attention-config '{"use_fp4_indexer_cache": true}'`）。                                                                                                                                                              |
+| DeepSeek-V4.1-Flash (replaced by CSA2) | **被取代。** V4.1 放弃 CSA/HCA 交替，改为纯 [CSA2](./csa2.zh.md)：不再有重度压缩层；encoder 的 CSA2 层 `m=2`，decoder 层 `m=1`（不压缩），main KV、indexer K 与 top-k 索引通过 Full / Reindex / Reuse 三种模式跨层共享。CSA2 还去掉了 CSA 重叠的 $`2m`$ 压缩窗口和压缩器内部的绝对位置编码。indexer 头数减半到 32（V4-Flash 为 64）；top-k 仍为 512；每层保留 $`n_{\mathrm{win}} = 128`$ 的 SWA 分支。 |
 
 <!-- BEGIN GENERATED: implemented-by-engines (synthesis.index) -->
 

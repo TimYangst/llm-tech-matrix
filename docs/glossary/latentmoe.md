@@ -17,11 +17,11 @@ shared experts keep a full-width path for common transformations, while routed e
 in a compact latent space of width $`\ell`$.
 
 ```math
-u = \sum_{i \in \text{Top-}k(x)} p_i \cdot E_{\mathrm{routed},i}(W_{\mathrm{down}} \cdot x)
+u = \sum_{i \in \mathcal{T}_k(x)} p_i E_i^{\mathrm{routed}}(W^{\downarrow} x)
 ```
 
 ```math
-y = \sum_j E_{\mathrm{shared},j}(x) + W_{\mathrm{up}} \cdot \mathrm{RMSNorm}(u)
+y = \sum_j E_j^{\mathrm{shared}}(x) + W^{\uparrow} \mathrm{RMSNorm}(u)
 ```
 
 - $`u`$ — routed branch, width $`\ell`$
@@ -35,21 +35,21 @@ That sparsity amplifies two failure modes, and "Stable" LatentMoE is the three f
 
 1. **RMSNorm before the up-projection** (Normalized LatentMoE, `latent_moe_use_norm=true`).
    The aggregated routed representation $`u`$ varies in scale with which experts fired and with
-   their routing weights; normalizing before $`W_{\mathrm{up}}`$ desensitizes the routed branch to that
+   their routing weights; normalizing before $`W^{\uparrow}`$ desensitizes the routed branch to that
    variation before it merges with the full-width shared branch. Beyond stability it
    consistently improved validation loss and downstream benchmarks.
-2. **SiTU-GLU** (Sigmoid Tanh Unit GLU), replacing SwiGLU. The routed path composes $`W_{\mathrm{down}}`$,
-   a gated multi-branch expert FFN, and $`W_{\mathrm{up}}`$ into a chain of nearly four consecutive matmuls;
+2. **SiTU-GLU** (Sigmoid Tanh Unit GLU), replacing SwiGLU. The routed path composes $`W^{\downarrow}`$,
+   a gated multi-branch expert FFN, and $`W^{\uparrow}`$ into a chain of nearly four consecutive matmuls;
    that ill-conditioned structure at 2.8T scale produces exploding activations, and SwiGLU's
    two multiplicative factors are both unbounded. SiTU-GLU applies a smooth cap
-   $`\mathrm{softcap}(x, \beta) = \beta \cdot \tanh(x/\beta)`$ to the linear factor of the Swish gate *and* independently to
+   $`\mathrm{softcap}(x, \beta) = \beta \tanh(x/\beta)`$ to the linear factor of the Swish gate *and* independently to
    the up branch:
-   $`\text{SiTU-GLU}(x) = [\beta_1 \cdot \tanh(W_g x / \beta_1) \odot \sigma(W_g x)] \odot [\beta_2 \cdot \tanh(W_u x / \beta_2)]`$.
+   $`\text{SiTU-GLU}(x) = [\beta_1 \tanh(W_g x / \beta_1) \odot \mathrm{Sigmoid}(W_g x)] \odot [\beta_2 \tanh(W_u x / \beta_2)]`$.
    K3 uses $`\beta_1 = 4`$ (gate) and $`\beta_2 = 25`$ (up), bounding the output at $`\beta_1 \beta_2 = 100`$. Near the origin
    it tracks SwiGLU; at large magnitude it saturates instead of running away in low precision.
 3. **Quantile Balancing (QB)**, replacing the fixed-step bias update of aux-loss-free routing.
    See [aux-loss-free routing](./aux-loss-free-routing.md) for the base scheme. The original
-   update $`b \leftarrow b + \gamma \cdot \mathrm{sign}(\mathrm{mean\_load} - \mathrm{load})`$ trades slow adaptation against load oscillation,
+   update $`b_j^{(t+1)} = b_j^{(t)} + \gamma \, \mathrm{sign}(\bar{\ell} - \ell_j^{(t)})`$ (mean load $`\bar{\ell}`$, load of expert $`j`$ $`\ell_j`$) trades slow adaptation against load oscillation,
    and at $`\sim 10^3`$ experts per layer neither setting behaves. QB instead derives each expert's bias
    directly from the **router-score quantile matching its target load** $`q = mk/n`$: routing runs
    Top-(k+1) on the biased score so the (k+1)-th entry gives each token's cutoff $`\alpha_i`$ for free,

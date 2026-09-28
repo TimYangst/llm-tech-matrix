@@ -15,21 +15,21 @@ $`S_t \in \mathbb{R}^{d_k \times d_v}`$，从而使开销随序列长度线性�
 KDA 在此基础上引入**逐通道保留因子** $`\alpha_t \in (0,1)^{d_k}`$，让每个 key 通道以各自学到的速率遗忘，而不是整个状态统一衰减：
 
 ```math
-S_t = (I - \beta_t k_t k_t^\top) \cdot \mathrm{Diag}(\alpha_t) \cdot S_{t-1} + \beta_t k_t v_t^\top
+S_t = (I - \beta_t k_t k_t^\top) \, \mathrm{Diag}(\alpha_t) \, S_{t-1} + \beta_t k_t v_t^\top
 ```
 
-Q/K/V 由 ShortConv 接 Swish 产生，并对 Q、K 做 L2Norm；$`\beta_t = \sigma(W_\beta x_t)`$ 控制写入强度；
+Q/K/V 由 ShortConv 接 Swish 产生，并对 Q、K 做 L2Norm；$`\beta_t = \mathrm{Sigmoid}(W_\beta x_t)`$ 控制写入强度；
 衰减 logit 来自一个低秩投影加逐头 bias。整层按 chunk 计算 —— chunk 之间递推、chunk 内部并行。
 
 **Kimi K3 的两项改动**（§2.1.1）都是为了让 chunkwise 形式在 1M token 规模下既快又数值安全：
 
 1. **下界化衰减（lower-bounded decay）。** Kimi Linear 用无界的 negative-Softplus 映射衰减 logit，
    于是 chunk 内用于重新缩放 key 的倒数累积衰减 $`1/\Gamma`$ 可能溢出。K3 改用
-   $`g = g_{\min} \cdot \sigma(e^{A} z)`$，其中 $`A`$ 是可学习的逐头 log 尺度、$`g_{\min} = -5`$ 固定。这样每个保留因子都
+   $`g = g_{\min} \, \mathrm{Sigmoid}(e^{A} z)`$，其中 $`A`$ 是可学习的逐头 log 尺度、$`g_{\min} = -5`$ 固定。这样每个保留因子都
    $`> e^{-5}`$，16-token tile 上的累积 log 衰减落在 $`(-80, 0)`$，缩放因子始终在 BF16 动态范围内。
    收益不止于稳定性：范围有界之后，对角与非对角 chunk tile *都* 能走稠密 Tensor Core 矩阵乘，
    从而彻底去掉 Kimi Linear 里显式的 position-pair 对角路径 —— 那正是 chunk 内的主要瓶颈。
-2. **全秩输出门。** 输出门从低秩参数化改为依赖输入的全秩投影：$`y = W_o[\sigma(W_g x) \odot \mathrm{RMSNorm}(\tilde{o})]`$。
+2. **全秩输出门。** 输出门从低秩参数化改为依赖输入的全秩投影：$`y_t = W_o[\mathrm{Sigmoid}(W_g x_t) \odot \mathrm{RMSNorm}(\tilde{o}_t)]`$。
 
 从跨模型比较的角度，最值得记的架构后果是：由于 KDA 的衰减递推本身就对位置敏感，
 把 KDA 与全局层交错堆叠的模型可以直接跑 **NoPE** —— 不用 RoPE、不用 YaRN、不用插值 —— 依然能外推到 1M token。

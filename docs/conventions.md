@@ -110,7 +110,7 @@ S_t = (I - \beta_t k_t k_t^\top) \cdot \mathrm{Diag}(\alpha_t) \cdot S_{t-1} + \
 - **No `|` inside math.** It splits table cells. Use `\lVert x \rVert`, `\mid`, `\parallel`.
 - **ASCII only inside math.** Write `\beta`, `\sum`, `\top`, `\le` — not `β`, `Σ`, `ᵀ`, `≤`. Multi-letter names go in `\mathrm{...}` (`\mathrm{RMSNorm}`, `g_{\min}`, `\pi_{\mathrm{train}}`).
 - **Config keys and code stay code.** `index_topk=2048`, `config.hc_mult`, CLI flags and `name=value` dimension listings remain plain code spans or text. Math is for the paper's notation.
-- **Transliterate, don't reconstruct.** Carry the source's notation over symbol-for-symbol. If the typesetting cannot be recovered from the source (is `n_I_h` a subscript or a superscript?), leave it as written rather than guessing — the no-hallucination rule covers notation too.
+- **Transliterate, don't reconstruct.** Carry the source's notation over symbol-for-symbol, and check it against the typeset PDF page, not the derived `.txt` — text extraction flattens sub- and superscripts, so `n_I_h` could be either. If the typesetting cannot be recovered from the source, leave it as written rather than guessing — the no-hallucination rule covers notation too.
 - In JSON, backslashes are escaped as usual: `\beta_t` is stored as `\\beta_t`. Adding math markup to an existing string is not a schema change.
 
 ## Schema changelog

@@ -13,7 +13,7 @@ Standard knowledge distillation (Hinton et al., 2015) has the student match teac
 
 The objective for $`N`$ expert teachers $`\{\pi_{E_1}, \dots, \pi_{E_N}\}`$:
 
-$`L_{\mathrm{OPD}}(\theta) = \sum_i w_i \cdot D_{\mathrm{KL}}(\pi_\theta \parallel \pi_{E_i})`$
+$`\mathcal{L}_{\mathrm{OPD}}(\theta) = \sum_{i=1}^{N} w_i \cdot D_{\mathrm{KL}}(\pi_\theta \parallel \pi_{E_i})`$
 
 where $`\pi_\theta`$ is the student, $`w_i`$ is the per-teacher weight, and the reverse-KL is computed on student-sampled trajectories. Reverse KL (vs forward KL) penalizes the student putting mass where teachers have low probability — encouraging the student to focus on regions teachers actually agree with.
 

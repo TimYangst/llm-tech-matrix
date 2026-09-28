@@ -16,11 +16,11 @@
 并把 token embedding 作为第 0 号来源，保证它始终可达：
 
 ```math
-\alpha_{i \to l} = \frac{\phi(q_l, k_i)}{\sum_j \phi(q_l, k_j)}, \qquad \phi(q, k) = \exp(q^\top \cdot \mathrm{RMSNorm}(k))
+\alpha_{i \to l} = \frac{\phi(q_l, k_i)}{\sum_{j=0}^{l-1} \phi(q_l, k_j)}, \qquad \phi(q, k) = \exp(q^\top \mathrm{RMSNorm}(k))
 ```
 
 ```math
-h_l = \sum_{i<l} \alpha_{i \to l} \cdot v_i
+h_l = \sum_{i=0}^{l-1} \alpha_{i \to l} \cdot v_i
 ```
 
 对 key 做 RMSNorm 是关键：否则输出幅值大的层会不论相关性如何都主导深度注意力权重。
@@ -29,7 +29,7 @@ h_l = \sum_{i<l} \alpha_{i \to l} \cdot v_i
 **真正上线的是 Block AttnRes。** 完整版 AttnRes 的算术开销是 $`O(L^2 d)`$（$`L < 100`$ 时可接受），
 但需要 $`O(Ld)`$ 的显存与跨流水段通信来保活每一层输出。分块版把 L 层切成 N 块；块内各层输出求和成一个块表示
 $`b_n`$（$`b_0`$ 为 token embedding），跨块只在这 N 个块级表示上做完整注意力 —— 第 n 块的首层看到
-$`[b_0 \dots b_{n-1}]`$，后续层再额外看到块内的滚动部分和。显存与通信从 $`O(Ld)`$ 降到 $`O(Nd)`$，
+$`[b_0, b_1, \dots, b_{n-1}]`$，后续层再额外看到块内的滚动部分和。显存与通信从 $`O(Ld)`$ 降到 $`O(Nd)`$，
 推理期状态被限定，且并行的跨块结果可通过 online softmax 与顺序的块内部分和合并。
 论文报告 $`N \approx 8`$ 在各规模上就能拿到大部分收益。
 

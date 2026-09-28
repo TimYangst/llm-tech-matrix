@@ -17,10 +17,10 @@ retention factor** $`\alpha_t \in (0,1)^{d_k}`$, so each key channel forgets at 
 rather than the whole state decaying uniformly:
 
 ```math
-S_t = (I - \beta_t k_t k_t^\top) \cdot \mathrm{Diag}(\alpha_t) \cdot S_{t-1} + \beta_t k_t v_t^\top
+S_t = (I - \beta_t k_t k_t^\top) \, \mathrm{Diag}(\alpha_t) \, S_{t-1} + \beta_t k_t v_t^\top
 ```
 
-Q/K/V come from a ShortConv followed by Swish, with L2Norm on Q and K; $`\beta_t = \sigma(W_\beta x_t)`$
+Q/K/V come from a ShortConv followed by Swish, with L2Norm on Q and K; $`\beta_t = \mathrm{Sigmoid}(W_\beta x_t)`$
 controls write strength; the decay logit comes from a low-rank projection plus a per-head bias.
 The layer is computed chunkwise — recurrent across chunks, parallel within a chunk.
 
@@ -29,14 +29,14 @@ numerically safe at 1M-token scale:
 
 1. **Lower-bounded decay.** Kimi Linear mapped decay logits through an unbounded
    negative-Softplus, so the reciprocal cumulative decay $`1/\Gamma`$ used to rescale keys within a
-   chunk could overflow. K3 uses $`g = g_{\min} \cdot \sigma(e^{A} z)`$ with a learnable per-head log-scale $`A`$
+   chunk could overflow. K3 uses $`g = g_{\min} \, \mathrm{Sigmoid}(e^{A} z)`$ with a learnable per-head log-scale $`A`$
    and fixed $`g_{\min} = -5`$. Every retention factor is then $`> e^{-5}`$, cumulative log-decay over a
    16-token tile stays in $`(-80, 0)`$, and the rescaling factor stays inside BF16 range. The
    payoff is not just stability: with a bounded range, *both* diagonal and off-diagonal chunk
    tiles can use dense Tensor Core matmuls, eliminating Kimi Linear's explicit position-pair
    diagonal path — which was the main intra-chunk bottleneck.
 2. **Full-rank output gate.** The output gate moves from a low-rank parameterization to an
-   input-dependent full-rank projection: $`y = W_o[\sigma(W_g x) \odot \mathrm{RMSNorm}(\tilde{o})]`$.
+   input-dependent full-rank projection: $`y_t = W_o[\mathrm{Sigmoid}(W_g x_t) \odot \mathrm{RMSNorm}(\tilde{o}_t)]`$.
 
 The architectural consequence worth noting for cross-model comparison: because KDA's decay
 recurrence is inherently position-sensitive, a stack that interleaves KDA with global layers
