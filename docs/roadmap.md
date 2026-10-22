@@ -41,6 +41,10 @@ views are validated in CI. Current scope and historical gaps live in the
 Other vendors' image/audio/video generators remain future work. Media coverage
 does not imply completion of M1's closed-LLM or interpretive-report goals.
 
+## Public accelerator catalog (parallel to M1)
+
+The [hardware track](hardware/overview.md) records public specifications for representative datacenter GPUs, TPUs and other AI accelerators, plus one consumer GPU comparison. Initial scope is ten exact NVIDIA/AMD/Google/AWS/Intel variants; [the generated index](../data/extracted/hardware/README.md) contains current records and [the sole coordination state](../tasks/projects/public-hardware-catalog.md) contains execution/review status. Hardware schema v1 preserves variants, units, precision, sparsity and chip/system scope. Internal measurements and private sources are excluded. This is a representative batch, not an exhaustive market inventory or performance ranking. Broader vendors and published benchmark records are follow-up candidates.
+
 ## Engines track (parallel to M1)
 
 **Goal**: record which engine versions serve or train which extracted models, and when each
@@ -76,7 +80,7 @@ Exit criteria for the first cycle:
 
 These are not tied to a specific milestone:
 
-- **Schema versioning** — maintain the independent model/engine/media changelogs and migrate affected records on each bump.
+- **Schema versioning** — maintain the independent model/engine/media/hardware changelogs and migrate affected records on each bump.
 - **Reproducible sourcing** — every `data/sources/<model>/manifest.json` should let someone re-fetch the same files. Verify before extending sourcing logic.
 - **Skill library growth** — `.claude/skills/extract-model` is the seed. Add `compare-models` and `synthesize-trend` skills only when usage patterns justify them.
 - **TODO: `add-model-source` skill** — wrap the "create manifest entry + fetch + record sha256" workflow currently exposed as `python -m llm_tech_matrix.sourcing add ...`. Source registration is already repetitive: the same 4–5 HF asset URLs per slug (config / tokenizer_config / preprocessor_config / README / blog), varying only by repo name, plus a boilerplate `tasks/models/<slug>.md`. Worth building whenever sourcing next feels tedious.

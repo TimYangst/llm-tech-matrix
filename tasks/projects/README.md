@@ -7,4 +7,4 @@ release-specific evidence in `tasks/models/`, `tasks/engines/` and `tasks/hardwa
 | Project                    | State                                                   |
 | -------------------------- | ------------------------------------------------------- |
 | DeepSeek / MiniMax refresh | [Coordination and handoff](deepseek-minimax-refresh.md) |
-| Public accelerator catalog | [Coordination and handoff](public-hardware-catalog.md) |
+| Public accelerator catalog | [Coordination and handoff](public-hardware-catalog.md)  |
