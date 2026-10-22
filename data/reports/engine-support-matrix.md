@@ -2,7 +2,7 @@
 
 # Engine support matrix
 
-24 model records × 6 engine snapshots, generated from each snapshot's
+35 model records × 6 engine snapshots, generated from each snapshot's
 typed `model_support[]` rows. A cell answers *what does this engine release carry for this
 model's architecture?* — not *will it run*: a `not found` model may still load through a
 generic path (HF Transformers backends, FSDP on any HF model), which snapshots do not assess.
@@ -36,7 +36,10 @@ Counts are per model record: an architecture shared by several records counts on
 | [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
 | [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | DeepSeek | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
 | [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | DeepSeek | 2026-07 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
+| [`deepseek-v4-flash-vision-exp`](../extracted/deepseek-v4-flash-vision-exp.md) | DeepSeek | 2026-08 | — | — | — | — | — | — |
+| [`deepseek-v4-pro-0813`](../extracted/deepseek-v4-pro-0813.md) | DeepSeek | 2026-08 | — | — | — | — | — | — |
 | [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | DeepSeek | 2026-09 | ✗ not found | ✗ not found | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`deepseek-v4.1-flash-1017`](../extracted/deepseek-v4.1-flash-1017.md) | DeepSeek | 2026-10 | — | — | — | — | — | — |
 | [`glm-4.7`](../extracted/glm-4.7.md) | GLM-4.5 | 2026-01 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✗ not found | 🟡 model-specific |
 | [`glm-5`](../extracted/glm-5.md) | GLM-5 | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | ✗ not found |
 | [`glm-5.1`](../extracted/glm-5.1.md) | GLM-5 | 2026-04 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | ✗ not found |
@@ -46,6 +49,14 @@ Counts are per model record: an architecture shared by several records counts on
 | [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
 | [`kimi-k2.6`](../extracted/kimi-k2.6.md) | Kimi K2 | [Unknown/Not Disclosed] | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✗ not found | ✗ not found |
 | [`kimi-k3`](../extracted/kimi-k3.md) | Kimi K3 | 2026-07 | ✅ registered | ✅ registered | ✗ not found | ↪ `megatron-bridge-v0.6.0`: ✗ not found | ✗ not found | ✗ not found |
+| [`minimax-text-01`](../extracted/minimax-text-01.md) | minimax-01 | 2025-01 | — | — | — | — | — | — |
+| [`minimax-vl-01`](../extracted/minimax-vl-01.md) | minimax-01 | 2025-01 | — | — | — | — | — | — |
+| [`minimax-m1-80k`](../extracted/minimax-m1-80k.md) | minimax-m1 | 2025-06 | — | — | — | — | — | — |
+| [`minimax-m2`](../extracted/minimax-m2.md) | minimax-m2 | 2025-10 | — | — | — | — | — | — |
+| [`minimax-m2.1`](../extracted/minimax-m2.1.md) | minimax-m2 | 2025-12 | — | — | — | — | — | — |
+| [`minimax-m2.5`](../extracted/minimax-m2.5.md) | minimax-m2 | 2026-02 | — | — | — | — | — | — |
+| [`minimax-m2.7`](../extracted/minimax-m2.7.md) | minimax-m2 | 2026-03 | — | — | — | — | — | — |
+| [`minimax-m3`](../extracted/minimax-m3.md) | minimax-m3 | 2026-06 | — | — | — | — | — | — |
 | [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
 | [`qwen3-32b`](../extracted/qwen3-32b.md) | Qwen | 2025-05 | ✅ registered | ✅ registered | ✅ registered | 🟡 model-specific | ✅ registered | 🟡 model-specific |
 | [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | Qwen | 2026-02 | ✅ registered | ✅ registered | ✅ registered | ↪ `megatron-bridge-v0.6.0`: ✅ registered | ✅ registered | 🟡 model-specific |
@@ -67,28 +78,30 @@ have no typed model slot, so their model count is not computed.
 
 | Technique | Models using | `sglang-v0.5.19` | `vllm-v0.29.0` | `megatron-bridge-v0.6.0` | `megatron-lm-core_v0.19.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [Multi-Token Prediction (MTP)](../../docs/glossary/mtp.md) | 18 | ✅ | ✅ | ✅ | ✅ |  | ✅ |
-| [YaRN RoPE scaling](../../docs/glossary/yarn-rope.md) | 17 |  |  |  |  |  |  |
+| [Multi-Token Prediction (MTP)](../../docs/glossary/mtp.md) | 23 | ✅ | ✅ | ✅ | ✅ |  | ✅ |
+| [YaRN RoPE scaling](../../docs/glossary/yarn-rope.md) | 20 |  |  |  |  |  |  |
+| [Grouped Query Attention (GQA)](../../docs/glossary/gqa.md) | 17 |  |  |  |  |  |  |
+| [Reasoning effort](../../docs/glossary/reasoning-effort.md) | 13 |  |  |  |  |  |  |
+| [Speculative-decoding modules](../../docs/glossary/speculative-decoding.md) | 13 | ✅ | ✅ |  | ✅ |  |  |
 | [Multi-head Latent Attention (MLA)](../../docs/glossary/mla.md) | 10 | ✅ | ✅ | ✅ | ✅ |  |  |
-| [Reasoning effort](../../docs/glossary/reasoning-effort.md) | 10 |  |  |  |  |  |  |
-| [Grouped Query Attention (GQA)](../../docs/glossary/gqa.md) | 9 |  |  |  |  |  |  |
+| [Manifold-Constrained Hyper-Connections (mHC)](../../docs/glossary/mhc.md) | 8 | ✅ | ✅ | ✅ |  | ✅ |  |
 | [Gated DeltaNet](../../docs/glossary/gated-deltanet.md) | 7 |  | ✅ | ✅ | ✅ | ✅ |  |
 | [Multimodal RoPE (mRoPE)](../../docs/glossary/mrope.md) | 6 |  |  |  |  |  |  |
-| [Speculative-decoding modules](../../docs/glossary/speculative-decoding.md) | 6 | ✅ | ✅ |  | ✅ |  |  |
+| [Compressed Sparse Attention + Heavily Compressed Attention](../../docs/glossary/csa-hca.md) | 5 |  |  | ✅ |  |  |  |
 | [DeepSeek Sparse Attention (DSA)](../../docs/glossary/dsa.md) | 5 | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | [Fill-in-Middle (FIM)](../../docs/glossary/fim.md) | 5 |  |  |  |  |  |  |
 | [FP4 Quantization-Aware Training (MXFP4)](../../docs/glossary/fp4-qat.md) | 5 |  |  |  |  | ✅ |  |
 | [Native INT4 Quantization-Aware Training](../../docs/glossary/int4-qat.md) | 5 |  |  |  |  |  |  |
-| [Manifold-Constrained Hyper-Connections (mHC)](../../docs/glossary/mhc.md) | 5 | ✅ | ✅ | ✅ |  | ✅ |  |
-| [Compressed Sparse Attention + Heavily Compressed Attention](../../docs/glossary/csa-hca.md) | 3 |  |  | ✅ |  |  |  |
+| [Lightning Attention](../../docs/glossary/lightning-attention.md) | 3 |  |  |  |  |  |  |
+| [N-gram Embedding](../../docs/glossary/ngram-embedding.md) | 3 |  |  |  |  |  |  |
+| [Causal Encoder-Decoder (CED)](../../docs/glossary/causal-encoder-decoder.md) | 2 |  |  |  |  |  |  |
+| [Compressed Sparse Attention 2 (CSA2)](../../docs/glossary/csa2.md) | 2 |  |  |  |  |  |  |
 | [Dual Chunk Attention (DCA)](../../docs/glossary/dual-chunk-attention.md) | 2 |  |  |  |  |  |  |
 | [Kimi Delta Attention (KDA)](../../docs/glossary/kda.md) | 2 | ✅ | ✅ |  |  |  |  |
-| [N-gram Embedding](../../docs/glossary/ngram-embedding.md) | 2 |  |  |  |  |  |  |
 | [Attention Residuals (AttnRes)](../../docs/glossary/attnres.md) | 1 |  |  |  |  |  |  |
-| [Causal Encoder-Decoder (CED)](../../docs/glossary/causal-encoder-decoder.md) | 1 |  |  |  |  |  |  |
-| [Compressed Sparse Attention 2 (CSA2)](../../docs/glossary/csa2.md) | 1 |  |  |  |  |  |  |
 | [Gated Residual (GR)](../../docs/glossary/gated-residual.md) | 1 |  |  |  |  |  |  |
 | [IndexShare (IndexCache)](../../docs/glossary/indexshare.md) | 1 | ✅ | ✅ | ✅ | ✅ |  |  |
+| [MiniMax Sparse Attention (MSA)](../../docs/glossary/msa.md) | 1 |  |  |  |  |  |  |
 | [Qwen Sparse Attention (QSA)](../../docs/glossary/qsa.md) | 1 |  |  |  |  |  |  |
 | [Auxiliary-loss-free routing](../../docs/glossary/aux-loss-free-routing.md) | prose-only |  |  |  | ✅ |  |  |
 | [FP8 mixed precision (DeepSeek-V3 variant)](../../docs/glossary/fp8-mixed-precision.md) | prose-only |  |  |  | ✅ |  | ✅ |

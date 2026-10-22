@@ -71,16 +71,13 @@ In rough priority order:
    next. Just did open weights? Do a closed model to exercise `inferred_fields`. Just
    did text-only? Do a multimodal one.
 
-4. **The synthesis layer is now unblocked** (it was gated on ≥10 extractions; the repo
-   passed 20 in 2026-08). It is still *unstarted*: `src/llm_tech_matrix/synthesis/` is an
-   empty package and `data/reports/` does not exist. Per
-   [`docs/roadmap.md`](./roadmap.md), the first report is the critical-path item for
-   closing M1 — but it should be driven by one real question (suggested threads:
-   optimizer evolution, MoE routing, or reasoning-effort mechanisms), not by building
-   infrastructure first. The hand-maintained "Used by" tables in `docs/glossary/` are the
-   obvious first thing to generate from `data/extracted/*.json`.
+4. **Use the existing synthesis surfaces.** `synthesis/index.py` already generates
+   the model index, technique/coverage reports and engine-support/adoption reports.
+   An interpretive trend report remains outstanding; choose one question before
+   expanding infrastructure. Audio/video generation has its own [media track](media/overview.md)
+   and [index](../data/extracted/media/README.md), separate from LLM technique edges.
 
-5. **The other standing gap is closed models.** `inferred_fields` is empty across all 20
+5. **The other standing gap is closed models.** `inferred_fields` is empty across the LLM
    records, so the mechanism the schema was designed around has never run. Any closed
    model fixes that; `qwen3.7-max` is currently the cheapest one (see
    [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)).
@@ -91,6 +88,12 @@ The engines track (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) run
 its own status file. If the user asks for engine work, or the quarterly snapshot is due,
 start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
 [`docs/engines/overview.md`](./engines/overview.md) instead of the priority list above.
+
+### Active DeepSeek / MiniMax refresh
+
+Start from [the sole coordination state](../tasks/deepseek-minimax-refresh.md)
+when continuing this phase. It records scope, permissions, review evidence and the
+next action; do not create a second task table.
 
 ## Common workflows
 

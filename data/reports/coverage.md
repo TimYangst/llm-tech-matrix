@@ -24,17 +24,51 @@ The data asserts it; the glossary table does not list it. These are safe additio
 
 | Technique | Model |
 | --- | --- |
+| [`causal-encoder-decoder`](../../docs/glossary/causal-encoder-decoder.md) | `deepseek-v4.1-flash-1017` |
+| [`csa-hca`](../../docs/glossary/csa-hca.md) | `deepseek-v4-flash-vision-exp` |
+| [`csa-hca`](../../docs/glossary/csa-hca.md) | `deepseek-v4-pro-0813` |
+| [`csa2`](../../docs/glossary/csa2.md) | `deepseek-v4.1-flash-1017` |
 | [`fim`](../../docs/glossary/fim.md) | `deepseek-v4-flash-0731` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m1-80k` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m2` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m2.1` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m2.5` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m2.7` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-m3` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-text-01` |
+| [`gqa`](../../docs/glossary/gqa.md) | `minimax-vl-01` |
 | [`int4-qat`](../../docs/glossary/int4-qat.md) | `glm-5` |
 | [`int4-qat`](../../docs/glossary/int4-qat.md) | `glm-5.1` |
+| [`mhc`](../../docs/glossary/mhc.md) | `deepseek-v4-flash-vision-exp` |
+| [`mhc`](../../docs/glossary/mhc.md) | `deepseek-v4-pro-0813` |
+| [`mhc`](../../docs/glossary/mhc.md) | `deepseek-v4.1-flash-1017` |
 | [`mla`](../../docs/glossary/mla.md) | `glm-5.2` |
 | [`mla`](../../docs/glossary/mla.md) | `glm-5.3-flash` |
 | [`mla`](../../docs/glossary/mla.md) | `kimi-k2-thinking` |
 | [`mla`](../../docs/glossary/mla.md) | `kimi-k2.5` |
 | [`mla`](../../docs/glossary/mla.md) | `kimi-k2.6` |
+| [`mtp`](../../docs/glossary/mtp.md) | `minimax-m2` |
+| [`mtp`](../../docs/glossary/mtp.md) | `minimax-m2.1` |
+| [`mtp`](../../docs/glossary/mtp.md) | `minimax-m2.5` |
+| [`mtp`](../../docs/glossary/mtp.md) | `minimax-m2.7` |
+| [`mtp`](../../docs/glossary/mtp.md) | `minimax-m3` |
+| [`ngram-embedding`](../../docs/glossary/ngram-embedding.md) | `deepseek-v4.1-flash-1017` |
+| [`reasoning-effort`](../../docs/glossary/reasoning-effort.md) | `deepseek-v4-flash-vision-exp` |
+| [`reasoning-effort`](../../docs/glossary/reasoning-effort.md) | `deepseek-v4-pro-0813` |
+| [`reasoning-effort`](../../docs/glossary/reasoning-effort.md) | `deepseek-v4.1-flash-1017` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `deepseek-v4-flash-vision-exp` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `deepseek-v4-pro-0813` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `deepseek-v4.1-flash-1017` |
 | [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `glm-5.2` |
 | [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `glm-5.3-flash` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `minimax-m2` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `minimax-m2.1` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `minimax-m2.5` |
+| [`speculative-decoding`](../../docs/glossary/speculative-decoding.md) | `minimax-m2.7` |
 | [`yarn-rope`](../../docs/glossary/yarn-rope.md) | `deepseek-v4-flash-0731` |
+| [`yarn-rope`](../../docs/glossary/yarn-rope.md) | `deepseek-v4-flash-vision-exp` |
+| [`yarn-rope`](../../docs/glossary/yarn-rope.md) | `deepseek-v4-pro-0813` |
+| [`yarn-rope`](../../docs/glossary/yarn-rope.md) | `deepseek-v4.1-flash-1017` |
 
 ## 4. "Used by" rows with no structured backing
 

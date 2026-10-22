@@ -1,0 +1,16 @@
+{
+  "slug": "minimax-m3.1-flash",
+  "assets": [
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://www.minimax.io/blog/minimax-m31f",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Official dated release announcement; mutable page archived by SHA256 on fetch",
+      "sha256": "8669a569630ba9a8e63c735342b6dba03870401c71e68135a375b075025b3f22",
+      "size_bytes": 80666,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

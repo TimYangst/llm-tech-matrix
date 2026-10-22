@@ -91,7 +91,8 @@ After changing dev tooling versions, bump the corresponding `rev:` in
 1. `uv sync --frozen` — installs from `uv.lock`.
 2. `uv run pre-commit run --all-files --show-diff-on-failure` — same
    hooks you run locally.
-3. `uv run python scripts/validate_extractions.py` — re-validates every
+3. `uv run python -m unittest discover -s tests -v` — media evidence and generated-view regression checks.
+4. `uv run python scripts/validate_extractions.py` — re-validates every
    `data/extracted/*.json` against `src/llm_tech_matrix/schema.py`, and every
    `data/extracted/engines/*.json` against `src/llm_tech_matrix/engine_schema.py` plus
    its cross-links. This is the gate for the **schema strictness** cardinal rule.

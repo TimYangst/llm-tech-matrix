@@ -33,16 +33,30 @@ inside the markers; CI fails when they are stale.
 
 ### Attention
 
+- [Lightning Attention](./lightning-attention.md)
+
+- [MiniMax Sparse Attention (MSA)](./msa.md)
+
 - [Multi-head Latent Attention (MLA)](./mla.md)
+
 - [Grouped Query Attention (GQA)](./gqa.md)
+
 - [QK-Norm](./qk-norm.md)
+
 - [Gated DeltaNet](./gated-deltanet.md)
+
 - [DeepSeek Sparse Attention (DSA)](./dsa.md)
+
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
+
 - [Kimi Delta Attention (KDA)](./kda.md)
+
 - [Qwen Sparse Attention (QSA)](./qsa.md)
+
 - [IndexShare / IndexCache (cross-layer index reuse)](./indexshare.md)
+
 - [Compressed Sparse Attention 2 (CSA2) — cross-layer KV + index reuse](./csa2.md)
+
 - [Causal Encoder-Decoder (CED) + SWA Bounded Replay](./causal-encoder-decoder.md)
 
 ### FFN / MoE

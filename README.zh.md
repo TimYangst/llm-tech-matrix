@@ -6,9 +6,11 @@
 
 ## 当前状态
 
-**M1 进行中。** 已抽取 23 个模型，覆盖 4 家厂商（DeepSeek、Qwen、Kimi、智谱），全部通过 schema v7 校验。最新记录：GLM-5.3-Flash（全新的 GLM 架构线，融合了 Kimi 的 KDA、DeepSeek 的 mHC 与 Qwen 式的 key 池化稀疏注意力）、GLM-5.2、Qwen3.8-Flash-Next（Qwen4 架构预览）。综合分析层尚未开始 —— 要等 M1 的抽取门槛达成后再动工。
+**M1 进行中，媒体生成分支已启动。** 已有 **35 个 LLM/VL 记录，覆盖 5 家厂商**（DeepSeek、Qwen、Kimi、智谱、MiniMax），使用 LLM schema v8；另有 **3 个媒体生成记录**（H3、Music3、Speech 2.8），使用独立 media schema v1。6 个引擎快照保持独立。技术索引、覆盖报告和引擎支持矩阵已生成；解释性的趋势报告仍待完成。
 
-当前重点：**M1——文本与多模态大模型。** 战略路线图见 [`docs/roadmap.md`](./docs/roadmap.md)，每个模型的具体状态见 [`tasks/ROADMAP.md`](./tasks/ROADMAP.md)。
+最新补录 DeepSeek-V4.1-Flash-1017、V4-Pro-0813、Flash-Vision-Exp，以及 MiniMax 从 Text-01/VL-01、M1 到 M3 的主线。音视频记录明确区分开放权重和托管服务；M3.1 Flash 尚未发布权重，不计入已抽取记录。
+
+浏览 [LLM 模型索引](data/extracted/README.md)、[媒体生成索引](data/extracted/media/README.zh.md)与[媒体 schema](docs/media/schema.md)。本轮任务、review 和交接见[协调状态](tasks/deepseek-minimax-refresh.md)；完整排期见 [tasks/ROADMAP.md](tasks/ROADMAP.md)。
 
 ## 文档导航
 
@@ -40,6 +42,7 @@ data/
   extracted/<model>.json  通过 Schema 校验的抽取产物（提交进 git）
   extracted/<model>.md    渲染出的英文摘要（提交进 git，由 .json 生成）
   extracted/<model>.zh.md 渲染出的中文摘要（提交进 git，由 .json 生成）
+  extracted/media/       Media JSON + bilingual summaries/index (schema v1)
   extracted/README.md     生成的模型索引（勿手改）
   reports/             生成物：technique-index.md（技术↔模型矩阵）、coverage.md
 tasks/
@@ -48,7 +51,7 @@ tasks/
 .claude/skills/        Claude Code skills（extract-model、draft-pr）
 ```
 
-目前还没有测试套件 —— CI 跑的 schema 闸门是 `scripts/validate_extractions.py`。
+媒体回归检查：`uv run python -m unittest discover -s tests -v`。CI 同时通过 `scripts/validate_extractions.py` 检查 schema、媒体来源证据和生成视图。
 
 ## 快速开始
 

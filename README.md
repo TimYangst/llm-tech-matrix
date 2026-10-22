@@ -6,9 +6,11 @@ A structured, continuously updatable knowledge base that tracks and decomposes t
 
 ## Status
 
-**M1 in progress.** 23 models extracted across 4 vendors (DeepSeek, Qwen, Kimi, Z.AI), all validating against schema v7. Newest records: GLM-5.3-Flash (a new GLM architecture line combining Kimi's KDA, DeepSeek's mHC and Qwen-style key-pooled sparse attention), GLM-5.2, and Qwen3.8-Flash-Next (a Qwen4 architecture preview). No synthesis layer yet — that starts once M1's extraction bar is met.
+**M1 in progress; media generation track started.** **35 LLM/VL records across 5 vendors** (DeepSeek, Qwen, Kimi, Z.AI, MiniMax) validate against LLM schema v8. **3 media records** (H3, Music3, Speech 2.8) use independent media schema v1; 6 engine snapshots remain separate. Generated technique/coverage and engine-support reports exist; an interpretive trend report is still outstanding.
 
-Current focus: **M1 — text and multimodal LLMs.** See [`docs/roadmap.md`](./docs/roadmap.md) for the strategic roadmap and [`tasks/ROADMAP.md`](./tasks/ROADMAP.md) for per-model status.
+Newest additions cover DeepSeek-V4.1-Flash-1017, V4-Pro-0813, Flash-Vision-Exp, and MiniMax's Text-01/VL-01 and M1–M3 lineage. Media records distinguish released weights from hosted services. M3.1 Flash is sourced but has no released weights and is not counted as extracted.
+
+Browse the [LLM index](data/extracted/README.md), [media index](data/extracted/media/README.md), and [media schema](docs/media/schema.md). This refresh's tasks, review and handoff live in the [coordination state](tasks/deepseek-minimax-refresh.md); the full model inventory is in [tasks/ROADMAP.md](tasks/ROADMAP.md).
 
 ## Where to find things
 
@@ -40,6 +42,7 @@ data/
   extracted/<model>.json  Schema-validated extraction output (committed)
   extracted/<model>.md    Rendered English summary (committed, generated from the .json)
   extracted/<model>.zh.md Rendered Chinese summary (committed, generated from the .json)
+  extracted/media/       Media JSON + bilingual summaries/index (schema v1)
   extracted/README.md     Generated model index (do not hand-edit)
   reports/             Generated: technique-index.md (technique↔model matrix), coverage.md
 tasks/
@@ -48,7 +51,7 @@ tasks/
 .claude/skills/        Claude Code skills (extract-model, draft-pr)
 ```
 
-No test suite yet — `scripts/validate_extractions.py` is the schema gate CI runs.
+Run `uv run python -m unittest discover -s tests -v` for media regression checks. CI also runs schema, source-evidence and generated-view validation via `scripts/validate_extractions.py`.
 
 ## Quickstart
 
