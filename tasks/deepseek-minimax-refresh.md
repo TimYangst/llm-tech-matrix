@@ -39,19 +39,19 @@ merge. Delivery is a reviewable PR; merge-required tasks stay `awaiting_merge`
 until the user merges. This is the latest on-branch snapshot; the linked PR's
 review section records the final head without another self-referencing commit.
 
-| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State          | Executor / evidence                                                                              |
-| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
-| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done           | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                     |
-| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | awaiting_merge | `deepseek`; commits f019d6a /b7b71cb /6603436                                                    |
-| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | awaiting_merge | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                         |
-| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | awaiting_merge | `media_schema`; 881e7a6                                                                          |
-| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | awaiting_merge | coordinator; b2fc180 /9b83045 /fd319e2                                                           |
-| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | awaiting_merge | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                  |
-| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | reviewing      | Two independent reviews completed; final state/document-only review pending in PR review section |
-| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | running        | coordinator; PR entry below; merge manual/A01                                                    |
-| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned        | Explicitly deferred by user; select representative checkpoints first                             |
-| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned        | ROADMAP follow-up inventory; not counted as extracted                                            |
-| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned        | M3.1 source-only notes; no guessed MoE label                                                     |
+| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State          | Executor / evidence                                                                                                   |
+| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done           | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                                          |
+| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | awaiting_merge | `deepseek`; commits f019d6a /b7b71cb /6603436                                                                         |
+| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | awaiting_merge | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                                              |
+| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | awaiting_merge | `media_schema`; 881e7a6                                                                                               |
+| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | awaiting_merge | coordinator; b2fc180 /9b83045 /fd319e2                                                                                |
+| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | awaiting_merge | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                                       |
+| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done           | Both independent reviews accepted through 1adc6fb; local PR draft stores review evidence.                             |
+| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | blocked        | Local draft ready; git push rejected by automatic approval review; needs explicit external-publication authorization. |
+| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned        | Explicitly deferred by user; select representative checkpoints first                                                  |
+| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned        | ROADMAP follow-up inventory; not counted as extracted                                                                 |
+| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned        | M3.1 source-only notes; no guessed MoE label                                                                          |
 
 ## Validation and independent review
 
@@ -99,10 +99,14 @@ review section records the final head without another self-referencing commit.
   PR/head before resuming; do not assume the snapshot proves remote publication.
 - All implementation agents have returned; no running jobs, deployments, GPU
   workloads or finfer changes. No dedicated worktrees were created to remove.
-- Current limitation: awaiting final documentation/state review and PR
-  publication at this snapshot; final checks/review evidence is recorded in PR.
-- Next action: read the PR review section and checks for its exact head; address
-  user feedback, or merge only after explicit authorization. Do not re-extract
+- Current limitation: automatic approval review rejected `git push` because
+  remote trust/ownership and permission to publish externally were not established
+  in explicit user content. No push, PR creation or merge occurred. The concrete
+  local PR draft is `.claude/drafts/pr/2026-10-22-deepseek-minimax-media.md`; it
+  preserves the independent review evidence until publication is authorized.
+- Next action: obtain explicit approval to push this branch to the configured
+  `origin` repository (`TimYangst/llm-tech-matrix`) and create a PR targeting main;
+  then attach the PR, read remote checks/comments, and retain manual merge. Do not re-extract
   completed records when continuing F01–F03.
 - Scope gaps and undisclosed values remain explicit; sourced, extracted,
   independently reviewed and merged are separate states.
@@ -135,5 +139,7 @@ expects plain model names; adapting the new rows avoided a needless parser chang
 These lessons are reflected in the final records, source notes and media schema
 evidence checks. No shared skill changes or background monitoring were introduced.
 
-Implementation is locally validated; publication/review status follows the PR.
+Implementation and independent review are complete locally. PR publication
+awaits explicit approval after automatic review rejected the push. The local PR
+draft is the evidence entry until a remote PR exists.
 Main has not been merged, and this snapshot does not claim merge acceptance.
