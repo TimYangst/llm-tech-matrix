@@ -1,0 +1,390 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "vendor": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "accelerator_type": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "variant": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "form_factor": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "record_scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "device_count": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ],
+      "snapshot_date": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf"
+      ]
+    },
+    "name": "AMD Instinct MI355X",
+    "vendor": "AMD",
+    "accelerator_type": "GPU",
+    "variant": "AMD Instinct MI355X 288GB OAM module",
+    "form_factor": "OAM module",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf",
+      "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=2"
+      ],
+      "process": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=4"
+      ],
+      "compute_units": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1",
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=2"
+      ],
+      "cache": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=2"
+      ],
+      "on_chip_memory": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=9"
+      ],
+      "execution_model": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=6"
+      ]
+    },
+    "family": "CDNA 4",
+    "process": "TSMC 3nm XCDs; 6nm I/O dies",
+    "compute_units": "256 CUs; 1024 Matrix Cores; 16,384 stream processors; eight XCDs",
+    "cache": "32 KB L1 per CU; 4 MB L2 per XCD; 256 MB shared Infinity Cache",
+    "on_chip_memory": "160 KB LDS per CU",
+    "execution_model": "GPU compute units with scalar, vector and matrix instruction execution",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "capacity_gb": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "bandwidth_tb_s": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ]
+    },
+    "technology": "HBM3E",
+    "capacity_gb": 288.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 8.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Peak local on-package GPU memory bandwidth; capacity and rate are for one OAM module."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP64",
+        "operation": "vector",
+        "throughput": 78.6,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 157.3,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "vector",
+        "throughput": 157.3,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP64",
+        "operation": "matrix",
+        "throughput": 78.6,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "matrix",
+        "throughput": 157.3,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 2516.6,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 5033.2,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 2516.6,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 5033.2,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "OCP-FP8",
+        "operation": "matrix",
+        "throughput": 5033.2,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "OCP-FP8",
+        "operation": "matrix",
+        "throughput": 10066.4,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 5033.2,
+        "unit": "TOPS",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 10066.4,
+        "unit": "TOPS",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "MXFP8",
+        "operation": "matrix",
+        "throughput": 5033.2,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "MXFP6",
+        "operation": "matrix",
+        "throughput": 10066.3,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "MXFP4",
+        "operation": "matrix",
+        "throughput": 10066.3,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+        ]
+      }
+    ],
+    "notes": [
+      "Theoretical peaks preserve source rounding. Accumulation formats are not supplied by the product table. No performance measurements are included.",
+      "MXFP8/MXFP6/MXFP4 sparsity columns are N/A; no sparse rate is fabricated. PFLOP/s and POPS converted to tera units by decimal unit scaling only."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "scale_up": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1",
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=21"
+      ]
+    },
+    "host": "PCIe Gen5 x16; 128 GB/s published total bandwidth",
+    "scale_up": "Seven Infinity Fabric links; 153.6 GB/s peak total aggregate transport data bandwidth per link",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ],
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf#page=1"
+      ]
+    },
+    "tdp_w": 1400.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Vendor metric is maximum total board power (TBP), 1400 W per OAM module; stored in catalog power field, not measured power."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=17"
+      ],
+      "programming_model": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf#page=17"
+      ]
+    },
+    "ecosystem": "AMD ROCm",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "Triton kernel language; vLLM and SGLang serving frameworks"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Exact matrix accumulation modes are not stated in the product specification table.",
+    "No public benchmark selected; application performance depends on software and workload.",
+    "Datasheet page 1 lists 7 × 153.6 GB/s links, while page 2 says 160 GB/s bidirectional between GPUs; retain the table value and do not silently reconcile payload vs link rate.",
+    "The datasheet labels sparse peaks without specifying the sparsity structure; the catalog preserves sparse rather than assuming a structure."
+  ]
+}

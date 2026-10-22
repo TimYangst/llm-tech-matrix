@@ -6,11 +6,13 @@
 
 ## 当前状态
 
-**M1 进行中，媒体生成分支已启动。** 已有 **35 个 LLM/VL 记录，覆盖 5 家厂商**（DeepSeek、Qwen、Kimi、智谱、MiniMax），使用 LLM schema v8；另有 **3 个媒体生成记录**（H3、Music3、Speech 2.8），使用独立 media schema v1。6 个引擎快照保持独立。技术索引、覆盖报告和引擎支持矩阵已生成；解释性的趋势报告仍待完成。
+**M1 进行中，新增公开加速器资料分支。** 已有 **35 个 LLM/VL 记录，覆盖 5 家厂商**（DeepSeek、Qwen、Kimi、智谱、MiniMax），使用 LLM schema v8；另有 **3 个媒体生成记录**（H3、Music3、Speech 2.8），使用独立 media schema v1。6 个引擎快照保持独立。技术索引、覆盖报告和引擎支持矩阵已生成；解释性的趋势报告仍待完成。
 
 最新补录 DeepSeek-V4.1-Flash-1017、V4-Pro-0813、Flash-Vision-Exp，以及 MiniMax 从 Text-01/VL-01、M1 到 M3 的主线。音视频记录明确区分开放权重和托管服务；M3.1 Flash 尚未发布权重，不计入已抽取记录。
 
 浏览 [LLM 模型索引](data/extracted/README.md)、[媒体生成索引](data/extracted/media/README.zh.md)与[媒体 schema](docs/media/schema.md)。本轮任务、review 和交接见[协调状态](tasks/projects/deepseek-minimax-refresh.md)；完整排期见 [tasks/ROADMAP.md](tasks/ROADMAP.md)。
+
+[硬件目录](data/extracted/hardware/README.zh.md)新增 **10 个代表性加速器**，覆盖 NVIDIA、AMD、Google、AWS、Intel，使用独立 hardware schema v1。配置、架构与峰值参数保留公开来源、具体型号、单位和性能口径；不收录内部实测。入口见[硬件流程](docs/hardware/overview.md)和[当前协调状态](tasks/projects/public-hardware-catalog.md)。
 
 ## 文档导航
 
@@ -35,6 +37,7 @@ docs/                  权威参考文档（愿景、Schema、流水线、约定
 src/llm_tech_matrix/   Python 包
   engine_schema.py     引擎快照（schema v3）
   media_schema.py      媒体生成（schema v1）
+  hardware_schema.py   公开加速器规格（schema v1）
   schema.py            Pydantic 模型 —— docs/schema.md 的可执行版本
   sourcing/            第一层 —— 拉取 HF config、论文、博客；manifest + sha256
   extraction/          第二层 —— Agent 按各类合同抽取；render*.py 生成双语视图。
@@ -47,6 +50,8 @@ data/
   extracted/<model>.zh.md 渲染出的中文摘要（提交进 git，由 .json 生成）
   extracted/engines/     引擎 JSON + 双语摘要（schema v3）
   extracted/media/       媒体 JSON + 双语摘要/索引（schema v1）
+  sources/hardware/      各型号公开来源 manifest 和忽略提交的缓存
+  extracted/hardware/    硬件 JSON + 双语摘要/索引（schema v1）
   extracted/README.md     生成的模型索引（勿手改）
   reports/             生成物：technique-index.md（技术↔模型矩阵）、coverage.md
 tasks/
@@ -54,10 +59,11 @@ tasks/
   ENGINES.md           引擎快照状态和排期
   ROADMAP.md           各模型状态总表 + Current focus
   models/<model>.md    每个模型的笔记、数据源、未决问题
+  hardware/<slug>.md   各硬件型号的来源、证据与未决问题
 .claude/skills/        抽取 LLM/引擎与 PR 草稿的工作流说明
 ```
 
-媒体回归检查：`uv run python -m unittest discover -s tests -v`。CI 同时通过 `scripts/validate_extractions.py` 检查 schema、媒体来源证据和生成视图。
+媒体与硬件回归检查：`uv run python -m unittest discover -s tests -v`。CI 同时通过 `scripts/validate_extractions.py` 检查 schema、媒体与硬件来源证据和生成视图。
 
 ## 快速开始
 
@@ -67,7 +73,7 @@ tasks/
 # 安装锁定的依赖
 uv sync --locked
 
-# 校验仓库已有的三类记录和生成索引
+# 校验仓库已有的四类记录和生成索引
 uv run python scripts/validate_extractions.py
 uv run python scripts/validate_registry.py
 ```
@@ -114,7 +120,7 @@ uv run pre-commit install     # 激活 git hook
 
 7. 更新受控词汇后，运行 `uv run python -m llm_tech_matrix.synthesis.index`，再运行上面的两个校验命令，避免模型索引或技术矩阵过期。
 
-以上步骤适用于 LLM/VL。音视频生成按[媒体流程](docs/media/overview.md)生成 `data/extracted/media/` 记录；引擎快照按[引擎流程](docs/engines/overview.md)执行。
+以上步骤适用于 LLM/VL。音视频生成按[媒体流程](docs/media/overview.md)生成 `data/extracted/media/` 记录；引擎快照按[引擎流程](docs/engines/overview.md)执行。加速器规格按[硬件流程](docs/hardware/overview.md)，使用 `--track hardware` 注册来源，记录放在 `data/extracted/hardware/`。
 
 完整 LLM/VL 流程见 [`.claude/skills/extract-model/SKILL.md`](./.claude/skills/extract-model/SKILL.md)。
 

@@ -15,7 +15,7 @@ M1 in progress. For the live "where we are" — phase, recent completions, recom
 A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI models (text, multimodal, diffusion). Three decoupled layers: **sourcing → extraction → synthesis**.
 
 - Vision and milestones: [`docs/vision.md`](./docs/vision.md), [`docs/roadmap.md`](./docs/roadmap.md)
-- Record contracts: [LLM/VL](./docs/schema.md), [engines](./docs/engines/schema.md), [media generation](./docs/media/schema.md) — select the matching track before extraction.
+- Record contracts: [LLM/VL](./docs/schema.md), [engines](./docs/engines/schema.md), [media generation](./docs/media/schema.md), [hardware](./docs/hardware/schema.md) — select the matching track before extraction.
 - Pipeline architecture: [`docs/pipeline.md`](./docs/pipeline.md)
 - Naming, file layout, schema versioning: [`docs/conventions.md`](./docs/conventions.md)
 - Dev environment, lint, CI, AI review, PR conventions: [`docs/development.md`](./docs/development.md)
@@ -27,16 +27,18 @@ A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI
 These rules underpin the project's value. Do not violate them, even if asked to "just fill it in":
 
 1. **No hallucination.** Missing information is the literal string `"[Unknown/Not Disclosed]"`. Never guess from training-data priors. See [`docs/schema.md`](./docs/schema.md#cardinal-rule-no-hallucination).
-2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py` (engine snapshots in `data/extracted/engines/` against `engine_schema.py`; media records in `data/extracted/media/` against `media_schema.py`). Do not invent fields, rename fields, or skip required groups.
+2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py` (engine snapshots in `data/extracted/engines/` against `engine_schema.py`; media records in `data/extracted/media/` against `media_schema.py`; hardware records in `data/extracted/hardware/` against `hardware_schema.py`). Do not invent fields, rename fields, or skip required groups.
 3. **Closed-model inferences go in `inferred_fields`.** The primary field stays `"[Unknown/Not Disclosed]"`. Current synthesis ignores inferred values. Any analysis using them must explicitly identify its inference policy.
 4. **Schema changes are versioned.** Bump `schema_version` and update [`docs/conventions.md`](./docs/conventions.md#schema-changelog) on any breaking change.
+
+Hardware specifications use public vendor pages/PDFs only, never internal measurements or private notes. Preserve units, exact variants, scope and dense/sparse peak qualifiers; see the [hardware guide](./docs/hardware/overview.md).
 
 ## Layer boundaries
 
 When implementing, keep the three layers decoupled:
 
 - **Sourcing** (`src/llm_tech_matrix/sourcing/`) writes raw bytes + a `manifest.json` to `data/sources/<model>/`. No interpretation.
-- **Extraction** (`src/llm_tech_matrix/extraction/`, `.claude/skills/extract-model/`) reads `data/sources/<model>/`, writes one validated release JSON under the matching LLM, engine or media extraction subtree. One release in, one JSON out.
+- **Extraction** (`src/llm_tech_matrix/extraction/`, `.claude/skills/extract-model/`) reads `data/sources/<model>/`, writes one validated release JSON under the matching LLM, engine, media or hardware extraction subtree. One release in, one JSON out.
 - **Synthesis** (`src/llm_tech_matrix/synthesis/`) reads canonical JSON in the appropriate track; generates browse indexes/reports and glossary engine sections. See [`docs/pipeline.md`](./docs/pipeline.md). Never re-trigger extraction.
 
 The contract between layers is the JSON file. As long as JSON validates, layers iterate independently.
@@ -46,17 +48,17 @@ The contract between layers is the JSON file. As long as JSON validates, layers 
 - **Package manager**: `uv`. Source of truth is `pyproject.toml`.
 - **Python**: 3.13 (pinned in `.python-version` and `pyproject.toml`).
 - **Lint + format**: `ruff` (Python) and `mdformat` (Markdown), wired through `pre-commit`. Aligned with Google style guides; details in [`docs/development.md`](./docs/development.md).
-- **CI**: `.github/workflows/ci.yml` runs the same `pre-commit` hooks plus both validators and media regression tests on every PR and push to main.
+- **CI**: `.github/workflows/ci.yml` runs the same `pre-commit` hooks plus both validators and media/hardware regression tests on every PR and push to main.
 - **AI code review**: [Gemini Code Assist](https://github.com/apps/gemini-code-assist) on PRs, configured by `.gemini/`.
 - **Common commands**:
   - `uv sync` — install/refresh venv from lockfile
   - `uv run pre-commit run --all-files` — run the same checks CI runs
-  - `uv run python scripts/validate_extractions.py` — validate all record contracts and media outputs
+  - `uv run python scripts/validate_extractions.py` — validate all record contracts and media/hardware outputs
   - `uv run python scripts/validate_registry.py` — check vocabulary and generated synthesis
   - Module-specific sourcing/render/synthesis commands: [`docs/session-start.md`](./docs/session-start.md#common-workflows)
   - `uv add <pkg>` — add a dependency
 
-Media regression tests are in `tests/`: run `uv run python -m unittest discover -s tests -v`. The extraction validator also checks media source manifests and generated-view freshness.
+Media and hardware regression tests are in `tests/`: run `uv run python -m unittest discover -s tests -v`. The extraction validator also checks media/hardware source manifests and generated-view freshness.
 
 ## Working style notes for Claude
 

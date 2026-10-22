@@ -14,14 +14,14 @@ in [ROADMAP.md](../ROADMAP.md); model-specific facts stay in `tasks/models/` and
 extractions. General loop: the externally maintained `coordinate-feature` skill;
 no finfer runtime, notes branch, deployment or background automation is involved.
 
-| Field       | Value                                                                    |
-| ----------- | ------------------------------------------------------------------------ |
-| project_id  | `deepseek-minimax-refresh-20261022`                                      |
-| state_home  | `docs/task-project-directory:tasks/projects/deepseek-minimax-refresh.md` |
-| code_base   | `main`, `dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8`                       |
-| coordinator | Current Codex chat; only coordinator updates this file                   |
-| updated_at  | 2026-10-22, America/Los_Angeles                                          |
-| delivery    | PR #21 merged; relocation follow-up targets `main`; merge manual         |
+| Field       | Value                                                  |
+| ----------- | ------------------------------------------------------ |
+| project_id  | `deepseek-minimax-refresh-20261022`                    |
+| state_home  | `main:tasks/projects/deepseek-minimax-refresh.md`      |
+| code_base   | `main`, `5175098bf8432dbcd73fda3c703c270f2b7aa5df`     |
+| coordinator | Current Codex chat; only coordinator updates this file |
+| updated_at  | 2026-10-22, America/Los_Angeles                        |
+| delivery    | PR #21 and relocation PR #22 merged; phase delivered   |
 
 ## Authorization and decisions
 
@@ -50,25 +50,26 @@ permit updates and pushes. Merge remains manual.
 ## Tasks
 
 T01–T09 were delivered in [PR #21](https://github.com/TimYangst/llm-tech-matrix/pull/21),
-merged as `dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8`. T10 tracks the requested
-state-document relocation on a new branch; its merge remains manual. Final
-fixed-head review evidence belongs in the follow-up PR description.
+merged as `dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8`. T10 delivered the requested state-document relocation in
+[PR #22](https://github.com/TimYangst/llm-tech-matrix/pull/22), merged as
+`5175098bf8432dbcd73fda3c703c270f2b7aa5df`. Its final fixed-head review
+evidence remains in that PR description.
 
-| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State     | Executor / evidence                                                                                     |
-| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------- |
-| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done      | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                            |
-| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | done      | `deepseek`; commits f019d6a /b7b71cb /6603436                                                           |
-| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | done      | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                                |
-| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | done      | `media_schema`; 881e7a6                                                                                 |
-| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | done      | coordinator; b2fc180 /9b83045 /fd319e2                                                                  |
-| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | done      | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                         |
-| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done      | Prior reviews accepted through 34d98c3; final publication checkpoint evidence is in PR #21 description. |
-| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | done      | PR #21 merged as dbbf1a7; final CI passed at 714b6a2.                                                   |
-| T09 | Audit and synchronize project progress, README, procedures and related docs          | required / P1    | T02–T08: reviewed/published artifacts    | done      | Independently accepted 714b6a2; CI passed; delivered in PR #21.                                         |
-| T10 | Move project state under tasks/projects and update incoming/outgoing links           | required / P1    | T01–T09: merged@dbbf1a7                  | reviewing | docs/task-project-directory; local link and formatting checks; final review in follow-up PR.            |
-| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned   | Explicitly deferred by user; select representative checkpoints first                                    |
-| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned   | ROADMAP follow-up inventory; not counted as extracted                                                   |
-| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned   | M3.1 source-only notes; no guessed MoE label                                                            |
+| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State   | Executor / evidence                                                                                     |
+| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done    | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                            |
+| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | done    | `deepseek`; commits f019d6a /b7b71cb /6603436                                                           |
+| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | done    | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                                |
+| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | done    | `media_schema`; 881e7a6                                                                                 |
+| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | done    | coordinator; b2fc180 /9b83045 /fd319e2                                                                  |
+| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | done    | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                         |
+| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done    | Prior reviews accepted through 34d98c3; final publication checkpoint evidence is in PR #21 description. |
+| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | done    | PR #21 merged as dbbf1a7; final CI passed at 714b6a2.                                                   |
+| T09 | Audit and synchronize project progress, README, procedures and related docs          | required / P1    | T02–T08: reviewed/published artifacts    | done    | Independently accepted 714b6a2; CI passed; delivered in PR #21.                                         |
+| T10 | Move project state under tasks/projects and update incoming/outgoing links           | required / P1    | T01–T09: merged@dbbf1a7                  | done    | PR #22 merged as 5175098; local links, formatting, independent review and CI passed.                    |
+| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned | Explicitly deferred by user; select representative checkpoints first                                    |
+| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned | ROADMAP follow-up inventory; not counted as extracted                                                   |
+| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned | M3.1 source-only notes; no guessed MoE label                                                            |
 
 ## Validation and independent review
 
@@ -108,24 +109,11 @@ fixed-head review evidence belongs in the follow-up PR description.
 
 ## Recovery checkpoint
 
-- Verified merged delivery: [PR #21](https://github.com/TimYangst/llm-tech-matrix/pull/21),
-  final head `714b6a286cd3ffcc41d0604c4a3edc70aaf91949`, merge commit
-  `dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8`. CI passed at that head.
-- Local `main` was fast-forwarded to the merge commit before creating
-  `docs/task-project-directory`. The follow-up changes only documentation layout,
-  references and this mutable coordination snapshot.
-- This is the sole maintained state at `tasks/projects/deepseek-minimax-refresh.md`.
-  The [pre-move state](https://github.com/TimYangst/llm-tech-matrix/blob/dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8/tasks/deepseek-minimax-refresh.md)
-  remains readable at the fixed merged commit. No duplicate root-level stub is
-  kept; project/phase state now belongs under `tasks/projects/`.
-- Follow-up PR: resolve the open PR for `docs/task-project-directory`; its
-  description links the new state and records the final fixed-head review and
-  checks. This snapshot precedes publication and does not assert a PR number.
-- Repository account remains `TimYangst` through local `git gh`; no login or
-  credentials changed. No GPU jobs, deployments or new worktrees were created.
-- Next action: complete T10's independent review and publish its follow-up PR;
-  then address feedback or merge only with explicit authorization. F01–F03 are
-  future scope, not ready tasks in this relocation.
+- PR #21 delivered the refresh, merged as `dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8`.
+- [PR #22](https://github.com/TimYangst/llm-tech-matrix/pull/22) delivered the state relocation, merged as `5175098bf8432dbcd73fda3c703c270f2b7aa5df`; review and CI evidence remain in the PR. T01–T10 are complete. No ongoing model refresh worker or hardware job exists.
+- This sole maintained state is now `main:tasks/projects/deepseek-minimax-refresh.md`. The [pre-move snapshot](https://github.com/TimYangst/llm-tech-matrix/blob/dbbf1a7b63ac30b9ae1ef9ba863471e0972f9ef8/tasks/deepseek-minimax-refresh.md) remains historical evidence.
+- The new [hardware phase](public-hardware-catalog.md) has independent state. Model follow-ups remain in ROADMAP; select a bounded follow-up before reopening this phase.
+- Repository account remains local `TimYangst` via `git gh`; merge permission for future changes remains manual.
 
 ## Closeout
 
@@ -156,8 +144,8 @@ These lessons are reflected in the final records, source notes and media schema
 evidence checks. No shared skill changes or background monitoring were introduced.
 
 Implementation, documentation cleanup and independent review were delivered in
-merged PR #21. Earlier publication/account blocks are resolved. The separate T10
-relocation follow-up remains subject to manual merge.
+merged PR #21; T10 was delivered in merged PR #22. Earlier publication/account
+blocks are resolved. Future changes retain manual merge mode.
 
 ## T09 documentation synchronization
 
@@ -197,5 +185,5 @@ rebased. Historical snapshots and source evidence keep their fixed identities.
 
 The original refresh is merged; this follow-up has no model/schema/runtime changes.
 Link targets and applicable formatting checks are the acceptance checks. Independent
-review and publication evidence for T10 will be recorded in its follow-up PR without
-modifying the reviewed head merely to store its own review result.
+review and publication evidence for T10 is recorded in merged PR #22 without
+modifying that reviewed head merely to store its own review result.

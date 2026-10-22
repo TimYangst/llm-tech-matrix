@@ -1,0 +1,27 @@
+{
+  "slug": "nvidia-b200-sxm",
+  "assets": [
+    {
+      "name": "datasheet",
+      "kind": "tech_report",
+      "url": "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf",
+      "archive_url": null,
+      "filename": "datasheet.pdf",
+      "description": "Official NVIDIA Blackwell datasheet linked from HGX page; p8 individual HGX B200 GPU column.",
+      "sha256": "ad8ed65e64974278670d8e6904c0e3020391027925e339bf28e75fdfe2d307d7",
+      "size_bytes": 1156321,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "product",
+      "kind": "blog_html",
+      "url": "https://www.nvidia.com/en-us/data-center/hgx/",
+      "archive_url": null,
+      "filename": "product.html",
+      "description": "Official HGX page; B200 SXM form factor and platform scope, not a substitute for per-GPU datasheet values.",
+      "sha256": "ae2c8dd2eebcbba9b1b5e2e4bd186ff15e8d547314b3f63695910e1412a4d261",
+      "size_bytes": 341571,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

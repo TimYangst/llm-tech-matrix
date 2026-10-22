@@ -40,7 +40,7 @@ adjustments enforced by tooling:
   rewrite on save.
 
 Pre-commit excludes all Markdown beneath `data/extracted/` and `data/reports/`
-from mdformat. These are renderer/generator outputs for all three tracks. Use the
+from mdformat. These are renderer/generator outputs for all four tracks. Use the
 matching generator rather than formatting them directly.
 
 ## First-time setup
@@ -70,7 +70,7 @@ uv run ruff format .
 # Format maintained Markdown, honoring generated-output exclusions
 uv run pre-commit run mdformat --all-files
 
-# Validate LLM/VL, engine and media records, plus generated registry/report outputs
+# Validate LLM/VL, engine, media and hardware records, plus generated outputs
 uv run python scripts/validate_extractions.py
 uv run python scripts/validate_registry.py
 uv run python -m unittest discover -s tests -v
@@ -95,14 +95,14 @@ After changing dev tooling versions, bump the corresponding `rev:` in
 2. `uv run pre-commit run --all-files --show-diff-on-failure` — same
    hooks you run locally.
 
-3. `uv run python -m unittest discover -s tests -v` — media evidence and generated-view regression checks.
+3. `uv run python -m unittest discover -s tests -v` — media/hardware evidence, units, scope and generated-view regression checks.
 
 4. `uv run python scripts/validate_extractions.py` — re-validates every
    `data/extracted/*.json` against `src/llm_tech_matrix/schema.py`, and every
    `data/extracted/engines/*.json` against `src/llm_tech_matrix/engine_schema.py` plus
    its cross-links. Media records in `data/extracted/media/` validate against
    `media_schema.py`, including evidence/source manifests and generated bilingual
-   views/index freshness. This is the gate for the **schema strictness** cardinal rule.
+   views/index freshness. Hardware records in `data/extracted/hardware/` similarly validate against `hardware_schema.py`, including public-source provenance and deterministic views/index. This is the gate for the **schema strictness** cardinal rule.
 
 5. `uv run python scripts/validate_registry.py` — controlled vocabulary and generated report freshness.
 
@@ -191,9 +191,10 @@ JSON is faster when the diff is just JSON. See
 .gemini/config.yaml          Gemini Code Assist behavior
 .gemini/styleguide.md        review rubric (cardinal rules + style)
 .github/workflows/ci.yml     presubmit CI
-scripts/validate_extractions.py   all record contracts and media views (CI)
+scripts/validate_extractions.py   all record contracts and media/hardware views (CI)
 scripts/validate_registry.py      vocabulary and generated synthesis checks (CI)
 tests/test_media.py              media evidence/rendering regressions (CI)
+tests/test_hardware.py           hardware evidence/units/scope/rendering regressions (CI)
 pyproject.toml               [tool.ruff.*] lint + format config
 .claude/skills/draft-pr/     skill for PR drafting
 docs/conventions.md          data-side conventions (naming, schema log)
@@ -206,7 +207,7 @@ CLAUDE.md                    cardinal rules + project orientation
 - A hook keeps changing the same file every commit → check
   `.mdformat.toml` and `.pre-commit-config.yaml`; the most common cause
   is a CRLF/LF mismatch or a plugin defaulting to a stricter mode.
-- CI fails but formatting hooks pass → run both validators and the media regression tests above; these are separate CI steps.
+- CI fails but formatting hooks pass → run both validators and the media/hardware regression tests above; these are separate CI steps.
 - Gemini bot doesn't show up on a PR → confirm the app is installed and
   scoped to this repo; inspect its current service/account limits.
 - `validate_extractions.py` rejects a JSON you just wrote → don't loosen

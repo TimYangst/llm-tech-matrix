@@ -1,0 +1,27 @@
+{
+  "slug": "amd-instinct-mi355x",
+  "assets": [
+    {
+      "name": "datasheet",
+      "kind": "tech_report",
+      "url": "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf",
+      "archive_url": null,
+      "filename": "datasheet.pdf",
+      "description": "Official AMD publicly accessible datasheet for amd-instinct-mi355x; OAM product variant and architecture, not measured performance.",
+      "sha256": "e1a411c53e034f3ea528a75383774a175f52ccd1a58f630d7717d1dca6a2f7c2",
+      "size_bytes": 553603,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "whitepaper",
+      "kind": "tech_report",
+      "url": "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-4-architecture-whitepaper.pdf",
+      "archive_url": null,
+      "filename": "whitepaper.pdf",
+      "description": "Official AMD publicly accessible whitepaper for amd-instinct-mi355x; OAM product variant and architecture, not measured performance.",
+      "sha256": "7ebf89edb9b82198b9edea7bb37eb7fe7c998842257eb21ef7a459a87774a4b2",
+      "size_bytes": 2703210,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
