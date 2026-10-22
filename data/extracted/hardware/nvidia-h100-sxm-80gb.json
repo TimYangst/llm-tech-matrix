@@ -1,0 +1,279 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "vendor": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "accelerator_type": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "variant": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "form_factor": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "record_scope": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "device_count": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "snapshot_date": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ]
+    },
+    "name": "NVIDIA H100 SXM 80GB",
+    "vendor": "NVIDIA",
+    "accelerator_type": "GPU",
+    "variant": "H100 SXM 80GB; excludes H100 NVL and PCIe variants",
+    "form_factor": "SXM5 module",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://www.nvidia.com/en-us/data-center/h100/",
+      "https://www.nvidia.com/en-us/data-center/technologies/hopper-architecture/",
+      "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "process": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "compute_units": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "cache": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "on_chip_memory": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "execution_model": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "notes": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ]
+    },
+    "family": "Hopper (GH100)",
+    "process": "TSMC 4N",
+    "compute_units": "132 SMs; 16,896 FP32 CUDA cores; 528 fourth-generation Tensor Cores",
+    "cache": "50 MB L2; product configuration, not the 60 MB full GH100 die",
+    "on_chip_memory": "Up to 228 KB shared memory per SM",
+    "execution_model": "CUDA threads, thread blocks and thread block clusters; asynchronous tensor memory transfers",
+    "notes": [
+      "Architecture counts use the H100 SXM5 product configuration; launch-era compute rates are not used."
+    ]
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "capacity_gb": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "bandwidth_tb_s": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "scope": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "notes": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ]
+    },
+    "technology": "HBM3",
+    "capacity_gb": 80.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 3.35,
+    "scope": "per_accelerator",
+    "notes": [
+      "Peak local GPU-memory bandwidth; not NVLink bandwidth or read-plus-write aggregate."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP64",
+        "operation": "vector",
+        "throughput": 34.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "FP64",
+        "operation": "matrix",
+        "throughput": 67.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 67.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 989.0,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 1979.0,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 1979.0,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 3958.0,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 3958.0,
+        "unit": "TOPS",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.nvidia.com/en-us/data-center/h100/"
+        ]
+      }
+    ],
+    "notes": [
+      "Current product page publishes sparse Tensor Core rates; unlisted dense Tensor rates and FP4 rates remain unrecorded."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "scale_up": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ]
+    },
+    "host": "PCIe Gen5; 128 GB/s total bidirectional (64 GB/s each direction)",
+    "scale_up": "Fourth-generation NVLink; 900 GB/s total bidirectional per GPU",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "scope": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ],
+      "notes": [
+        "https://www.nvidia.com/en-us/data-center/h100/"
+      ]
+    },
+    "tdp_w": 700.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Maximum configurable GPU TDP; up to 700 W, not observed power or full-server power."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ],
+      "programming_model": [
+        "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      ]
+    },
+    "ecosystem": "NVIDIA CUDA; Transformer Engine",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "CUDA threads, thread blocks, thread block clusters and cooperative groups"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Dense Tensor Core rates at the same final-product configuration and accumulation formats are not separately listed on the current product page.",
+    "No public workload measurements selected in this snapshot; theoretical peaks cannot establish application throughput."
+  ]
+}
