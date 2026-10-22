@@ -27,7 +27,7 @@ A schema-driven AI extraction-and-synthesis pipeline for analyzing mainstream AI
 These rules underpin the project's value. Do not violate them, even if asked to "just fill it in":
 
 1. **No hallucination.** Missing information is the literal string `"[Unknown/Not Disclosed]"`. Never guess from training-data priors. See [`docs/schema.md`](./docs/schema.md#cardinal-rule-no-hallucination).
-2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py` (engine snapshots in `data/extracted/engines/` against `engine_schema.py`). Do not invent fields, rename fields, or skip required groups.
+2. **Schema strictness.** Every `data/extracted/<model>.json` must validate against `src/llm_tech_matrix/schema.py` (engine snapshots in `data/extracted/engines/` against `engine_schema.py`; media records in `data/extracted/media/` against `media_schema.py`). Do not invent fields, rename fields, or skip required groups.
 3. **Closed-model inferences go in `inferred_fields`.** The primary field stays `"[Unknown/Not Disclosed]"`. Synthesis tools opt in to inferred values; default is to ignore them.
 4. **Schema changes are versioned.** Bump `schema_version` and update [`docs/conventions.md`](./docs/conventions.md#schema-changelog) on any breaking change.
 
@@ -54,7 +54,7 @@ The contract between layers is the JSON file. As long as JSON validates, layers 
   - `uv run python -m llm_tech_matrix` — run entry point
   - `uv add <pkg>` — add a dependency
 
-No test suite yet — add tests as the project grows. Don't assume they exist.
+Media regression tests are in `tests/`: run `uv run python -m unittest discover -s tests -v`. The extraction validator also checks media source manifests and generated-view freshness.
 
 ## Working style notes for Claude
 
