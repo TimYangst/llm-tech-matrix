@@ -1,0 +1,126 @@
+{
+  "slug": "deepseek-v4-pro-0813",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "DeepSeek-V4-Pro-0813: official config.json at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "9dd2a89255469e120b333668ef5a169b7ae46c00f6bbab786bf0be457546aec0",
+      "size_bytes": 1967,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "DeepSeek-V4-Pro-0813: official README.md at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "61755d88e95789fcd7a36f50892f97bba977a30fc99d0f2907ab787ed10b0e66",
+      "size_bytes": 7522,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "tokenizer_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/tokenizer_config.json",
+      "archive_url": null,
+      "filename": "tokenizer_config.json",
+      "description": "DeepSeek-V4-Pro-0813: official tokenizer_config.json at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "6ac8c8dc065ed118161d02dd532749ae3f52c243deac27872134fae2f50d8547",
+      "size_bytes": 801,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "encoding_readme",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/encoding/README.md",
+      "archive_url": null,
+      "filename": "encoding_README.md",
+      "description": "DeepSeek-V4-Pro-0813: official encoding/README.md at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "294ed6493ebfe5a487f172154d60c494899997fed8806fdd3352dd8e3c33f9de",
+      "size_bytes": 9168,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "inference_readme",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/README.md",
+      "archive_url": null,
+      "filename": "inference_README.md",
+      "description": "DeepSeek-V4-Pro-0813: official inference/README.md at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "b9fe8027f91f2160b46582b61eaaf7b9873b3da36ee9f98bc76a900e7c1fed94",
+      "size_bytes": 951,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "inference_config",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/config.json",
+      "archive_url": null,
+      "filename": "inference_config.json",
+      "description": "DeepSeek-V4-Pro-0813: official inference/config.json at 72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "sha256": "801bc719d08cd5be57cddc185cac621417522810e29d0314849c939bf0176ee7",
+      "size_bytes": 1240,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "model_code",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/model.py",
+      "archive_url": null,
+      "filename": "inference_model.py",
+      "description": "Official reference implementation inference/model.py; architecture evidence",
+      "sha256": "c0c19e6c9fa439bac7fbb1c5bc1868232dfd5aa2f439a548d0e33dcc2a9edd3f",
+      "size_bytes": 45118,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "release_metadata",
+      "kind": "other",
+      "url": "https://huggingface.co/api/models/deepseek-ai/DeepSeek-V4-Pro-0813/revision/72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "archive_url": null,
+      "filename": "hf_metadata.json",
+      "description": "Official pinned HF revision metadata; release timestamp and checkpoint files",
+      "sha256": "e0884e22aefbc14f9e29a5b2d3d55a9fdc9424e6ccaa54013ac366faefcba6f2",
+      "size_bytes": 6610,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "api_release",
+      "kind": "blog_html",
+      "url": "https://api-docs.deepseek.com/updates/",
+      "archive_url": null,
+      "filename": "api_release.html",
+      "description": "Official release note; snapshot 2026-10-22. Web page may change; architecture sources use immutable HF revisions.",
+      "sha256": "9abda5ba89b86be5d82ad045864dbe5047e0908b45c161d8a4631d4d5fcb6f18",
+      "size_bytes": 52380,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "predecessor_report",
+      "kind": "tech_report",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/resolve/ad664d5e83023a67c735992e8fe612aeab3c52d2/DeepSeek_V4.pdf",
+      "archive_url": null,
+      "filename": "predecessor_report.pdf",
+      "description": "Earlier V4 family report linked by current model card; architecture background only, not current update training evidence",
+      "sha256": "6d62e4a2bfd00049abc23a8e025eeccad68e8436cbb0515e0bb6e432b1883fdc",
+      "size_bytes": 4476057,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "encoding_code",
+      "kind": "other",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/encoding/encoding_dsv4.py",
+      "archive_url": null,
+      "filename": "encoding.py",
+      "description": "Current prompt encoder: exact reasoning effort prefixes/default/validation and DSML protocol",
+      "sha256": "abc0d26120250dda0ae077dc64aa28836026e61e970854aaeb792445e6a0dde6",
+      "size_bytes": 29001,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
