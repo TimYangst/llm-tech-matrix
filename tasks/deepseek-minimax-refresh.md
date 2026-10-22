@@ -37,6 +37,11 @@ after being shown destination `TimYangst/llm-tech-matrix`. This authorizes pushi
 `collect/deepseek-minimax-20261022` and creating a PR targeting `main`; merge
 remains manual. The earlier automatic approval block is superseded by A03.
 
+Account instruction A04: user specified the `yt0701@gmail.com` account for this
+repository and completed browser authorization. The repository-scoped CLI login
+is verified as `TimYangst` with admin/push permission; use `git gh` here. Its
+configuration is local to the Git directory and is not part of this PR.
+
 ## Tasks
 
 Dependencies consumed validated artifacts on this shared feature branch before
@@ -44,19 +49,19 @@ merge. Delivery is a reviewable PR; merge-required tasks stay `awaiting_merge`
 until the user merges. This is the latest on-branch snapshot; the linked PR's
 review section records the final head without another self-referencing commit.
 
-| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State          | Executor / evidence                                                                                              |
-| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
-| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done           | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                                     |
-| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | awaiting_merge | `deepseek`; commits f019d6a /b7b71cb /6603436                                                                    |
-| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | awaiting_merge | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                                         |
-| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | awaiting_merge | `media_schema`; 881e7a6                                                                                          |
-| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | awaiting_merge | coordinator; b2fc180 /9b83045 /fd319e2                                                                           |
-| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | awaiting_merge | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                                  |
-| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done           | Reviews accepted through e58173d; final publication checkpoint reviewed separately, evidence in local PR draft.  |
-| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | blocked        | Branch pushed under A03; PR creation blocked by GitHub account collaborator permissions, not user authorization. |
-| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned        | Explicitly deferred by user; select representative checkpoints first                                             |
-| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned        | ROADMAP follow-up inventory; not counted as extracted                                                            |
-| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned        | M3.1 source-only notes; no guessed MoE label                                                                     |
+| ID  | Deliverable / acceptance                                                             | Type / priority  | Dependency                               | State          | Executor / evidence                                                                                     |
+| --- | ------------------------------------------------------------------------------------ | ---------------- | ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
+| T01 | Official inventory and pinned sources; remaining candidates classified               | unblocker / P0   | —                                        | done           | 15 manifests /100 cached assets; model notes and ROADMAP follow-up inventory                            |
+| T02 | Three recent DeepSeek checkpoints, exact-version attribution, bilingual views        | required / P1    | T01: accepted inventory                  | awaiting_merge | `deepseek`; commits f019d6a /b7b71cb /6603436                                                           |
+| T03 | Eight MiniMax LLM/VL core records and M3.1 source-only note                          | required / P1    | T01: accepted inventory                  | awaiting_merge | `minimax_llm`; commits b8f7c96 through f44c588; M1 source repair c39a920                                |
+| T04 | Media schema v1, bilingual renderer/index, evidence validation, CI regression checks | unblocker / P0   | A02                                      | awaiting_merge | `media_schema`; 881e7a6                                                                                 |
+| T05 | H3, Music3 and closed Speech 2.8 media records with public/hosted scope              | required / P1    | T04: validated schema artifact           | awaiting_merge | coordinator; b2fc180 /9b83045 /fd319e2                                                                  |
+| T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | awaiting_merge | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                         |
+| T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done           | Prior reviews accepted through 34d98c3; final publication checkpoint evidence is in PR #21 description. |
+| T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | awaiting_merge | PR #21 created under A03/A04; remote CI running at snapshot; manual merge.                              |
+| F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned        | Explicitly deferred by user; select representative checkpoints first                                    |
+| F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned        | ROADMAP follow-up inventory; not counted as extracted                                                   |
+| F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned        | M3.1 source-only notes; no guessed MoE label                                                            |
 
 ## Validation and independent review
 
@@ -99,19 +104,23 @@ review section records the final head without another self-referencing commit.
 - Last reconciled implementation head:
   `6681cffeb165b99bf2846b2be91d7df3ba7e9df5`; this state snapshot follows it.
 - Branch: `collect/deepseek-minimax-20261022`; target: `main`; merge mode: `manual`.
-- Published remote branch: `origin/collect/deepseek-minimax-20261022` at
-  `e58173d72127eb64da69d0b9681cbee2f3326d47` before this checkpoint update.
-- PR: **not created**. Connector returned HTTP 403 `Resource not accessible by integration`; GitHub CLI returned `must be a collaborator (createPullRequest)`.
-  Both existing CLI accounts have read-only repository permission. SSH push
-  authorization and GitHub API account permission are different.
-- Local PR draft: `.claude/drafts/pr/2026-10-22-deepseek-minimax-media.md`.
-  [Browser PR entry](https://github.com/TimYangst/llm-tech-matrix/compare/main...collect/deepseek-minimax-20261022?expand=1).
-- All implementation agents have returned; no running jobs, deployments, GPU
-  workloads or finfer changes. No dedicated worktrees were created to remove.
-- Next action: use a GitHub API/CLI session authenticated as repository owner or
-  collaborator, then create the authorized PR from the published branch and local
-  draft, attach it and read its actual checks/comments. A03 remains valid; do not
-  ask again for push/PR authorization. Merge remains manual. Do not re-extract
+- Published PR: [#21](https://github.com/TimYangst/llm-tech-matrix/pull/21),
+  open and ready for review, targeting `main`; author `TimYangst`. Verified
+  initial remote head `34d98c38f7ff35c8b5ed78d0cb4fe44a969d5366`; this checkpoint
+  follows it. Final reviewed head and CI outcome are recorded in the PR description.
+- Initial PR-triggered CI run `39864994914` is in progress at this snapshot.
+  No human or bot review comments existed on the initial readback.
+- Account-permission blocker is resolved: `git gh api user` returns `TimYangst`,
+  and repository permissions include admin/push. Local `git gh` uses a scoped
+  GitHub CLI configuration; SSH already authenticates the same account. Other
+  projects' default GitHub login is unchanged. No credentials are committed.
+- Local PR body copy: `.claude/drafts/pr/2026-10-22-deepseek-minimax-media.md`;
+  the remote PR description is the published review evidence entry.
+- No running jobs, deployments, GPU workloads or finfer changes. No dedicated
+  worktrees were created to remove. Remote CI is the only tracked operation.
+- Next action: read PR #21's exact head, checks and new review comments. Address
+  actual feedback; merge only with explicit user authorization. A03/A04 remain
+  valid for pushes and PR updates; do not request them again. Do not re-extract
   completed records when continuing F01–F03.
 - Scope gaps and undisclosed values remain explicit; sourced, extracted,
   independently reviewed and merged are separate states.
@@ -144,7 +153,7 @@ expects plain model names; adapting the new rows avoided a needless parser chang
 These lessons are reflected in the final records, source notes and media schema
 evidence checks. No shared skill changes or background monitoring were introduced.
 
-Implementation and independent review are complete. The user explicitly
-authorized publication under A03 and the reviewed branch was pushed. PR creation
-is blocked by API/CLI account permissions; no PR or merge occurred. The local PR
-draft remains the review evidence entry until an authorized account creates it.
+Implementation and independent review are complete; PR #21 is published under
+A03/A04 with the intended repository account. Earlier publication/account blocks
+are resolved. Remote checks are recorded against their actual head in the PR;
+main remains unmerged and merge authorization remains manual.
