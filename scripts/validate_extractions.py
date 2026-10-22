@@ -7,6 +7,8 @@
   and every `integrations[].engine_slug` has an engine snapshot.
 - data/extracted/media/*.json    media records   -> media_schema.MediaRecord, with
   source-manifest consistency and deterministic bilingual views/index freshness.
+- data/extracted/hardware/*.json hardware snapshots -> hardware_schema.HardwareRecord,
+  with public URL/evidence, fetched-manifest/hash and generated-view freshness checks.
 
 Run locally:
     uv run python scripts/validate_extractions.py
@@ -26,16 +28,25 @@ from urllib.parse import urldefrag
 from pydantic import ValidationError
 
 from llm_tech_matrix.engine_schema import ENGINE_SCHEMA_VERSION, EngineRecord
+from llm_tech_matrix.extraction.render_hardware import rendered_files as rendered_hardware_files
 from llm_tech_matrix.extraction.render_media import rendered_files as rendered_media_files
+from llm_tech_matrix.hardware_schema import (
+    HARDWARE_SCHEMA_VERSION,
+    HardwareRecord,
+    validate_public_url,
+)
 from llm_tech_matrix.media_schema import MEDIA_SCHEMA_VERSION, MediaRecord
 from llm_tech_matrix.schema import SCHEMA_VERSION, ExtractedModel
+from llm_tech_matrix.sourcing.fetch import sha256_of
 from llm_tech_matrix.sourcing.manifest import SourceManifest
+from llm_tech_matrix.synthesis.hardware import generated_files as hardware_index_files
 from llm_tech_matrix.synthesis.media import generated_files as media_index_files
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXTRACTED_DIR = REPO_ROOT / "data" / "extracted"
 ENGINES_DIR = EXTRACTED_DIR / "engines"
 MEDIA_DIR = EXTRACTED_DIR / "media"
+HARDWARE_DIR = EXTRACTED_DIR / "hardware"
 GLOSSARY_DIR = REPO_ROOT / "docs" / "glossary"
 
 
@@ -153,6 +164,76 @@ def validate_media() -> tuple[int, list[str]]:
     return len(files), failures
 
 
+def _hardware_sources(path: Path, record: HardwareRecord) -> list[str]:
+    source_dir = REPO_ROOT / "data" / "sources" / "hardware" / path.stem
+    manifest_path = source_dir / "manifest.json"
+    if not manifest_path.is_file():
+        return [f"no source manifest at {manifest_path.relative_to(REPO_ROOT)}"]
+    try:
+        manifest = SourceManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    except ValidationError as err:
+        return [f"invalid source manifest: {err}"]
+    errors = []
+    if manifest.slug != path.stem:
+        errors.append(f"manifest slug {manifest.slug!r} differs from record {path.stem!r}")
+    urls = {urldefrag(url)[0] for url in record.metadata.sources}
+    manifest_urls = {urldefrag(asset.url)[0] for asset in manifest.assets}
+    if urls != manifest_urls:
+        errors.append(
+            f"metadata.sources differs from manifest: missing={sorted(manifest_urls - urls)}, unregistered={sorted(urls - manifest_urls)}"
+        )
+    for asset in manifest.assets:
+        try:
+            validate_public_url(asset.url)
+            if asset.archive_url:
+                validate_public_url(asset.archive_url)
+        except ValueError as err:
+            errors.append(f"source {asset.name!r}: {err}")
+        if not asset.sha256 or not re.fullmatch(r"[0-9a-f]{64}", asset.sha256):
+            errors.append(f"source {asset.name!r}: missing or invalid sha256")
+        if asset.size_bytes is None or asset.size_bytes <= 0 or asset.fetched_at is None:
+            errors.append(f"source {asset.name!r}: asset has not been fetched")
+        filename = Path(asset.filename)
+        if filename.is_absolute() or ".." in filename.parts:
+            errors.append(f"source {asset.name!r}: unsafe cache filename")
+            continue
+        cached = source_dir / filename
+        # A fresh CI clone has no cache. If present, ensure it is the registered public asset.
+        if cached.is_file() and (
+            sha256_of(cached) != asset.sha256 or cached.stat().st_size != asset.size_bytes
+        ):
+            errors.append(f"source {asset.name!r}: cached bytes differ from manifest")
+    return errors
+
+
+def validate_hardware() -> tuple[int, list[str]]:
+    files = sorted(HARDWARE_DIR.glob("*.json"))
+    failures = []
+    for path in files:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data.get("hardware_schema_version") != HARDWARE_SCHEMA_VERSION:
+                raise ValueError(f"hardware_schema_version must equal {HARDWARE_SCHEMA_VERSION}")
+            record = HardwareRecord.model_validate(data)
+        except (ValueError, ValidationError) as err:
+            failures.append(f"{path.relative_to(REPO_ROOT)}:\n{err}")
+            continue
+        errors = _hardware_sources(path, record)
+        if errors:
+            failures.append(f"{path.relative_to(REPO_ROOT)}:\n" + "\n".join(errors))
+        else:
+            print(f"  OK  hardware/{path.name}")
+    if files and not failures:
+        for path, expected in (
+            rendered_hardware_files(HARDWARE_DIR) | hardware_index_files(HARDWARE_DIR)
+        ).items():
+            if not path.is_file() or path.read_text(encoding="utf-8") != expected:
+                failures.append(
+                    f"{path.relative_to(REPO_ROOT)}: missing or stale generated hardware output; run render_hardware --all and synthesis.hardware"
+                )
+    return len(files), failures
+
+
 def main() -> int:
     files = sorted(EXTRACTED_DIR.glob("*.json"))
     failures: list[str] = []
@@ -188,6 +269,9 @@ def main() -> int:
     media_count, media_failures = validate_media()
     failures += media_failures
 
+    hardware_count, hardware_failures = validate_hardware()
+    failures += hardware_failures
+
     if failures:
         print("\nFailed:\n", file=sys.stderr)
         for msg in failures:
@@ -196,7 +280,7 @@ def main() -> int:
         return 1
 
     print(
-        f"\nValidated {len(files)} extraction(s), {engine_count} engine snapshot(s), and {media_count} media record(s)."
+        f"\nValidated {len(files)} extraction(s), {engine_count} engine snapshot(s), {media_count} media record(s), and {hardware_count} hardware snapshot(s)."
     )
     return 0
 
