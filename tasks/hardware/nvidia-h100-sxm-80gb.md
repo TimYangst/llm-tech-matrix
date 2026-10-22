@@ -14,6 +14,8 @@ Product Specifications: H100 SXM column, with-sparsity footnote. The technical b
 - [architecture](https://www.nvidia.com/en-us/data-center/technologies/hopper-architecture/): fetched 2026-10-22; SHA-256 `0ad9c690d09fb434705011e593994b4948294f182a7e954c900cf1061e5c522d`.
 - [technical-blog](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/): fetched 2026-10-22; SHA-256 `29de170a1079fe9747535a752eb45ce27a6376a3f452f118ed7b515f1414f95b`.
 
+Sparse-row source audit: each structured-sparse rate also cites the Hopper architecture article, which explicitly identifies the sparsity feature as structured.
+
 ## Open questions
 
 - Dense Tensor Core rates at the same final-product configuration and accumulation formats are not separately listed on the current product page.

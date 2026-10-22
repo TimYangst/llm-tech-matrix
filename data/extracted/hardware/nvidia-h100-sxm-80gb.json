@@ -159,10 +159,11 @@
         "sparsity": "structured_sparse",
         "scope": "per_accelerator",
         "accumulation": "[Unknown/Not Disclosed]",
-        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred. Hopper architecture article identifies Tensor Core sparsity as fine-grained structured sparsity.",
         "fma_counting": "[Unknown/Not Disclosed]",
         "evidence": [
-          "https://www.nvidia.com/en-us/data-center/h100/"
+          "https://www.nvidia.com/en-us/data-center/h100/",
+          "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
         ]
       },
       {
@@ -173,10 +174,11 @@
         "sparsity": "structured_sparse",
         "scope": "per_accelerator",
         "accumulation": "[Unknown/Not Disclosed]",
-        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred. Hopper architecture article identifies Tensor Core sparsity as fine-grained structured sparsity.",
         "fma_counting": "[Unknown/Not Disclosed]",
         "evidence": [
-          "https://www.nvidia.com/en-us/data-center/h100/"
+          "https://www.nvidia.com/en-us/data-center/h100/",
+          "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
         ]
       },
       {
@@ -187,10 +189,11 @@
         "sparsity": "structured_sparse",
         "scope": "per_accelerator",
         "accumulation": "[Unknown/Not Disclosed]",
-        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred. Hopper architecture article identifies Tensor Core sparsity as fine-grained structured sparsity.",
         "fma_counting": "[Unknown/Not Disclosed]",
         "evidence": [
-          "https://www.nvidia.com/en-us/data-center/h100/"
+          "https://www.nvidia.com/en-us/data-center/h100/",
+          "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
         ]
       },
       {
@@ -201,10 +204,11 @@
         "sparsity": "structured_sparse",
         "scope": "per_accelerator",
         "accumulation": "[Unknown/Not Disclosed]",
-        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred. Hopper architecture article identifies Tensor Core sparsity as fine-grained structured sparsity.",
         "fma_counting": "[Unknown/Not Disclosed]",
         "evidence": [
-          "https://www.nvidia.com/en-us/data-center/h100/"
+          "https://www.nvidia.com/en-us/data-center/h100/",
+          "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
         ]
       },
       {
@@ -215,10 +219,11 @@
         "sparsity": "structured_sparse",
         "scope": "per_accelerator",
         "accumulation": "[Unknown/Not Disclosed]",
-        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred.",
+        "conditions": "Product specification marked with the with-sparsity footnote; dense throughput is not inferred. Hopper architecture article identifies Tensor Core sparsity as fine-grained structured sparsity.",
         "fma_counting": "[Unknown/Not Disclosed]",
         "evidence": [
-          "https://www.nvidia.com/en-us/data-center/h100/"
+          "https://www.nvidia.com/en-us/data-center/h100/",
+          "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
         ]
       }
     ],

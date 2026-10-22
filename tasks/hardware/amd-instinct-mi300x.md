@@ -13,6 +13,8 @@ Datasheet PDF page 1 separates peak theoretical AI dense/with-sparsity columns a
 - [datasheet](https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf): fetched 2026-10-22; SHA-256 `60d78bc2849cd7c3a34aa17fdbcd263c44c0447d597895ab41d2832ab740c7ab`.
 - [whitepaper](https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf): fetched 2026-10-22; SHA-256 `a0811d04f101f9127bd183d6e228f462b6fd988b0e0e6d263a25e4bed712f593`.
 
+Sparse-row source audit: compute-row evidence includes the architecture source establishing structured sparsity; product tables alone establish only the published sparse rate. MI300X TF32 remains `sparse_unspecified` because the cited structure description names other formats.
+
 ## Open questions
 
 - Exact matrix accumulation modes are not stated in the product specification table.
