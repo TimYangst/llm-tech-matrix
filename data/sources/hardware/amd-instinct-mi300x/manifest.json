@@ -1,0 +1,27 @@
+{
+  "slug": "amd-instinct-mi300x",
+  "assets": [
+    {
+      "name": "datasheet",
+      "kind": "tech_report",
+      "url": "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf",
+      "archive_url": null,
+      "filename": "datasheet.pdf",
+      "description": "Official AMD publicly accessible datasheet for amd-instinct-mi300x; OAM product variant and architecture, not measured performance.",
+      "sha256": "60d78bc2849cd7c3a34aa17fdbcd263c44c0447d597895ab41d2832ab740c7ab",
+      "size_bytes": 1855742,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "whitepaper",
+      "kind": "tech_report",
+      "url": "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf",
+      "archive_url": null,
+      "filename": "whitepaper.pdf",
+      "description": "Official AMD publicly accessible whitepaper for amd-instinct-mi300x; OAM product variant and architecture, not measured performance.",
+      "sha256": "a0811d04f101f9127bd183d6e228f462b6fd988b0e0e6d263a25e4bed712f593",
+      "size_bytes": 8096236,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
