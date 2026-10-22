@@ -5,6 +5,8 @@
   cross-link checks: the filename equals `<engine>-<release_tag>`, the commit is a full SHA,
   every `model_slugs` entry has a model record, every `glossary_slug` has a glossary entry,
   and every `integrations[].engine_slug` has an engine snapshot.
+- data/extracted/media/*.json    media records   -> media_schema.MediaRecord, with
+  source-manifest consistency and deterministic bilingual views/index freshness.
 
 Run locally:
     uv run python scripts/validate_extractions.py
@@ -19,15 +21,21 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urldefrag
 
 from pydantic import ValidationError
 
 from llm_tech_matrix.engine_schema import ENGINE_SCHEMA_VERSION, EngineRecord
+from llm_tech_matrix.extraction.render_media import rendered_files as rendered_media_files
+from llm_tech_matrix.media_schema import MEDIA_SCHEMA_VERSION, MediaRecord
 from llm_tech_matrix.schema import SCHEMA_VERSION, ExtractedModel
+from llm_tech_matrix.sourcing.manifest import SourceManifest
+from llm_tech_matrix.synthesis.media import generated_files as media_index_files
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXTRACTED_DIR = REPO_ROOT / "data" / "extracted"
 ENGINES_DIR = EXTRACTED_DIR / "engines"
+MEDIA_DIR = EXTRACTED_DIR / "media"
 GLOSSARY_DIR = REPO_ROOT / "docs" / "glossary"
 
 
@@ -92,12 +100,61 @@ def validate_engines() -> tuple[int, list[str]]:
     return len(files), failures
 
 
+def _media_sources(path: Path, record: MediaRecord) -> list[str]:
+    manifest_path = REPO_ROOT / "data" / "sources" / path.stem / "manifest.json"
+    if not manifest_path.is_file():
+        return [f"no source manifest at {manifest_path.relative_to(REPO_ROOT)}"]
+    try:
+        manifest = SourceManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    except ValidationError as err:
+        return [f"invalid source manifest: {err}"]
+    errors = []
+    if manifest.slug != path.stem:
+        errors.append(f"manifest slug {manifest.slug!r} differs from record {path.stem!r}")
+    source_urls = {urldefrag(url)[0] for url in record.metadata.sources}
+    manifest_urls = {urldefrag(asset.url)[0] for asset in manifest.assets}
+    if source_urls != manifest_urls:
+        errors.append(
+            f"metadata.sources differs from manifest: missing={sorted(manifest_urls - source_urls)}, unregistered={sorted(source_urls - manifest_urls)}"
+        )
+    for asset in manifest.assets:
+        if not asset.sha256 or not re.fullmatch(r"[0-9a-f]{64}", asset.sha256):
+            errors.append(f"source {asset.name!r}: missing or invalid sha256")
+        if asset.size_bytes is None or asset.fetched_at is None:
+            errors.append(f"source {asset.name!r}: asset has not been fetched")
+    return errors
+
+
+def validate_media() -> tuple[int, list[str]]:
+    files = sorted(MEDIA_DIR.glob("*.json"))
+    failures: list[str] = []
+    for path in files:
+        rel = path.relative_to(REPO_ROOT)
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data.get("media_schema_version") != MEDIA_SCHEMA_VERSION:
+                raise ValueError(f"media_schema_version must equal {MEDIA_SCHEMA_VERSION}")
+            record = MediaRecord.model_validate(data)
+        except (ValueError, ValidationError) as err:
+            failures.append(f"{rel}:\n{err}")
+            continue
+        errors = _media_sources(path, record)
+        if errors:
+            failures.append(f"{rel}:\n" + "\n".join(errors))
+        else:
+            print(f"  OK  media/{path.name}")
+    if files and not failures:
+        generated = rendered_media_files(MEDIA_DIR) | media_index_files(MEDIA_DIR)
+        for path, expected in generated.items():
+            if not path.is_file() or path.read_text(encoding="utf-8") != expected:
+                failures.append(
+                    f"{path.relative_to(REPO_ROOT)}: missing or stale generated media output; run render_media --all and synthesis.media"
+                )
+    return len(files), failures
+
+
 def main() -> int:
     files = sorted(EXTRACTED_DIR.glob("*.json"))
-    if not files:
-        print(f"No JSON files found under {EXTRACTED_DIR} — nothing to validate.")
-        return 0
-
     failures: list[str] = []
     for path in files:
         rel = path.relative_to(EXTRACTED_DIR.parent.parent)
@@ -128,6 +185,8 @@ def main() -> int:
 
     engine_count, engine_failures = validate_engines()
     failures += engine_failures
+    media_count, media_failures = validate_media()
+    failures += media_failures
 
     if failures:
         print("\nFailed:\n", file=sys.stderr)
@@ -136,7 +195,9 @@ def main() -> int:
             print("---", file=sys.stderr)
         return 1
 
-    print(f"\nValidated {len(files)} extraction(s) and {engine_count} engine snapshot(s).")
+    print(
+        f"\nValidated {len(files)} extraction(s), {engine_count} engine snapshot(s), and {media_count} media record(s)."
+    )
     return 0
 
 
