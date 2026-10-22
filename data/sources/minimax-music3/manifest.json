@@ -1,0 +1,137 @@
+{
+  "slug": "minimax-music3",
+  "assets": [
+    {
+      "name": "card",
+      "kind": "model_card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/README.md",
+      "archive_url": null,
+      "filename": "card.md",
+      "description": "Official Music3 README.md pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "d24a3e65f3ab0b3b9852986fc2d63dffbdfb8b0472d502dd3de47a24d41c623a",
+      "size_bytes": 11699,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "license",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/LICENSE",
+      "archive_url": null,
+      "filename": "license.txt",
+      "description": "Official Music3 LICENSE pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "b21d12df2adae59dad3fcf80c1d81492654c662342f497d9a9770198c9317e58",
+      "size_bytes": 7373,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Official Music3 config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "1ffcff67d916d5519d1ef9a36853232ee6bcb7e14a936623c4e85559f5dce106",
+      "size_bytes": 107,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "language-model",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/language_model/config.json",
+      "archive_url": null,
+      "filename": "language-model.json",
+      "description": "Official Music3 language_model/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "34ded58fcd5e8181557f1417e76af9f3e95109a5ce113a4771fd16f8625b53c0",
+      "size_bytes": 1596,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "transformer",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/transformer/config.json",
+      "archive_url": null,
+      "filename": "transformer.json",
+      "description": "Official Music3 transformer/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "f60856be934127a8b8223510aff2e38a9efd8bbdbc230c3d3339b96e2cb12f00",
+      "size_bytes": 294,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "vocoder",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/vocoder/config.json",
+      "archive_url": null,
+      "filename": "vocoder.json",
+      "description": "Official Music3 vocoder/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "4161afd07ba7d5b949e29c8a7a005592259fba73e9110b6ece9dfd38d3489eac",
+      "size_bytes": 251,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "rvq-depth-decoder",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/rvq_depth_decoder/config.json",
+      "archive_url": null,
+      "filename": "rvq-depth-decoder.json",
+      "description": "Official Music3 rvq_depth_decoder/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "b38c7f72d4b2fa8667442071f9e4a63ca5a7b5d0859e5e64ee7f79c4bc64520c",
+      "size_bytes": 274,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "condition-encoder",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/condition_encoder/config.json",
+      "archive_url": null,
+      "filename": "condition-encoder.json",
+      "description": "Official Music3 condition_encoder/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "1cdea3f36506719128ae4a29cdfff74b1134e607eb4a504ce6d810568fac8263",
+      "size_bytes": 292,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "scheduler",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/scheduler/scheduler_config.json",
+      "archive_url": null,
+      "filename": "scheduler.json",
+      "description": "Official Music3 scheduler/scheduler_config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "b544466124aab333da4874417da0168610067e9c9ff95fcb63d749e4bf891d99",
+      "size_bytes": 483,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "qwen",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/qwen_7B/qwen_7B/config.json",
+      "archive_url": null,
+      "filename": "qwen.json",
+      "description": "Official Music3 qwen_7B/qwen_7B/config.json pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "7ec0400456b20551c8ee8d693170f7f608380624aee37c07b17ae04a8588ac1c",
+      "size_bytes": 1663,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "inference",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-Music3/raw/fbdf52fbaaca799592917417eb05f1899f1255ec/scripts/end_to_end/minimax_ttm_test.py",
+      "archive_url": null,
+      "filename": "inference.py",
+      "description": "Official Music3 scripts/end_to_end/minimax_ttm_test.py pinned at fbdf52fbaaca799592917417eb05f1899f1255ec; audio generation source.",
+      "sha256": "9c1f8416cc740164021d6701ac325f0c1ee8cd16e55b201415b866749bd851c2",
+      "size_bytes": 8584,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "release",
+      "kind": "blog_html",
+      "url": "https://www.minimax.io/blog/minimax-music-3-0-next-generation-open-weights-production-ready-versatile-music-model",
+      "archive_url": null,
+      "filename": "release.html",
+      "description": "Official August 13 2026 Music3 launch; release date and architecture; conflicts with pinned HF card on Global LLM initialization family.",
+      "sha256": "01e2c637e6f9a7eef2cbe5ed276b4c319baed17f107f80a921b8145d0430bf14",
+      "size_bytes": 167741,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
