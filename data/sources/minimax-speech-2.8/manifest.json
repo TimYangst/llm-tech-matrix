@@ -1,0 +1,16 @@
+{
+  "slug": "minimax-speech-2.8",
+  "assets": [
+    {
+      "name": "release",
+      "kind": "blog_html",
+      "url": "https://www.minimax.io/news/minimax-speech-28",
+      "archive_url": null,
+      "filename": "release.html",
+      "description": "Official dated January 23 2026 Speech 2.8 announcement; hosted API/product capabilities, not released weights.",
+      "sha256": "7eaab582bbf04008f48faf4fbc7e06a3bcaaf48baa0c60156a0235d556d727ca",
+      "size_bytes": 82890,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

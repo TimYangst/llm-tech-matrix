@@ -1,0 +1,122 @@
+{
+  "media_schema_version": 1,
+  "metadata": {
+    "name": "MiniMax-Speech-2.8",
+    "family": "MiniMax",
+    "organization": "MiniMax",
+    "release_date": "2026-01",
+    "openness": "closed",
+    "license": "[Unknown/Not Disclosed]",
+    "sources": [
+      "https://www.minimax.io/news/minimax-speech-28"
+    ],
+    "variant_policy": "Hosted Speech 2.8 service announced January 23, 2026. Official announcement links the Open Platform and Audio product; no model checkpoint or self-hosted architecture is disclosed there. This record covers those public capabilities, not an open-weight release.",
+    "evidence": {
+      "name": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "family": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "organization": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "release_date": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "openness": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "variant_policy": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ]
+    }
+  },
+  "generation": {
+    "input_modalities": [
+      "text",
+      "audio"
+    ],
+    "output_modalities": [
+      "audio"
+    ],
+    "tasks": [
+      "text-to-speech",
+      "voice-cloned text-to-speech"
+    ],
+    "objective": "[Unknown/Not Disclosed]",
+    "scheduler": "[Unknown/Not Disclosed]",
+    "sampling": "[Unknown/Not Disclosed]",
+    "evidence": {
+      "input_modalities": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "output_modalities": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "tasks": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ]
+    }
+  },
+  "architecture": {
+    "backbone": "[Unknown/Not Disclosed]",
+    "parameters": "[Unknown/Not Disclosed]",
+    "attention": "[Unknown/Not Disclosed]",
+    "conditioning": "Text includes native sound tags for fillers and nonverbal cues. Vendor describes voice cloning from a 10-second reference sample. Reference audio is conditioning for voice identity, not a claim of unrestricted audio-to-audio generation.",
+    "vae": "[Unknown/Not Disclosed]",
+    "audio_codec": "[Unknown/Not Disclosed]",
+    "multimodal_coupling": "[Unknown/Not Disclosed]",
+    "implementation": "Hosted Open Platform API and MiniMax Audio are the access routes named in the announcement.",
+    "evidence": {
+      "conditioning": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "implementation": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ]
+    }
+  },
+  "output": {
+    "resolution": "[Unknown/Not Disclosed]",
+    "frame_rate": "[Unknown/Not Disclosed]",
+    "duration": "[Unknown/Not Disclosed]",
+    "sample_rate": "[Unknown/Not Disclosed]",
+    "channels": "[Unknown/Not Disclosed]",
+    "formats": [],
+    "evidence": {}
+  },
+  "training": {
+    "data": "[Unknown/Not Disclosed]",
+    "pretraining": "[Unknown/Not Disclosed]",
+    "post_training": "[Unknown/Not Disclosed]",
+    "evidence": {}
+  },
+  "precision": {
+    "weights": "[Unknown/Not Disclosed]",
+    "compute": "[Unknown/Not Disclosed]",
+    "quantization": "[Unknown/Not Disclosed]",
+    "evidence": {}
+  },
+  "release": {
+    "artifacts": [],
+    "hosted_scope": "Speech 2.8 text-to-speech with native sound tags, voice cloning and cross-lingual improvements is offered through Open Platform and MiniMax Audio.",
+    "limitations": [
+      "Announcement provides capabilities and demos rather than architecture, weights, training details or output-format specifications.",
+      "Voice similarity and noise-removal improvements are vendor claims; no runtime or listening evaluation was performed here."
+    ],
+    "evidence": {
+      "hosted_scope": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ],
+      "limitations": [
+        "https://www.minimax.io/news/minimax-speech-28"
+      ]
+    }
+  },
+  "open_questions": [
+    "Backbone, parameters, training objective/data/optimizer, codec and deployment precision are undisclosed in the registered announcement.",
+    "Sample rate, channels, output formats and request limits need version-specific API evidence before they can be filled.",
+    "Earlier Speech 02 /2.5 /2.6 services remain inventory items; the open Speech test dataset is not a release of model weights."
+  ]
+}
