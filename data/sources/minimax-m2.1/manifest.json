@@ -1,0 +1,71 @@
+{
+  "slug": "minimax-m2.1",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.1/resolve/cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Official MiniMax-M2.1 config.json, pinned HF revision cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c",
+      "sha256": "3372a31ecbdba614b309cfa5b3dfec33ceea3c580cb9612ff35345d92ced8618",
+      "size_bytes": 1652,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.1/resolve/cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Official MiniMax-M2.1 README.md, pinned HF revision cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c",
+      "sha256": "0d9e35865a62b3b767def1ae0a1272572744ccbed3305d7000dc7505fdbc6ec9",
+      "size_bytes": 20825,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "chat_template",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.1/resolve/cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c/chat_template.jinja",
+      "archive_url": null,
+      "filename": "chat_template.jinja",
+      "description": "Official MiniMax-M2.1 chat_template.jinja, pinned HF revision cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c",
+      "sha256": "2aeb48049bf0f720e16706cf98309b534ca277cda04887da961866c6f1e108ae",
+      "size_bytes": 6772,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "generation_config",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.1/resolve/cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c/generation_config.json",
+      "archive_url": null,
+      "filename": "generation_config.json",
+      "description": "Official MiniMax-M2.1 generation_config.json, pinned HF revision cd97f59135f37b2a6bf09356e485d5e4aeb7dc9c",
+      "sha256": "2c24fe5507e260bb081727e2a14693d9a982942e721b28720c184d201bffb9dd",
+      "size_bytes": 166,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2605.26494v1",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Official technical report, pinned arXiv revision 2605.26494v1",
+      "sha256": "4c090a07b73dade56ed3e90f7fdf56a183601c12d2f2d1f81eb46f24cff311fd",
+      "size_bytes": 3136621,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "blog",
+      "kind": "blog_html",
+      "url": "https://www.minimax.io/news/minimax-m21",
+      "archive_url": null,
+      "filename": "blog.html",
+      "description": "Official dated release announcement; mutable page archived by SHA256 on fetch",
+      "sha256": "9b6158fdd36a8b6f71c1f52538a300ae4f175202ae8443dfee1e694319f2bbe4",
+      "size_bytes": 182481,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
