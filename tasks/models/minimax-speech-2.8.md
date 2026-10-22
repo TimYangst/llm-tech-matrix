@@ -13,4 +13,4 @@ training and output-format fields remain UNKNOWN. No weights or inference were
 accessed. The Speech test dataset in the official HF collection is not a release
 of Speech model weights. Earlier Speech 02/2.5/2.6 remain historical follow-ups.
 
-Tracking: [refresh state](../deepseek-minimax-refresh.md), T05.
+Tracking: [refresh state](../projects/deepseek-minimax-refresh.md), T05.

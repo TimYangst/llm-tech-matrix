@@ -35,6 +35,7 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 | `docs/glossary/`                           | Per-technique wiki — short entries, "Used by" tables.                         |
 | `docs/roadmap.md`                          | Strategic milestones (M1/M2 scope).                                           |
 | `tasks/ROADMAP.md`                         | Per-model status table + **Current focus**.                                   |
+| `tasks/projects/`                          | Project/phase coordination state and handoff index.                           |
 | `tasks/models/<slug>.md`                   | Per-model notes, sources, open questions.                                     |
 | `data/sources/<slug>/manifest.json`        | Source URLs + sha256 (**committed**).                                         |
 | `data/sources/<slug>/<file>`               | Cached source files (gitignored).                                             |
@@ -93,7 +94,7 @@ start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
 
 ### Active DeepSeek / MiniMax refresh
 
-Start from [the sole coordination state](../tasks/deepseek-minimax-refresh.md)
+Start from [the sole coordination state](../tasks/projects/deepseek-minimax-refresh.md)
 when continuing this phase. It records scope, permissions, review evidence and the
 next action; do not create a second task table.
 

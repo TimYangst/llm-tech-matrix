@@ -34,4 +34,4 @@ August 13, 2026; earlier HF repository creation is not used as the release date.
 - Training data totals, optimizer and compute are not disclosed.
 - No runtime/quality or GPU-memory claims were independently tested.
 
-Tracking: [refresh state](../deepseek-minimax-refresh.md), T05.
+Tracking: [refresh state](../projects/deepseek-minimax-refresh.md), T05.
