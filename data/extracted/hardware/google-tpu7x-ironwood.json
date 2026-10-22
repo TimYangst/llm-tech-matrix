@@ -1,0 +1,177 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "vendor": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "accelerator_type": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "variant": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#dual-chiplet_architecture"
+      ],
+      "record_scope": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "device_count": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "snapshot_date": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ]
+    },
+    "name": "Google TPU7x (Ironwood)",
+    "vendor": "Google",
+    "accelerator_type": "TPU",
+    "variant": "TPU7x whole chip; two chiplets",
+    "form_factor": "[Unknown/Not Disclosed]",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://docs.cloud.google.com/tpu/docs/tpu7x"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x"
+      ],
+      "compute_units": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "on_chip_memory": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#memory_hierarchy"
+      ],
+      "execution_model": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#dual-chiplet_architecture"
+      ]
+    },
+    "family": "Ironwood, seventh-generation TPU",
+    "process": "[Unknown/Not Disclosed]",
+    "compute_units": "2 TensorCores and 4 SparseCores per chip.",
+    "cache": "[Unknown/Not Disclosed]",
+    "on_chip_memory": "VMEM is on-chip SRAM; size is not given.",
+    "execution_model": "Two chiplets with separate memory spaces; frameworks expose two devices per physical chip.",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "capacity_gib": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "bandwidth_tb_s": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "scope": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "notes": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ]
+    },
+    "technology": "HBM",
+    "capacity_gb": "[Unknown/Not Disclosed]",
+    "capacity_gib": 192.0,
+    "bandwidth_tb_s": 7.38,
+    "scope": "per_accelerator",
+    "notes": [
+      "Published capacity: 192 GiB per physical chip, 96 GiB per chiplet; not relabeled GB.",
+      "Specification table gives 7380 GB/s per chip; decimal conversion to TB/s. Memory-hierarchy prose rounds this to approximately 7.37 TB/s."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "BF16",
+        "operation": "undisclosed",
+        "throughput": 2307.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "undisclosed",
+        "throughput": 4614.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+        ]
+      }
+    ],
+    "notes": [
+      "Published whole-chip peaks: BF16 2307 TFLOP/s and FP8 4614 TFLOP/s; engine breakdown, sparsity, accumulation, and FMA counting are unspecified."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#memory_hierarchy"
+      ],
+      "scale_up": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#configurations"
+      ],
+      "scale_out": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ],
+      "topology": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#configurations"
+      ]
+    },
+    "host": "PCIe connects each four-chip group to its CPU host; generation and link width unspecified.",
+    "scale_up": "ICI: six links at 200 GB/s bidirectional each, totaling 1200 GB/s bidirectional per chip.",
+    "scale_out": "DCN: 100 Gbit/s per chip.",
+    "topology": "3D mesh below 64 chips; 4x4x4 cubes and larger slices use 3D torus."
+  },
+  "power": {
+    "evidence": {
+      "scope": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#system-architecture"
+      ]
+    },
+    "tdp_w": "[Unknown/Not Disclosed]",
+    "scope": "per_accelerator",
+    "notes": []
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x"
+      ],
+      "programming_model": [
+        "https://docs.cloud.google.com/tpu/docs/tpu7x#programming_model_and_framework_exposure"
+      ]
+    },
+    "ecosystem": "JAX and PyTorch; TensorFlow unsupported.",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "Two framework-visible devices per chip, each with its own memory space."
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Process technology, per-chip power, and exact matrix/vector decomposition remain undisclosed in this snapshot."
+  ]
+}

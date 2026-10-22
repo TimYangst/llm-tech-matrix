@@ -1,0 +1,16 @@
+{
+  "slug": "google-tpu7x-ironwood",
+  "assets": [
+    {
+      "name": "architecture",
+      "kind": "other",
+      "url": "https://docs.cloud.google.com/tpu/docs/tpu7x",
+      "archive_url": null,
+      "filename": "architecture.html",
+      "description": "Google Cloud TPU7x Ironwood architecture and configurations; official mutable webpage snapshot",
+      "sha256": "73cb8f294607753a9636e228cd6fed11f5ce800e8bba6cbb06db1e5ae9747d5c",
+      "size_bytes": 176721,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
