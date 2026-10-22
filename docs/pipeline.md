@@ -29,10 +29,10 @@ dates, source kinds and optional archive URLs. Cached files are gitignored.
 - `list` enumerates manifests for the selected source track.
 - `sourcing.pdf_to_text` derives text from cached PDFs for extraction.
 
-Sources must be public and openly accessible. A configured HF token may
-accompany requests; it does not make private or login-gated source material
-eligible. Pin model-hub/repository files and versioned papers; distinguish mutable
-announcement snapshots. See [source conventions](conventions.md#source-assets-committed-vs-cached).
+Sources follow the existing public-source eligibility convention: ordinary HF
+account/token access is permitted, while payment or privileged/nonpublic access
+is not. A token does not authorize private sources. Pin model-hub/repository
+files and versioned papers; distinguish mutable announcement snapshots. See [source conventions](conventions.md#source-assets-committed-vs-cached).
 Sourcing records bytes and provenance, without interpreting technical claims.
 
 ## Layer 2: Information extraction

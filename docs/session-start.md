@@ -19,7 +19,7 @@ Three load-bearing rules:
 
 - **No hallucination.** Missing data → the literal string `"[Unknown/Not Disclosed]"`.
 - **Schema-strict.** LLM/VL, engine and media JSON use `schema.py`, `engine_schema.py` and `media_schema.py` respectively.
-- **Public-source-only.** No paywalled or login-gated material.
+- **Public-source-only.** No paywall or privileged/nonpublic access. Ordinary HF-account access follows the [source convention](conventions.md#source-assets-committed-vs-cached).
 
 For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 [`docs/pipeline.md`](./pipeline.md), [`docs/conventions.md`](./conventions.md).

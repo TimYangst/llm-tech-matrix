@@ -185,3 +185,9 @@ link/incoming-anchor checks pass. Existing media tests and remote CI passed befo
 this documentation-only addition; no GPU or new data extraction is required.
 Independent review of the concrete T09 commit is pending at this snapshot; its
 fixed-head result and remote CI outcome belong in PR #21's review section.
+
+T09 independent review repairs: restored the September V4.1-Flash inventory row
+when removing the superseded narrative; exact comparison now confirms 35 LLM/VL
+and three media records each occur once. Source-eligibility wording remains
+consistent with the existing convention permitting ordinary HF-account access;
+this documentation cleanup does not change source-admission policy.
