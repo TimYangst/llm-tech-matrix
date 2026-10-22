@@ -1,0 +1,271 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "vendor": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "accelerator_type": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "variant": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "record_scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "device_count": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "snapshot_date": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ]
+    },
+    "name": "AWS Trainium2",
+    "vendor": "AWS",
+    "accelerator_type": "ASIC",
+    "variant": "trainium2 chip",
+    "form_factor": "[Unknown/Not Disclosed]",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html",
+      "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v3.html"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "compute_units": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "execution_model": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v3.html#neuroncore-v3-architecture"
+      ],
+      "on_chip_memory": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#memory"
+      ]
+    },
+    "family": "AWS Trainium2",
+    "process": "[Unknown/Not Disclosed]",
+    "compute_units": "8 NeuronCore-v3; 16 collective-communication cores.",
+    "cache": "[Unknown/Not Disclosed]",
+    "on_chip_memory": "224 MiB SBUF per chip, as published in the chip memory table.",
+    "execution_model": "Heterogeneous Tensor, Vector, Scalar and GPSIMD engines; software-managed SRAM.",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "capacity_gib": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "bandwidth_tb_s": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "notes": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ]
+    },
+    "technology": "HBM",
+    "capacity_gb": "[Unknown/Not Disclosed]",
+    "capacity_gib": 96.0,
+    "bandwidth_tb_s": 2.9,
+    "scope": "per_accelerator",
+    "notes": [
+      "Published HBM capacity: 96 GiB per chip; retained in source units, not relabeled GB."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute",
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v3.html#tensor-engine"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP8",
+        "operation": "undisclosed",
+        "throughput": 1299.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "undisclosed",
+        "throughput": 667.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "undisclosed",
+        "throughput": 667.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "undisclosed",
+        "throughput": 667.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "undisclosed",
+        "throughput": 181.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "undisclosed",
+        "throughput": 2563.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Chip aggregate sparse rate; source table does not identify the exact sparsity pattern or engine breakdown.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "undisclosed",
+        "throughput": 2563.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Chip aggregate sparse rate; source table does not identify the exact sparsity pattern or engine breakdown.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "undisclosed",
+        "throughput": 2563.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Chip aggregate sparse rate; source table does not identify the exact sparsity pattern or engine breakdown.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "undisclosed",
+        "throughput": 2563.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Chip aggregate sparse rate; source table does not identify the exact sparsity pattern or engine breakdown.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#compute"
+        ]
+      }
+    ],
+    "notes": [
+      "Published aggregate chip rates: FP8 1299; BF16/FP16/TF32 667; FP32 181 TFLOP/s; sparse FP8/FP16/BF16/TF32 2563 TFLOP/s. Engine decomposition is unspecified.",
+      "NeuronCore-v3 TensorEngine rates are per core and differ from chip aggregate divided by eight; no chip matrix peak is inferred."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "scale_up": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-chip-components"
+      ]
+    },
+    "host": "[Unknown/Not Disclosed]",
+    "scale_up": "NeuronLink-v3: 1.28 TB/s per chip; directionality unspecified in this source.",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ]
+    },
+    "tdp_w": "[Unknown/Not Disclosed]",
+    "scope": "per_accelerator",
+    "notes": []
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "isa": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ],
+      "programming_model": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html#trainium2-architecture"
+      ]
+    },
+    "ecosystem": "AWS Neuron",
+    "isa": "NeuronCore-v3 ISA extensions support dynamic shapes and control flow.",
+    "programming_model": "Custom operators through embedded GPSIMD engines."
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Per-chip TDP, manufacturing process and exact matrix/vector chip throughput require additional public evidence."
+  ]
+}
