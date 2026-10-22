@@ -10,7 +10,8 @@
     "sources": [
       "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/config.json",
       "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/README.md",
-      "https://arxiv.org/pdf/2506.13585v1"
+      "https://arxiv.org/pdf/2506.13585v1",
+      "https://arxiv.org/pdf/2501.08313v1"
     ],
     "variant_policy": "This record covers the 80K-output-budget checkpoint only. M1-40k is a separate intermediate checkpoint in the same RL run; -hf repositories are packaging variants, not independently extracted here. Vendor evaluation/recommendation: temperature=1.0, top_p=0.95; 80K is a separate checkpoint, not a runtime inference mode."
   },

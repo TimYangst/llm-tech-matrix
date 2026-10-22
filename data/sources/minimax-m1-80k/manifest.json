@@ -33,6 +33,17 @@
       "sha256": "d355a6a41a26b85ca145aec5154650f4d39733c92f54775ae7f5851ecbedf600",
       "size_bytes": 1584812,
       "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "architecture-paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2501.08313v1",
+      "archive_url": null,
+      "filename": "architecture-paper.pdf",
+      "description": "Pinned MiniMax-01 predecessor report explicitly cited for inherited M1 backbone/parallelism architecture; not evidence of M1 current post-training.",
+      "sha256": "e5fe73cf990aa81f8e2fa43f2a5b650418308b0a07e0c5e1a994287afa77c0f2",
+      "size_bytes": 5552980,
+      "fetched_at": "2026-10-22"
     }
   ]
 }

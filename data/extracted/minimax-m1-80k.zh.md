@@ -23,6 +23,7 @@ _章节标题、字段名与样板文字译为中文；字段取值保留源材�
 - <https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/config.json>
 - <https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/README.md>
 - <https://arxiv.org/pdf/2506.13585v1>
+- <https://arxiv.org/pdf/2501.08313v1>
 
 ## 架构
 
