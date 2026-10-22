@@ -1,0 +1,27 @@
+{
+  "slug": "aws-inferentia2",
+  "assets": [
+    {
+      "name": "architecture",
+      "kind": "other",
+      "url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html",
+      "archive_url": null,
+      "filename": "architecture.html",
+      "description": "AWS Neuron Inferentia2 chip architecture; official mutable webpage snapshot",
+      "sha256": "686639c4eec6c89508db6d1b1d03e6588b326c2f5debb71db6b1c2a647461389",
+      "size_bytes": 250806,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "neuroncore",
+      "kind": "other",
+      "url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v2.html",
+      "archive_url": null,
+      "filename": "neuroncore.html",
+      "description": "AWS NeuronCore-v2 engines; official public documentation snapshot",
+      "sha256": "fb380f4a47584ea2f8cf89cf23a1396f421d233eb375d335aaa7d13978325a33",
+      "size_bytes": 251599,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
