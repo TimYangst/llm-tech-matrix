@@ -1,0 +1,421 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "vendor": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "accelerator_type": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "variant": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "form_factor": [
+        "https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/"
+      ],
+      "record_scope": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "device_count": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ],
+      "snapshot_date": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf"
+      ]
+    },
+    "name": "NVIDIA GeForce RTX 5090",
+    "vendor": "NVIDIA",
+    "accelerator_type": "GPU",
+    "variant": "Reference desktop RTX 5090 32GB / Founders Edition; excludes RTX 5090 D and partner overclocks",
+    "form_factor": "PCIe graphics card",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf",
+      "https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=46"
+      ],
+      "process": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ],
+      "compute_units": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=46"
+      ],
+      "cache": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ],
+      "on_chip_memory": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=10"
+      ],
+      "execution_model": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=10"
+      ],
+      "notes": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=9"
+      ]
+    },
+    "family": "RTX Blackwell (GB202)",
+    "process": "TSMC 4nm 4N NVIDIA custom process",
+    "compute_units": "170 enabled SMs; 21,760 CUDA cores; 680 fifth-generation Tensor Cores; 170 fourth-generation RT Cores",
+    "cache": "96 MB L2 (98,304 KB)",
+    "on_chip_memory": "128 KB configurable L1/shared memory and 256 KB register file per SM",
+    "execution_model": "Streaming multiprocessors with CUDA, Tensor and RT execution units",
+    "notes": [
+      "The full GB202 design has 192 SMs and 128 MB L2; those full-die figures are not the RTX 5090 product configuration."
+    ]
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+      ],
+      "capacity_gb": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+      ],
+      "bandwidth_tb_s": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+      ],
+      "scope": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+      ],
+      "notes": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+      ]
+    },
+    "technology": "GDDR7",
+    "capacity_gb": 32.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 1.792,
+    "scope": "per_accelerator",
+    "notes": [
+      "512-bit memory interface; 28 Gbit/s memory data rate. Peak local memory bandwidth; no read-plus-write aggregation."
+    ]
+  },
+  "compute": {
+    "evidence": {},
+    "peaks": [
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 104.8,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Peak rate based on GPU Boost Clock (2407 MHz in Table 3).",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=46"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "vector",
+        "throughput": 104.8,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Peak rate based on GPU Boost Clock (2407 MHz in Table 3).",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "vector",
+        "throughput": 104.8,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Peak rate based on GPU Boost Clock (2407 MHz in Table 3).",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP4",
+        "operation": "matrix",
+        "throughput": 1676.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP4",
+        "operation": "matrix",
+        "throughput": 3352.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 838.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP16",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 1676.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP16",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 419.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 838.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 419.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP16",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 838.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP16",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 209.5,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 419.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 209.5,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 419.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "FP32",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 104.8,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 209.5,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 838.0,
+        "unit": "TOPS",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 1676.0,
+        "unit": "TOPS",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 3 publishes the pair explicitly; second value uses Sparsity Feature (footnote 2); peak rates based on GPU Boost Clock.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=47"
+        ]
+      }
+    ],
+    "notes": []
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ]
+    },
+    "host": "PCI Express Gen5",
+    "scale_up": "[Unknown/Not Disclosed]",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ],
+      "scope": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ],
+      "notes": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=48"
+      ]
+    },
+    "tdp_w": 575.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Vendor metric is Total Graphics Power (TGP), stored in the catalog power field; not minimum system PSU power or measured power."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf#page=12"
+      ]
+    },
+    "ecosystem": "NVIDIA CUDA",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "[Unknown/Not Disclosed]"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "TF32 and INT8 accumulation formats are not stated in Table 3 and remain unknown.",
+    "FP64 product throughput is not reconstructed from a full-GB202 ratio.",
+    "Partner card power limits, clocks and cooling can differ from this reference product."
+  ]
+}
