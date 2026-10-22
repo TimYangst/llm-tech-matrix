@@ -25,7 +25,10 @@ snapshot's release month minus the model's release month.
 
 | Model | Released | `sglang-v0.5.19` | `vllm-v0.29.0` | `megatron-bridge-v0.6.0` | `megatron-lm-core_v0.19.0` | `veomni-v0.1.12` | `verl-v0.9.0` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| [`deepseek-v4.1-flash-1017`](../extracted/deepseek-v4.1-flash-1017.md) | 2026-10 | — | — | — | — | — | — |
 | [`deepseek-v4.1-flash`](../extracted/deepseek-v4.1-flash.md) | 2026-09 | · same month | · same month | · model newer | ↪ `megatron-bridge-v0.6.0` | · same month | · model newer |
+| [`deepseek-v4-flash-vision-exp`](../extracted/deepseek-v4-flash-vision-exp.md) | 2026-08 | — | — | — | — | — | — |
+| [`deepseek-v4-pro-0813`](../extracted/deepseek-v4-pro-0813.md) | 2026-08 | — | — | — | — | — | — |
 | [`glm-5.3-flash`](../extracted/glm-5.3-flash.md) | 2026-08 | ✗ missing at +1 mo | ✗ missing at +1 mo | · same month | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +1 mo | · same month |
 | [`qwen3.8-2.4t-a95b`](../extracted/qwen3.8-2.4t-a95b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
 | [`qwen3.8-27b`](../extracted/qwen3.8-27b.md) | 2026-08 | 🆕 added, +1 mo | ✅ ≤ +1 mo | ✅ ≤ +0 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +1 mo | ✅ ≤ +0 mo |
@@ -33,19 +36,27 @@ snapshot's release month minus the model's release month.
 | [`deepseek-v4-flash-0731`](../extracted/deepseek-v4-flash-0731.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✅ ≤ +1 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +2 mo | ✅ ≤ +1 mo |
 | [`kimi-k3`](../extracted/kimi-k3.md) | 2026-07 | ✅ ≤ +2 mo | ✅ ≤ +2 mo | ✗ missing at +1 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +2 mo | ✗ missing at +1 mo |
 | [`glm-5.2`](../extracted/glm-5.2.md) | 2026-06 | ✅ ≤ +3 mo | ✅ ≤ +3 mo | 🆕 added, +2 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +3 mo | ✗ missing at +2 mo |
+| [`minimax-m3`](../extracted/minimax-m3.md) | 2026-06 | — | — | — | — | — | — |
 | [`deepseek-v4-flash`](../extracted/deepseek-v4-flash.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
 | [`deepseek-v4-pro`](../extracted/deepseek-v4-pro.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
 | [`glm-5.1`](../extracted/glm-5.1.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✗ missing at +4 mo |
 | [`qwen3.6-27b`](../extracted/qwen3.6-27b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
 | [`qwen3.6-35b-a3b`](../extracted/qwen3.6-35b-a3b.md) | 2026-04 | ✅ ≤ +5 mo | ✅ ≤ +5 mo | ✅ ≤ +4 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +5 mo | ✅ ≤ +4 mo |
+| [`minimax-m2.7`](../extracted/minimax-m2.7.md) | 2026-03 | — | — | — | — | — | — |
 | [`glm-5`](../extracted/glm-5.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✗ missing at +6 mo |
+| [`minimax-m2.5`](../extracted/minimax-m2.5.md) | 2026-02 | — | — | — | — | — | — |
 | [`qwen3.5-27b`](../extracted/qwen3.5-27b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
 | [`qwen3.5-35b-a3b`](../extracted/qwen3.5-35b-a3b.md) | 2026-02 | ✅ ≤ +7 mo | ✅ ≤ +7 mo | ✅ ≤ +6 mo | ↪ `megatron-bridge-v0.6.0` | ✅ ≤ +7 mo | ✅ ≤ +6 mo |
 | [`glm-4.7`](../extracted/glm-4.7.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✅ ≤ +7 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +8 mo | ✅ ≤ +7 mo |
 | [`kimi-k2.5`](../extracted/kimi-k2.5.md) | 2026-01 | ✅ ≤ +8 mo | ✅ ≤ +8 mo | ✅ ≤ +7 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +8 mo | ✗ missing at +7 mo |
+| [`minimax-m2.1`](../extracted/minimax-m2.1.md) | 2025-12 | — | — | — | — | — | — |
+| [`minimax-m2`](../extracted/minimax-m2.md) | 2025-10 | — | — | — | — | — | — |
 | [`deepseek-v3.2-exp`](../extracted/deepseek-v3.2-exp.md) | 2025-09 | ✅ ≤ +12 mo | ✅ ≤ +12 mo | ✗ missing at +11 mo | ↪ `megatron-bridge-v0.6.0` | ✗ missing at +12 mo | ✗ missing at +11 mo |
+| [`minimax-m1-80k`](../extracted/minimax-m1-80k.md) | 2025-06 | — | — | — | — | — | — |
 | [`qwen3-235b-a22b`](../extracted/qwen3-235b-a22b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo | ✅ ≤ +15 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
 | [`qwen3-32b`](../extracted/qwen3-32b.md) | 2025-05 | ✅ ≤ +16 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo | ✅ ≤ +15 mo | ✅ ≤ +16 mo | ✅ ≤ +15 mo |
+| [`minimax-text-01`](../extracted/minimax-text-01.md) | 2025-01 | — | — | — | — | — | — |
+| [`minimax-vl-01`](../extracted/minimax-vl-01.md) | 2025-01 | — | — | — | — | — | — |
 | [`deepseek-v3`](../extracted/deepseek-v3.md) | 2024-12 | ✅ ≤ +21 mo | ✅ ≤ +21 mo | ✅ ≤ +20 mo | ✅ ≤ +20 mo | ✅ ≤ +21 mo | ✅ ≤ +20 mo |
 | [`kimi-k2-thinking`](../extracted/kimi-k2-thinking.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) |
 | [`kimi-k2.6`](../extracted/kimi-k2.6.md) | [Unknown/Not Disclosed] | ✅ (model undated) | ✅ (model undated) | ✅ (model undated) | ↪ `megatron-bridge-v0.6.0` | ✗ (model undated) | ✗ (model undated) |

@@ -1,0 +1,272 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "DeepSeek-V4-Pro-0813",
+    "family": "DeepSeek",
+    "release_date": "2026-08",
+    "openness": "open_weights",
+    "params_total": "1.6T backbone (linked V4 family report; current card explicitly retains Preview architecture)",
+    "params_active": "49B backbone per token (linked V4 family report; excludes DSpark draft)",
+    "sources": [
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/tokenizer_config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/encoding/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/inference/model.py",
+      "https://huggingface.co/api/models/deepseek-ai/DeepSeek-V4-Pro-0813/revision/72e1d3230f6c080a530b0a1d46f8eb4602340597",
+      "https://api-docs.deepseek.com/updates/",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/resolve/ad664d5e83023a67c735992e8fe612aeab3c52d2/DeepSeek_V4.pdf",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/72e1d3230f6c080a530b0a1d46f8eb4602340597/encoding/encoding_dsv4.py"
+    ],
+    "variant_policy": "August 13 official/GA Pro release supersedes the Preview, retaining its architecture and adding an attached DSpark draft. Same weights expose thinking/chat and low/high/max reasoning-effort modes. The current card reports stronger agentic performance; it does not disclose the new post-training recipe."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 61,
+      "hidden_dim": 7168,
+      "context_window": 1048576,
+      "context_window_notes": "config.json max_position_embeddings=1048576 (1M tokens). Training curriculum for this dated checkpoint is not disclosed.",
+      "context_extension": {
+        "method": "yarn",
+        "trained_max": "[Unknown/Not Disclosed]",
+        "extended_max": 1048576,
+        "factor": 16.0,
+        "original_max": 65536,
+        "notes": "Config-declared YaRN; this does not establish a current-checkpoint pre-training curriculum."
+      }
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 128,
+      "num_kv_heads": 1,
+      "head_dim": 512,
+      "rope": {
+        "type": "yarn",
+        "base": 10000,
+        "scaling": {
+          "beta_fast": 32,
+          "beta_slow": 1,
+          "factor": 16,
+          "original_max_position_embeddings": 65536,
+          "type": "yarn",
+          "compress_rope_theta": 160000
+        }
+      },
+      "mla": null,
+      "variants": [
+        {
+          "name": "sliding_window_attention",
+          "family": "sliding_window",
+          "num_query_heads": 128,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "Partial RoPE width 64.",
+          "notes": "128-token local window alongside global compressed attention; ratio 0 layers are SWA only."
+        },
+        {
+          "name": "compressed_sparse_attention",
+          "family": "other",
+          "num_query_heads": 128,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "Compressed branch theta=160000.",
+          "notes": "CSA ratio 4; indexer selects top-1024 compressed entries."
+        },
+        {
+          "name": "heavily_compressed_attention",
+          "family": "other",
+          "num_query_heads": 128,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "Compressed branch theta=160000.",
+          "notes": "HCA ratio 128; attends all causally available heavily compressed entries (reference Attention)."
+        }
+      ],
+      "layer_pattern": "Zero-indexed backbone compress_ratios=[128, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4, 128, 4]. 0=SWA only, 4=CSA+SWA, 128=HCA+SWA. Trailing three ratio-0 entries belong to the draft stack in reference inference/config.json.",
+      "sparse_attention": {
+        "kind": "csa+hca",
+        "selection": "CSA: lightning-indexer top-1024 over ratio-4 compressed positions. HCA: all causally available ratio-128 entries (reference Attention).",
+        "top_k": 1024,
+        "indexer_heads": 64,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "4 (CSA) / 128 (HCA)",
+        "training_recipe": "",
+        "notes": "Shapes and sharing topology from current config and reference code; the family report is earlier architecture background."
+      },
+      "cross_layer_sharing": [],
+      "notes": "Current config: query low-rank projection 1536; grouped output projection 16 groups × rank 1024; partial RoPE width 64 of 512."
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 384,
+        "num_active_experts": 6,
+        "shared_experts": 1,
+        "expert_intermediate_size": 3072,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Current config: top-6 routed experts + 1 shared expert; SqrtSoftplus affinity (scoring_func=sqrtsoftplus); topk_method=noaux_tc; norm_topk_prob=true; routed_scaling_factor=2.5. Reference Gate uses correction biases for selection and unbiased scores for output weights."
+      },
+      "layer_partition": "All backbone blocks instantiate MoE FFNs in inference/model.py. First three layers use hash routing for text token IDs; remaining layers use score-based routing."
+    },
+    "components": {
+      "activation": "SwiGLU (hidden_act=silu), swiglu_limit=10.0 in current config and reference Expert.",
+      "normalization": "RMSNorm, rms_norm_eps=1e-06; separate hc_eps=1e-06 for Hyper-Connections.",
+      "embedding_notes": "vocab_size=129280; tie_word_embeddings=false. Text-only checkpoint."
+    },
+    "residual_connections": {
+      "kind": "mhc",
+      "expansion_factor": 4,
+      "constraint": "Doubly stochastic residual mixing via Sinkhorn normalization in the current reference implementation.",
+      "iterations": 20,
+      "dynamic_parameterization": true,
+      "notes": "Current config hc_mult=4, hc_sinkhorn_iters=20."
+    },
+    "auxiliary_modules": [
+      {
+        "name": "DSpark draft module",
+        "purpose": "speculative_decoding",
+        "architecture": "3 draft blocks (reference inference/config.json n_mtp_layers=3), window-only attention; block_size=5; Markov rank 512; target layers [58, 59, 60].",
+        "shipped_in_checkpoint": true,
+        "activation": "vLLM --speculative-config with method=dspark; SGLang --speculative-algorithm DSPARK (same checkpoint; no separate draft path).",
+        "notes": "The reference Transformer constructs DSparkBlock modules when dspark_block_size is nonzero; this does not establish an MTP training objective."
+      }
+    ],
+    "memory_modules": [],
+    "parallelism_notes": "Only inference topology is documented here; current-checkpoint training parallelism is undisclosed. Reference inference supports tensor-parallel torchrun and checkpoint conversion."
+  },
+  "training": {
+    "optimizer": "[Unknown/Not Disclosed]",
+    "lr_schedule": "[Unknown/Not Disclosed]",
+    "data_total_tokens": "[Unknown/Not Disclosed]",
+    "data_mix": {},
+    "data_mix_notes": "No current-update token budget or mixture disclosed. The linked V4 report describes the earlier Preview and is not treated as the 0813 training recipe.",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": []
+    },
+    "alignment": {
+      "sft": "[Unknown/Not Disclosed]",
+      "rl_method": "[Unknown/Not Disclosed]",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [],
+      "inference_modes": [
+        {
+          "name": "thinking-low",
+          "trigger": "thinking_mode=thinking, reasoning_effort=low",
+          "description": "Prompt prefix controls reasoning effort on the same weights.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "low"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 (agentic) / 1.0 (otherwise)"
+          }
+        },
+        {
+          "name": "thinking-high",
+          "trigger": "thinking_mode=thinking, reasoning_effort=high",
+          "description": "Prompt prefix controls reasoning effort on the same weights.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "high"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 (agentic) / 1.0 (otherwise)",
+            "max_tokens": "384K"
+          }
+        },
+        {
+          "name": "thinking-max",
+          "trigger": "thinking_mode=thinking, reasoning_effort=max",
+          "description": "Prompt prefix controls reasoning effort on the same weights.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "max"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95 (agentic) / 1.0 (otherwise)",
+            "max_tokens": "384K"
+          }
+        },
+        {
+          "name": "chat",
+          "trigger": "thinking_mode=chat",
+          "description": "Places </think> after the assistant prefix to skip reasoning.",
+          "kwargs": {
+            "thinking_mode": "chat"
+          },
+          "sampling_recommended": {}
+        }
+      ],
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "discrete",
+        "range": "",
+        "levels": [
+          {
+            "name": "low",
+            "numeric_value": null,
+            "rendering": "none",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "high",
+            "numeric_value": null,
+            "rendering": "Reasoning Effort: Absolute maximum with no shortcuts permitted.\nYou MUST be very thorough in your thinking and comprehensively decompose the problem to resolve the root cause, rigorously stress-testing your logic against all potential paths, edge cases, and adversarial scenarios.\nExplicitly write out your entire deliberation process, documenting every intermediate step, considered alternative, and rejected hypothesis to ensure absolutely no assumption is left unchecked.\n\n",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "max",
+            "numeric_value": null,
+            "rendering": "Reasoning Effort: Beyond maximum — exhaustive, relentless, and uncompromising.\nYou MUST reason with the utmost depth and rigor, leaving absolutely nothing to chance: exhaustively decompose the problem into its most fundamental components, trace every causal chain to its root, and resolve the underlying cause rather than any surface symptom.\nDo not stop reasoning until you have independently verified the solution from multiple angles and are certain that no assumption remains unchecked and no error remains undiscovered.\n\n",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "thinking_mode=thinking at conversation index 0; prefix before system text. No effect in chat mode.",
+        "invalid_value_behavior": "Reference render_message uses the low default for falsy values, then asserts membership in low/high/max. Other unknown nonempty values raise AssertionError; validation occurs in chat mode too.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "Verified against this checkpoint's encoding/encoding_dsv4.py; low is the default."
+      },
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<｜DSML｜tool_calls>",
+        "end_token": "</｜DSML｜tool_calls>",
+        "arguments_schema": "<｜DSML｜invoke name=\"...\"> and per-argument <｜DSML｜parameter string=\"true|false\">; raw strings or JSON for non-strings.",
+        "parser_flags": {},
+        "notes": "Current encoding/README.md; retains V4 DSML spelling without V4.1 leading spaces."
+      }
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed]"
+    },
+    "quantization": {
+      "weight_format": "fp4+fp8 mixed",
+      "activation_format": "fp8 dynamic (config.quantization_config.activation_scheme=dynamic)",
+      "method": "[Unknown/Not Disclosed]",
+      "scope": "FP4 routed-expert weights; FP8 quantization configuration for other quantized weights. This is a deployment format, not proof of the current training precision.",
+      "granularity": "FP8 weight blocks [128, 128]; scale_fmt=ue8m0.",
+      "stage": "",
+      "notes": "Current config uses quant_method=fp8 together with expert_dtype=fp4. The dated checkpoint does not disclose a new quantization training recipe."
+    },
+    "stability_notes": "Current config/reference Expert clamps SwiGLU activations at 10. The update does not disclose loss-spike handling or a full training-stability recipe."
+  },
+  "multimodal": null,
+  "inferred_fields": [],
+  "open_questions": [
+    "0813 optimizer, LR schedule, training-token budget, data mixture and post-training algorithm are undisclosed. The linked V4 report is earlier Preview background, not update evidence.",
+    "HF config num_nextn_predict_layers=1 conflicts with reference inference/config.json n_mtp_layers=3 and three trailing ratio-0 draft entries; current card confirms DSpark attachment but does not reconcile the count. Training MTP objective remains unasserted.",
+    "The earlier DeepSeek-V4-Pro report URL now returns 404. This manifest pins the official shared V4 report in the Flash repository instead; architecture matches current config."
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "MiniMax-M2",
+    "family": "minimax-m2",
+    "release_date": "2025-10",
+    "openness": "open_weights",
+    "params_total": "229.9B",
+    "params_active": "9.8B",
+    "sources": [
+      "https://huggingface.co/MiniMaxAI/MiniMax-M2/resolve/757303d492a50514c312788b5247a4f696a4c6a3/config.json",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M2/resolve/757303d492a50514c312788b5247a4f696a4c6a3/README.md",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M2/resolve/757303d492a50514c312788b5247a4f696a4c6a3/chat_template.jinja",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M2/resolve/757303d492a50514c312788b5247a4f696a4c6a3/generation_config.json",
+      "https://arxiv.org/pdf/2605.26494v1",
+      "https://www.minimax.io/news/minimax-m2"
+    ],
+    "variant_policy": "Version-specific checkpoint. Serving speed tiers do not establish distinct architecture or weight identities; this record covers the named official HF checkpoint."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 62,
+      "hidden_dim": 3072,
+      "context_window": 196608,
+      "context_window_notes": "Native 192K=196608 in M2 series report and this config.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "GQA",
+      "num_heads": 48,
+      "num_kv_heads": 8,
+      "head_dim": 128,
+      "rope": {
+        "type": "standard",
+        "base": 5000000,
+        "scaling": null
+      },
+      "mla": null,
+      "variants": [],
+      "layer_pattern": "",
+      "sparse_attention": null,
+      "cross_layer_sharing": [],
+      "notes": "Pinned config: rotary_dim=64 of head_dim=128; RoPE applies to half of each attention head."
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 256,
+        "num_active_experts": 8,
+        "shared_experts": 0,
+        "expert_intermediate_size": 1536,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Sigmoid routing with expert-specific bias; 8 of 256 routed experts active. Paper §2.2.1 says biases are optimized jointly with model parameters and reduce reliance on auxiliary losses; not assumed to be DeepSeek fixed-step auxiliary-loss-free updates."
+      },
+      "layer_partition": ""
+    },
+    "components": {
+      "activation": "silu",
+      "normalization": "RMSNorm, epsilon=1e-06",
+      "embedding_notes": "vocab_size=200064; tie_word_embeddings=false"
+    },
+    "residual_connections": null,
+    "auxiliary_modules": [
+      {
+        "name": "MTP speculative draft modules",
+        "purpose": "speculative_decoding",
+        "architecture": "Three MTP modules; one transformer layer per module (config); original M2 report describes copy-initialization, short draft-only warmup, then joint training.",
+        "shipped_in_checkpoint": "[Unknown/Not Disclosed]",
+        "activation": "",
+        "notes": "Config use_mtp=true, num_mtp_modules=3. Config alone does not verify tensor presence; no full weight download performed."
+      }
+    ],
+    "memory_modules": [],
+    "parallelism_notes": "[Unknown/Not Disclosed]"
+  },
+  "training": {
+    "optimizer": "[Unknown/Not Disclosed]",
+    "lr_schedule": "[Unknown/Not Disclosed]",
+    "data_total_tokens": "29.2T for original M2 base (19.9T constant + 9.3T decay phase); version-specific additional training tokens undisclosed.",
+    "data_mix": {},
+    "data_mix_notes": "Shared M2 base pre-training: web, academic literature, books, code, structured QA; code/math/STEM upsampled. Series report describes agent-driven executable-workspace coding/cowork pipelines; per-checkpoint proportions undisclosed.",
+    "objectives": {
+      "multi_token_prediction": {
+        "depth": 3,
+        "loss_weight_schedule": "Original M2: one MTP module during initial pre-training, weight 0.3→0.1 in decay; expanded to three MTP modules during continued pre-training (series report §2.3).",
+        "shared_modules": "Config for this checkpoint: num_mtp_modules=3, mtp_transformer_layers=1; paper Figure 2 follows DeepSeek-V3 style. Exact per-version loss schedule beyond original M2 undisclosed."
+      },
+      "fill_in_middle": null,
+      "other": []
+    },
+    "alignment": {
+      "sft": "Series report §5: rejection-sampled interleaved reasoning/action/observation trajectories in chat, reasoning, code and cowork; exact version-specific SFT mixture undisclosed.",
+      "rl_method": "CISPO (series-wide report §6): clipped importance-sampling weights with agent/process rewards. Forge decouples training/inference from white-box or black-box agent scaffolds.",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [
+        {
+          "name": "Interleaved-thinking SFT",
+          "method": "sft",
+          "description": "Domain-reward rejection sampling and multi-stage data cleaning."
+        },
+        {
+          "name": "Agent RL",
+          "method": "rl",
+          "description": "CISPO; Forge asynchronous infrastructure, windowed-FIFO scheduling and prefix-tree merging. This is a series-wide recipe, not a disclosed identical run per version."
+        }
+      ],
+      "inference_modes": [
+        {
+          "name": "Interleaved reasoning",
+          "trigger": "Standard checkpoint use; preserve reasoning in assistant history.",
+          "description": "M2 card explicitly requires retaining <think>...</think> across tool turns; no documented per-version effort axis.",
+          "kwargs": {},
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95",
+            "top_k": "40"
+          }
+        }
+      ],
+      "reasoning_effort": null,
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<minimax:tool_call>",
+        "end_token": "</minimax:tool_call>",
+        "arguments_schema": "One or more <invoke name=\"FUNCTION\"><parameter name=\"ARG\">VALUE</parameter></invoke>; strings emitted directly and non-string argument values JSON-encoded via tojson(ensure_ascii=False).",
+        "parser_flags": {},
+        "notes": "Tool messages serialized by pinned checkpoint template; parser flags not inferred from third-party recipes."
+      }
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed]"
+    },
+    "quantization": {
+      "weight_format": "FP8 (e4m3)",
+      "activation_format": "dynamic FP8 (float8_e4m3fn config)",
+      "method": "[Unknown/Not Disclosed]",
+      "scope": "All eligible modules except gate, e_score_correction_bias and lm_head (config.quantization_config.modules_to_not_convert).",
+      "granularity": "weight_block_size=[128,128]",
+      "stage": "",
+      "notes": "quant_method=fp8; config does not establish QAT versus PTQ. Training arithmetic remains UNKNOWN."
+    },
+    "stability_notes": ""
+  },
+  "multimodal": null,
+  "inferred_fields": [],
+  "open_questions": [
+    "The M2-series report retrospectively describes a common base and evolving data/RL system; exact additional tokens, optimizer, learning-rate schedule and per-version run configuration remain undisclosed.",
+    "MTP config metadata is not proof that every configured draft tensor is in the public checkpoint. Objective depth is supported by the paper; shipment remains UNKNOWN without tensor-index audit.",
+    "Unknown fields are deliberate; no optimizer, token mixture, full training precision or version deltas are inherited from neighboring checkpoints without source attribution."
+  ]
+}

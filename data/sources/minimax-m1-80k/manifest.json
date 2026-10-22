@@ -1,0 +1,49 @@
+{
+  "slug": "minimax-m1-80k",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Official MiniMax-M1-80k config.json, pinned HF revision 8d1494b1a260e22040d5b9b2eb332eb44500b34d",
+      "sha256": "de9574bcaf3586337a2b2ca5755ade806e9dab521056ca1f12b8efa7de352921",
+      "size_bytes": 1866,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Official MiniMax-M1-80k README.md, pinned HF revision 8d1494b1a260e22040d5b9b2eb332eb44500b34d",
+      "sha256": "4df24f961a0c9c1d20c4e496ff8a7fec040898ff8b78540bcda3a8ab0b2ce432",
+      "size_bytes": 24198,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2506.13585v1",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Official technical report, pinned arXiv revision 2506.13585v1",
+      "sha256": "d355a6a41a26b85ca145aec5154650f4d39733c92f54775ae7f5851ecbedf600",
+      "size_bytes": 1584812,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "architecture-paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2501.08313v1",
+      "archive_url": null,
+      "filename": "architecture-paper.pdf",
+      "description": "Pinned MiniMax-01 predecessor report explicitly cited for inherited M1 backbone/parallelism architecture; not evidence of M1 current post-training.",
+      "sha256": "e5fe73cf990aa81f8e2fa43f2a5b650418308b0a07e0c5e1a994287afa77c0f2",
+      "size_bytes": 5552980,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

@@ -22,15 +22,18 @@ Target families:
 
 Live model list and per-model status: see `../tasks/ROADMAP.md`.
 
-### M2 — Diffusion and image/video generation (future)
+### Media generation — audio, image and video
 
-Stable Diffusion family, Flux, Sora (inferred), Veo, Midjourney (inferred). Schema will need extension for diffusion-specific concepts (UNet vs DiT backbone, noise schedule, conditioning, etc.) — defer schema design until M1 is stable.
+The [media track](media/overview.md) is implemented with an independent schema for
+generation objective, scheduler, conditioning, VAE/codec, output and released/hosted
+scope. Initial coverage is MiniMax H3, Music3 and Speech 2.8. Other vendors remain
+future coverage; see the [model roadmap](../tasks/ROADMAP.md) for the current scope.
 
 ## Tracks beyond models
 
-### Engines — inference, training and RL systems (design stage)
+### Engines — inference, training and RL systems
 
-A second record type for the systems that run the models: inference engines (vLLM, SGLang),
+An implemented record type for the systems that run the models: inference engines (vLLM, SGLang),
 training frameworks (VeOmni, Megatron-LM / Megatron-Bridge) and RL post-training systems (verl). The value is the
 **model ↔ technique ↔ engine** triangle: which engine versions serve or train which extracted
 models, and how long a technique takes to go from a model release to engine support. Engine

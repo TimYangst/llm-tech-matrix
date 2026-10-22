@@ -7,6 +7,10 @@ description: Run a schema-strict extraction for one AI model. Reads sources from
 
 You are a **Senior AI Researcher** producing a structured technical analysis of a specific AI model. Your output feeds a knowledge base that will be used for cross-vendor comparison and longitudinal trend analysis. **Other people's work depends on the data you produce being trustworthy.**
 
+This procedure targets causal LLM/VL records under `data/extracted/*.json`.
+For audio/video/image generation, select the [media workflow](../../../docs/media/overview.md)
+and independent media schema; engine snapshots use `extract-engine`.
+
 ## Cardinal rule — no hallucination
 
 If a value is not stated in the source material you have in front of you, the field value is the literal string `"[Unknown/Not Disclosed]"` (exact spelling, exact brackets). **Do not** fill from training-data prior knowledge. **Do not** guess "reasonable defaults." **Do not** approximate from related models in the same family.
@@ -43,77 +47,89 @@ If a sha256 mismatches and re-fetch keeps failing, **do not edit the manifest to
 
 ## Procedure
 
-1. **Read context**:
+01. **Read context**:
 
-   - `docs/schema.md` — the field-by-field spec (current SCHEMA_VERSION wins over older extractions).
-   - `docs/conventions.md` — naming, formatting, and the schema changelog.
-   - `tasks/models/<slug>.md` — model-specific sources and prior open questions.
-   - `src/llm_tech_matrix/schema.py` — the executable schema you must validate against.
-   - `docs/glossary/README.md` — scan to know which techniques have entries; you'll touch this in step 7.
+    - `docs/schema.md` — the field-by-field spec (current SCHEMA_VERSION wins over older extractions).
+    - `docs/conventions.md` — naming, formatting, and the schema changelog.
+    - `tasks/models/<slug>.md` — model-specific sources and prior open questions.
+    - `src/llm_tech_matrix/schema.py` — the executable schema you must validate against.
+    - `docs/glossary/README.md` — scan to know which techniques have entries; you'll touch this in step 7.
 
-2. **Read sources** in `data/sources/<slug>/`:
+02. **Read sources** in `data/sources/<slug>/`:
 
-   - `manifest.json` — every asset's URL goes into the extracted JSON's `metadata.sources` field.
-   - `config.json` (kind: `hf_config`) — primary source for architecture. High-confidence.
-   - `<paper>.txt` (derived from `arxiv_pdf` / `tech_report` PDFs by pdf_to_text) — primary source for training, optimizer, data, alignment.
-   - Blog HTML (kind: `blog_html`) — supporting context. Lower confidence than papers.
+    - `manifest.json` — every asset's URL goes into the extracted JSON's `metadata.sources` field.
+    - `config.json` (kind: `hf_config`) — primary source for architecture. High-confidence.
+    - `<paper>.txt` (derived from `arxiv_pdf` / `tech_report` PDFs by pdf_to_text) — primary source for training, optimizer, data, alignment.
+    - Blog HTML (kind: `blog_html`) — supporting context. Lower confidence than papers.
 
-3. **Extract** field by field, following the four schema groups in this order:
+03. **Extract** field by field, following the four schema groups in this order:
 
-   1. Model metadata (name, family, release_date, openness, params, sources)
-   2. Architecture (backbone, attention incl. `mla` subobject if MLA, ffn incl. `dense_intermediate_size`/`moe`/`layer_partition` for hybrids, components, parallelism_notes)
-   3. Training (optimizer, lr_schedule, data_total_tokens, data_mix, data_mix_notes, **objectives** (MTP/FIM/other), alignment, advanced)
-   4. Multimodal (only if the model is multimodal — otherwise omit the section / set to null)
+    1. Model metadata (name, family, release_date, openness, params, sources)
+    2. Architecture (backbone, attention incl. `mla` subobject if MLA, ffn incl. `dense_intermediate_size`/`moe`/`layer_partition` for hybrids, components, parallelism_notes)
+    3. Training (optimizer, lr_schedule, data_total_tokens, data_mix, data_mix_notes, **objectives** (MTP/FIM/other), alignment, advanced)
+    4. Multimodal (only if the model is multimodal — otherwise omit the section / set to null)
 
-   For each field, prefer the most authoritative source. If two sources disagree, pick the official one and add an `open_questions` entry noting the discrepancy. Schema gaps belong in `open_questions` too — flag them; don't paper over with awkward field reuse.
+    For each field, prefer the most authoritative source. If two sources disagree, pick the official one and add an `open_questions` entry noting the discrepancy. Schema gaps belong in `open_questions` too — flag them; don't paper over with awkward field reuse.
 
-4. **Write** `data/extracted/<slug>.json`. Pretty-print with 2-space indent. Set `schema_version` to match `SCHEMA_VERSION` in `src/llm_tech_matrix/schema.py`.
+04. **Write** `data/extracted/<slug>.json`. Pretty-print with 2-space indent. Set `schema_version` to match `SCHEMA_VERSION` in `src/llm_tech_matrix/schema.py`.
 
-5. **Validate** the JSON:
+05. **Validate** the JSON:
 
-   ```bash
-   uv run python -c "import json; from llm_tech_matrix.schema import ExtractedModel; ExtractedModel.model_validate(json.load(open('data/extracted/<slug>.json'))); print('OK')"
-   ```
+    ```bash
+    uv run python -c "import json; from llm_tech_matrix.schema import ExtractedModel; ExtractedModel.model_validate(json.load(open('data/extracted/<slug>.json'))); print('OK')"
+    ```
 
-   If validation fails, fix the JSON. **Do not loosen the schema to accommodate extraction shortcuts** — if the schema genuinely needs a new field, that's a separate change (bump `schema_version`, update `docs/schema.md`, document in `docs/conventions.md` schema changelog).
+    If validation fails, fix the JSON. **Do not loosen the schema to accommodate extraction shortcuts** — if the schema genuinely needs a new field, that's a separate change (bump `schema_version`, update `docs/schema.md`, document in `docs/conventions.md` schema changelog).
 
-6. **Render the human-readable Markdown (bilingual):**
+06. **Render the human-readable Markdown (bilingual):**
 
-   ```bash
-   uv run python -m llm_tech_matrix.extraction.render <slug>
-   ```
+    ```bash
+    uv run python -m llm_tech_matrix.extraction.render <slug>
+    ```
 
-   This produces **two** files deterministically from the JSON, both committed:
+    This produces **two** files deterministically from the JSON, both committed:
 
-   - `data/extracted/<slug>.md` — English (section headers, table labels, chrome).
-   - `data/extracted/<slug>.zh.md` — Chinese chrome (headers + labels translated). Field
-     *values* stay in source-language English to keep the .md a faithful view of the
-     JSON; the glossary is the place to look up term definitions in Chinese.
+    - `data/extracted/<slug>.md` — English (section headers, table labels, chrome).
+    - `data/extracted/<slug>.zh.md` — Chinese chrome (headers + labels translated). Field
+      *values* stay in source-language English to keep the .md a faithful view of the
+      JSON; the glossary is the place to look up term definitions in Chinese.
 
-   Both files cross-link to each other in their header. If you want to change the
-   Chinese label wording, edit `LABELS["zh"]` in `src/llm_tech_matrix/extraction/render.py`
-   and re-render — never edit the rendered files.
+    Both files cross-link to each other in their header. If you want to change the
+    Chinese label wording, edit `LABELS["zh"]` in `src/llm_tech_matrix/extraction/render.py`
+    and re-render — never edit the rendered files.
 
-7. **Touch the glossary** (`docs/glossary/`):
+07. **Touch the glossary** (`docs/glossary/`):
 
-   - For every distinctive technique referenced in your extraction (a new attention variant, MoE routing trick, training objective, optimizer, quantization recipe, etc.):
-     - If an entry already exists, **add a row to its "Used by" table** for this model with the model-specific variant/details. Update **both** `<slug>.md` and `<slug>.zh.md` so the two stay in sync (same row, English content in `.md`, Chinese translation in `.zh.md`).
-     - If no entry exists and the technique is meaningfully novel (not just a one-off naming difference), **create both** `<slug>.md` (from `_template.md`) and `<slug>.zh.md` (from `_template.zh.md`), and add an entry to **both** `README.md` and `README.zh.md` indexes.
-   - Skip techniques that are universal commodities (e.g. "transformer block", "softmax") — the glossary is for things worth comparing across vendors.
-   - Each glossary file should have a top cross-link to its sibling (`> 中文版：...` in the English file, `> English: ...` in the Chinese file) — see existing entries for the format.
+    - For every distinctive technique referenced in your extraction (a new attention variant, MoE routing trick, training objective, optimizer, quantization recipe, etc.):
+      - If an entry already exists, **add a row to its "Used by" table** for this model with the model-specific variant/details. Update **both** `<slug>.md` and `<slug>.zh.md` so the two stay in sync (same row, English content in `.md`, Chinese translation in `.zh.md`).
+      - If no entry exists and the technique is meaningfully novel (not just a one-off naming difference), **create both** `<slug>.md` (from `_template.md`) and `<slug>.zh.md` (from `_template.zh.md`), and add an entry to **both** `README.md` and `README.zh.md` indexes.
+    - Skip techniques that are universal commodities (e.g. "transformer block", "softmax") — the glossary is for things worth comparing across vendors.
+    - Each glossary file should have a top cross-link to its sibling (`> 中文版：...` in the English file, `> English: ...` in the Chinese file) — see existing entries for the format.
 
-8. **Update tasks**:
+08. **Update tasks**:
 
-   - In `tasks/ROADMAP.md`, change the model's status to `extracted`.
-   - In `tasks/models/<slug>.md`, move resolved questions to "Resolved" with the source; add any new questions surfaced during extraction.
+    - In `tasks/ROADMAP.md`, change the model's status to `extracted`.
+    - In `tasks/models/<slug>.md`, move resolved questions to "Resolved" with the source; add any new questions surfaced during extraction.
 
-9. **Report back** to the user with:
+09. **Regenerate synthesis and run the full data gates** after glossary/registry updates:
 
-   - Path to the extracted JSON and the two rendered Markdown files (`<slug>.md` and `<slug>.zh.md`).
-   - Count of `[Unknown/Not Disclosed]` fields (signals disclosure quality).
-   - New glossary entries created (if any) — list both the `.md` and `.zh.md` paths.
-   - Any new open questions worth their attention.
-   - For closed models: the `inferred_fields` summary so they can sanity-check the inferences.
+    ```bash
+    uv run python -m llm_tech_matrix.synthesis.index
+    uv run python scripts/validate_extractions.py
+    uv run python scripts/validate_registry.py
+    ```
+
+    Register new typed technique values in `docs/glossary/registry.json`; do not
+    index arbitrary prose mentions as adoption. Rendered model summaries and
+    generated indexes/reports must match their canonical inputs before delivery.
+
+10. **Report back** to the user with:
+
+- Path to the extracted JSON and the two rendered Markdown files (`<slug>.md` and `<slug>.zh.md`).
+- Count of `[Unknown/Not Disclosed]` fields (signals disclosure quality).
+- New glossary entries created (if any) — list both the `.md` and `.zh.md` paths.
+- Any new open questions worth their attention.
+- For closed models: the `inferred_fields` summary so they can sanity-check the inferences.
 
 ## Common pitfalls
 

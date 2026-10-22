@@ -18,8 +18,8 @@ public signals (paper leaks, public talks) with explicit `inferred_fields` annot
 Three load-bearing rules:
 
 - **No hallucination.** Missing data → the literal string `"[Unknown/Not Disclosed]"`.
-- **Schema-strict.** Every extracted JSON validates against `src/llm_tech_matrix/schema.py`.
-- **Public-source-only.** No paywalled or login-gated material.
+- **Schema-strict.** LLM/VL, engine and media JSON use `schema.py`, `engine_schema.py` and `media_schema.py` respectively.
+- **Public-source-only.** No paywall or privileged/nonpublic access. Ordinary HF-account access follows the [source convention](conventions.md#source-assets-committed-vs-cached).
 
 For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 [`docs/pipeline.md`](./pipeline.md), [`docs/conventions.md`](./conventions.md).
@@ -46,10 +46,12 @@ For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
 | `.claude/skills/extract-model/`            | The Senior AI Researcher skill — invoke when extracting.                      |
 | `docs/glossary/registry.json`              | Controlled vocabulary: typed field values → glossary entries.                 |
 | `src/llm_tech_matrix/synthesis/index.py`   | Generates the model index, technique matrix and coverage report.              |
-| `scripts/validate_extractions.py`          | The CI schema gate — run it (or `pre-commit`) before pushing.                 |
+| `scripts/validate_extractions.py`          | The schema gate — run it separately from formatting hooks before pushing.     |
 | `scripts/migrate_v*.py`                    | One-off schema migrations, one per version bump.                              |
-| `docs/engines/overview.md`                 | Engines track design: roles, snapshots, evidence rules, draft schema.         |
+| `docs/engines/overview.md`                 | Engines track design: roles, snapshots, evidence rules, current contract.     |
 | `tasks/ENGINES.md`                         | Engines track status + quarterly snapshot calendar.                           |
+| `docs/media/overview.md`                   | Media workflow and independent schema/renderer/index.                         |
+| `data/extracted/media/`                    | Media JSON and bilingual summaries/index.                                     |
 | `src/llm_tech_matrix/engine_schema.py`     | Engine snapshot schema (independent version). Spec: `docs/engines/schema.md`. |
 | `.claude/skills/extract-engine/`           | Engine snapshot procedure — invoke when recording an engine release.          |
 
@@ -71,18 +73,15 @@ In rough priority order:
    next. Just did open weights? Do a closed model to exercise `inferred_fields`. Just
    did text-only? Do a multimodal one.
 
-4. **The synthesis layer is now unblocked** (it was gated on ≥10 extractions; the repo
-   passed 20 in 2026-08). It is still *unstarted*: `src/llm_tech_matrix/synthesis/` is an
-   empty package and `data/reports/` does not exist. Per
-   [`docs/roadmap.md`](./roadmap.md), the first report is the critical-path item for
-   closing M1 — but it should be driven by one real question (suggested threads:
-   optimizer evolution, MoE routing, or reasoning-effort mechanisms), not by building
-   infrastructure first. The hand-maintained "Used by" tables in `docs/glossary/` are the
-   obvious first thing to generate from `data/extracted/*.json`.
+4. **Use the existing synthesis surfaces.** `synthesis/index.py` already generates
+   the model index, technique/coverage reports and engine-support/adoption reports.
+   An interpretive trend report remains outstanding; choose one question before
+   expanding infrastructure. Audio/video generation has its own [media track](media/overview.md)
+   and [index](../data/extracted/media/README.md), separate from LLM technique edges.
 
-5. **The other standing gap is closed models.** `inferred_fields` is empty across all 20
-   records, so the mechanism the schema was designed around has never run. Any closed
-   model fixes that; `qwen3.7-max` is currently the cheapest one (see
+5. **The other standing gap is closed models.** `inferred_fields` is empty across the LLM
+   records, so the mechanism the schema was designed around has never run. A closed LLM requires a schema check first: v8 cannot represent an unknown
+   FFN type. `qwen3.7-max` is one candidate (see
    [`tasks/ROADMAP.md`](../tasks/ROADMAP.md)).
 
 ### Engines track
@@ -91,6 +90,12 @@ The engines track (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) run
 its own status file. If the user asks for engine work, or the quarterly snapshot is due,
 start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
 [`docs/engines/overview.md`](./engines/overview.md) instead of the priority list above.
+
+### Active DeepSeek / MiniMax refresh
+
+Start from [the sole coordination state](../tasks/deepseek-minimax-refresh.md)
+when continuing this phase. It records scope, permissions, review evidence and the
+next action; do not create a second task table.
 
 ## Common workflows
 
@@ -114,7 +119,12 @@ uv run python -c "import json; from llm_tech_matrix.schema import ExtractedModel
 # 5. Render the human-readable Markdown:
 uv run python -m llm_tech_matrix.extraction.render <slug>
 
-# 6. Update tasks/ROADMAP.md status, tasks/models/<slug>.md notes, and glossary "Used by" tables.
+# 6. Update tasks/ROADMAP.md, model notes, glossary rows and registry aliases.
+
+# 7. Regenerate browse surfaces and validate both contracts and registry:
+uv run python -m llm_tech_matrix.synthesis.index
+uv run python scripts/validate_extractions.py
+uv run python scripts/validate_registry.py
 ```
 
 ### Iterate the schema
@@ -134,6 +144,19 @@ Sources go through `python -m llm_tech_matrix.sourcing --track engines add <slug
 (pinned to the tag commit). Records live in `data/extracted/engines/`, are validated by
 `scripts/validate_extractions.py` and rendered with
 `python -m llm_tech_matrix.extraction.render_engine <slug>`.
+
+### Extract a media generation release
+
+Read the [media guide](media/overview.md) and [schema](media/schema.md).
+Register public sources under `data/sources/<slug>/`, then write
+`data/extracted/media/<slug>.json` with field-level evidence.
+
+```bash
+uv run python -m llm_tech_matrix.extraction.render_media <slug>
+uv run python -m llm_tech_matrix.synthesis.media
+uv run python scripts/validate_extractions.py
+uv run python scripts/validate_registry.py
+```
 
 ### Add or update a glossary entry
 

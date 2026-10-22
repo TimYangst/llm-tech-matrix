@@ -1,0 +1,136 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "MiniMax-M1-80k",
+    "family": "minimax-m1",
+    "release_date": "2025-06",
+    "openness": "open_weights",
+    "params_total": "456B",
+    "params_active": "45.9B",
+    "sources": [
+      "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/config.json",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/resolve/8d1494b1a260e22040d5b9b2eb332eb44500b34d/README.md",
+      "https://arxiv.org/pdf/2506.13585v1",
+      "https://arxiv.org/pdf/2501.08313v1"
+    ],
+    "variant_policy": "This record covers the 80K-output-budget checkpoint only. M1-40k is a separate intermediate checkpoint in the same RL run; -hf repositories are packaging variants, not independently extracted here. Vendor evaluation/recommendation: temperature=1.0, top_p=0.95; 80K is a separate checkpoint, not a runtime inference mode."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 80,
+      "hidden_dim": 6144,
+      "context_window": 1000000,
+      "context_window_notes": "M1 report/card state native 1M input and 80K output budget. The config upper bound max_position_embeddings=10240000 is not an advertised 10.24M validated context.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 64,
+      "num_kv_heads": 8,
+      "head_dim": 128,
+      "rope": {
+        "type": "standard",
+        "base": 10000000,
+        "scaling": null
+      },
+      "mla": null,
+      "variants": [
+        {
+          "name": "lightning_attention",
+          "family": "linear_attention",
+          "num_query_heads": 64,
+          "num_kv_heads": "[Unknown/Not Disclosed]",
+          "head_dim": 128,
+          "rope": "RoPE is documented for the softmax branch; no rotary operation assumed for linear attention.",
+          "notes": "Lightning Attention: I/O-aware linear attention with recurrent state and blockwise execution (MiniMax-01 report §§2.1–2.2)."
+        },
+        {
+          "name": "gqa",
+          "family": "gqa",
+          "num_query_heads": 64,
+          "num_kv_heads": 8,
+          "head_dim": 128,
+          "rope": "Partial RoPE, rotary_dim=64; final checkpoint base 10000000.",
+          "notes": ""
+        }
+      ],
+      "layer_pattern": "(7 Lightning Attention layers, 1 GQA softmax layer) × 10, 80 total; config.attn_type_list has GQA at zero-based indices 7,15,...,79.",
+      "sparse_attention": null,
+      "cross_layer_sharing": [],
+      "notes": "Pinned config: rotary_dim=64 of head_dim=128; RoPE applies to half of each attention head."
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 32,
+        "num_active_experts": 2,
+        "shared_experts": 0,
+        "expert_intermediate_size": 9216,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Top-2 of 32 experts; shared_intermediate_size=0. M1 continued training reduces the MoE auxiliary-loss coefficient, but its final value is undisclosed."
+      },
+      "layer_partition": ""
+    },
+    "components": {
+      "activation": "silu",
+      "normalization": "RMSNorm, epsilon=1e-05; postnorm=true; DeepNorm scaling in the original Text-01 report.",
+      "embedding_notes": "vocab_size=200064; tie_word_embeddings=false"
+    },
+    "residual_connections": null,
+    "auxiliary_modules": [],
+    "memory_modules": [],
+    "parallelism_notes": "Original MiniMax-01 report §3: expert/tensor/data parallelism, Expert Tensor Parallel (ETP), varlen ring attention for softmax, LASP+ for linear-attention sequence parallelism. Exact M1 deployment degrees not assumed."
+  },
+  "training": {
+    "optimizer": "AdamW for RL, beta1=0.9, beta2=0.95, epsilon=1e-15 (M1 report §3.2); full inherited pre-training optimizer is not reasserted here.",
+    "lr_schedule": "Continual pre-training: 8e-5 constant for 2.5T tokens, then decay over 5T tokens to 8e-6 (report §2.1). RL learning-rate schedule undisclosed.",
+    "data_total_tokens": "7.5T additional continual-pretraining tokens; lifetime total including Text-01 is not stated as one figure.",
+    "data_mix": {
+      "STEM/code/books/reasoning": "70% of continual-pretraining corpus"
+    },
+    "data_mix_notes": "Natural QA from webpages/forums/textbooks; explicitly avoids synthetic data in the continual-pretraining QA pipeline. SFT math+coding account for ~60%, a separate post-training distribution.",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": []
+    },
+    "alignment": {
+      "sft": "Cold-start long-CoT SFT on math, code, STEM, writing, QA and multi-turn chat; reflection behavior (report §2.2).",
+      "rl_method": "CISPO: Clipped IS-weight Policy Optimization; clips importance sampling weights rather than dropping token gradients; group-relative advantages and token-level loss (report §3.1).",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [
+        {
+          "name": "Continual pre-training",
+          "method": "continued_pretraining",
+          "description": "7.5T additional tokens and gradual context extension from 32K to 1M."
+        },
+        {
+          "name": "Cold-start SFT",
+          "method": "sft",
+          "description": "High-quality long-CoT demonstrations with reflection; ~60% math/code."
+        },
+        {
+          "name": "40K then 80K reasoning RL",
+          "method": "rl",
+          "description": "CISPO; 40K checkpoint is intermediate. Output length extended 40K→48K→56K→64K→72K→80K; full RL run uses 512 H800 GPUs for three weeks."
+        }
+      ],
+      "inference_modes": [],
+      "reasoning_effort": null,
+      "tool_call_protocol": null
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "RL output LM head raised to FP32 to align training and rollout probabilities; other compute/master-weight precision not fully specified (report §3.2)."
+    },
+    "quantization": null,
+    "stability_notes": "Smooth context extension prevents gradient explosion; repetition truncation when 3000 consecutive tokens each have probability >0.99; small AdamW epsilon chosen for very small gradients."
+  },
+  "multimodal": null,
+  "inferred_fields": [],
+  "open_questions": [
+    "M1-40k and HF-compatible repackagings are not separate canonical records in this collection. Exact per-variant weight/dtype differences require future audit.",
+    "Unknown fields are deliberate; no optimizer, token mixture, full training precision or version deltas are inherited from neighboring checkpoints without source attribution."
+  ]
+}

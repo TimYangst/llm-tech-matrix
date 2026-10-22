@@ -1,0 +1,385 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "DeepSeek-V4.1-Flash-1017",
+    "family": "DeepSeek",
+    "release_date": "2026-10",
+    "openness": "open_weights",
+    "params_total": "552B backbone + 196B Engram (linked V4.1 family report; the 1017 config is identical to the September checkpoint)",
+    "params_active": "8B prefill / 16B decode (linked V4.1 family architecture report; unchanged 1017 config)",
+    "sources": [
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/tokenizer_config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/encoding/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/encoding/encoding.py",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/inference/README.md",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/inference/config.json",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/inference/model.py",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/inference/vision.py",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/raw/1bae0e1088993b9b82de08f59de5be5a34e42170/inference/engram.py",
+      "https://huggingface.co/api/models/deepseek-ai/DeepSeek-V4.1-Flash-1017/revision/1bae0e1088993b9b82de08f59de5be5a34e42170",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/dba1be0a40aa45a94ad051997016db3960a90277/DeepSeek_V41_Tech_Report.pdf",
+      "https://api-docs.deepseek.com/news/news261017/",
+      "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/config.json"
+    ],
+    "variant_policy": "October 17 minor update to DeepSeek-V4.1-Flash, with one image+text checkpoint, chat/thinking modes and continuous numeric reasoning effort. Current config is structurally identical to the September pinned config. The new release specifically discloses self-feedback RL and improved reasoning, coding, agentic and visual results with shorter output and task time; it does not publish a separate 1017 technical report or training budget. The model card links the earlier V4.1 report for architecture background."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 40,
+      "hidden_dim": 5120,
+      "context_window": 1048576,
+      "context_window_notes": "config.json max_position_embeddings=1048576 (1M tokens). Training curriculum for this dated checkpoint is not disclosed.",
+      "context_extension": {
+        "method": "yarn",
+        "trained_max": "[Unknown/Not Disclosed]",
+        "extended_max": 1048576,
+        "factor": 16.0,
+        "original_max": 65536,
+        "notes": "Config-declared YaRN; this does not establish a current-checkpoint pre-training curriculum."
+      }
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 64,
+      "num_kv_heads": 1,
+      "head_dim": 512,
+      "rope": {
+        "type": "yarn",
+        "base": 10000,
+        "scaling": {
+          "rope_type": "yarn",
+          "factor": 16,
+          "beta_fast": 32,
+          "beta_slow": 1,
+          "original_max_position_embeddings": 65536,
+          "compress_rope_theta": 160000
+        }
+      },
+      "mla": null,
+      "variants": [
+        {
+          "name": "sliding_window_attention",
+          "family": "sliding_window",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "64 rotary dimensions; compressed branch theta=160000.",
+          "notes": "128-token layer-local window in every layer; layers 0-1 are SWA only."
+        },
+        {
+          "name": "csa2_full",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "64 rotary dimensions; compressed branch theta=160000.",
+          "notes": "Computes shared global KV and indexer keys; layers 2,8,14,20."
+        },
+        {
+          "name": "csa2_reindex",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "64 rotary dimensions; compressed branch theta=160000.",
+          "notes": "Reuses global KV/indexer keys but computes fresh top-512; layers 24,28,32,36."
+        },
+        {
+          "name": "csa2_reuse",
+          "family": "other",
+          "num_query_heads": 64,
+          "num_kv_heads": 1,
+          "head_dim": 512,
+          "rope": "64 rotary dimensions; compressed branch theta=160000.",
+          "notes": "Reuses preceding global KV and top-k; remaining 30 global-attention layers."
+        }
+      ],
+      "layer_pattern": "40 backbone layers: 0-1 SWA only; 2-19 encoder CSA2 with ratio 2 and [Full, Reuse×5] repeated three times; 20-39 decoder ratio 1 with Full at 20, Reindex at 24/28/32/36 and Reuse otherwise. All layers retain local SWA. Current config matches the linked family report topology.",
+      "sparse_attention": {
+        "kind": "csa2",
+        "selection": "Full/Reindex layers score indexer keys projected from shared main KV; Reuse layers inherit top-512 indices. Layer 20 builds a candidate pool of top 2048 blocks × 8 positions (at most 16384 positions); decoder Reindex layers select within that pool (config + reference Indexer).",
+        "top_k": 512,
+        "indexer_heads": 32,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "2 (encoder) / 1 (decoder)",
+        "training_recipe": "",
+        "notes": "Shapes and sharing topology from current config and reference code; the family report is earlier architecture background."
+      },
+      "cross_layer_sharing": [
+        {
+          "kind": "ced",
+          "shared_state": [
+            "kv_from_encoder_output"
+          ],
+          "source_layers": [
+            19
+          ],
+          "consumer_layers": [
+            20
+          ],
+          "effect": "[Unknown/Not Disclosed]",
+          "training_recipe": "",
+          "notes": "Linked family report: decoder global KV is projected from final encoder output; under CSA2, Full layer 20 materializes it for decoder reuse. The minimal current reference runs the full stack and does not implement the optimized encoder-only prefill schedule."
+        },
+        {
+          "kind": "csa2",
+          "shared_state": [
+            "kv",
+            "indexer_keys"
+          ],
+          "source_layers": [
+            2,
+            8,
+            14,
+            20
+          ],
+          "consumer_layers": "All other global-attention layers read the most recent Full layer state.",
+          "effect": "[Unknown/Not Disclosed]",
+          "training_recipe": "",
+          "notes": "Current config kv_source_layer_ids and reference SharedAttentionRuntime."
+        },
+        {
+          "kind": "csa2",
+          "shared_state": [
+            "topk_indices"
+          ],
+          "source_layers": [
+            2,
+            8,
+            14,
+            20,
+            24,
+            28,
+            32,
+            36
+          ],
+          "consumer_layers": "The other 30 global-attention layers reuse the most recent index-source top-k.",
+          "effect": "[Unknown/Not Disclosed]",
+          "training_recipe": "",
+          "notes": "Current config index_source_layer_ids; candidate_source_layer_id=20 is an additional shared search-domain restriction."
+        }
+      ],
+      "notes": "Current config: query low-rank projection 1280; grouped output projection 8 groups × rank 1024; partial RoPE width 64 of 512."
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 384,
+        "num_active_experts": 6,
+        "shared_experts": 1,
+        "expert_intermediate_size": 2304,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Current config: top-6 routed experts + 1 shared expert; SqrtSoftplus affinity (scoring_func=sqrtsoftplus); topk_method=noaux_tc; norm_topk_prob=true; routed_scaling_factor=1.5. Reference Gate uses correction biases for selection and unbiased scores for output weights. Current Gate has separate text/image selection biases (bias and bias_vl)."
+      },
+      "layer_partition": "All backbone blocks instantiate MoE FFNs in inference/model.py."
+    },
+    "components": {
+      "activation": "SwiGLU (hidden_act=silu), swiglu_limit=10.0 in current config and reference Expert.",
+      "normalization": "RMSNorm, rms_norm_eps=1e-20; separate hc_eps=1e-06 for Hyper-Connections.",
+      "embedding_notes": "vocab_size=129280; tie_word_embeddings=false. Image positions are replaced by visual embeddings in the reference Transformer."
+    },
+    "residual_connections": {
+      "kind": "mhc",
+      "expansion_factor": 4,
+      "constraint": "Doubly stochastic residual mixing via Sinkhorn normalization in the current reference implementation.",
+      "iterations": 20,
+      "dynamic_parameterization": true,
+      "notes": "Current config hc_mult=4, hc_sinkhorn_iters=20."
+    },
+    "auxiliary_modules": [
+      {
+        "name": "DSpark draft module",
+        "purpose": "speculative_decoding",
+        "architecture": "3 draft blocks (reference inference/config.json n_mtp_layers=3), window-only attention; block_size=5; Markov rank 256; target layers [37, 38, 39].",
+        "shipped_in_checkpoint": true,
+        "activation": "",
+        "notes": "The reference Transformer constructs DSparkBlock modules when dspark_block_size is nonzero; this does not establish an MTP training objective."
+      }
+    ],
+    "memory_modules": [
+      {
+        "name": "Engram conditional memory",
+        "kind": "engram",
+        "params": "196B (linked V4.1 family report; current table dimensions imply 196.614B embedding elements before projections)",
+        "layers": [
+          1,
+          14
+        ],
+        "addressing": "Current config and inference/engram.py: n-gram orders 2,3,4 with 8 hash heads per order over tokenizer-compressed IDs; text only, image tokens masked.",
+        "table_config": "engram_num_embeddings=[384006168,384016682]; head_dim=256; compressed vocab=99092; base vocab per hash=16000000. Current Engram projects retrieved vectors to per-HC-copy keys plus shared values and gates the update.",
+        "storage": "Current inference ParallelEngramEmbedding uses FP8 embedding weights. Production offload policy for the 1017 release is not separately specified.",
+        "optimizer": "[Unknown/Not Disclosed]",
+        "notes": "Forward-pass memory, separate from the DSpark draft. This entry does not import September optimizer or learning-rate claims."
+      }
+    ],
+    "parallelism_notes": "Only inference topology is documented here; current-checkpoint training parallelism is undisclosed. Reference inference supports tensor-parallel torchrun and checkpoint conversion."
+  },
+  "training": {
+    "optimizer": "[Unknown/Not Disclosed]",
+    "lr_schedule": "[Unknown/Not Disclosed]",
+    "data_total_tokens": "[Unknown/Not Disclosed]",
+    "data_mix": {},
+    "data_mix_notes": "The current release does not disclose training-token counts or mixture fractions. Earlier family reports are not evidence for the dated update training budget.",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": []
+    },
+    "alignment": {
+      "sft": "[Unknown/Not Disclosed]",
+      "rl_method": "Reinforcement learning with self-feedback (official 2026-10-17 release note). The update does not name an RL algorithm or specify reward, feedback-label generation, or training budget.",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [
+        {
+          "name": "Self-feedback reinforcement learning",
+          "method": "rl",
+          "description": "Official release note attributes stronger end-to-end project development (game creation and 3D modeling) to self-feedback RL. Ordering relative to other training stages and implementation details are undisclosed."
+        }
+      ],
+      "inference_modes": [
+        {
+          "name": "thinking-low",
+          "trigger": "thinking_mode=thinking, reasoning_effort=low",
+          "description": "Reasoning effort selected by the current prompt encoder.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "low"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "1.0"
+          }
+        },
+        {
+          "name": "thinking-high",
+          "trigger": "thinking_mode=thinking, reasoning_effort=high",
+          "description": "Reasoning effort selected by the current prompt encoder.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "high"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "1.0"
+          }
+        },
+        {
+          "name": "thinking-max",
+          "trigger": "thinking_mode=thinking, reasoning_effort=max",
+          "description": "Reasoning effort selected by the current prompt encoder.",
+          "kwargs": {
+            "thinking_mode": "thinking",
+            "reasoning_effort": "max"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "1.0"
+          }
+        },
+        {
+          "name": "chat",
+          "trigger": "thinking_mode=chat",
+          "description": "Places </think> after the assistant prefix to skip reasoning.",
+          "kwargs": {
+            "thinking_mode": "chat"
+          },
+          "sampling_recommended": {}
+        }
+      ],
+      "reasoning_effort": {
+        "api_parameter": "reasoning_effort",
+        "delivery": "prompt_prefix",
+        "scale": "continuous",
+        "range": "1-100",
+        "levels": [
+          {
+            "name": "low",
+            "numeric_value": 50,
+            "rendering": "<｜System｜>Reasoning Effort: 50 (range 1-100, the higher the value, the more thorough the reasoning)\n\n",
+            "is_default": false,
+            "notes": ""
+          },
+          {
+            "name": "high",
+            "numeric_value": 75,
+            "rendering": "<｜System｜>Reasoning Effort: 75 (range 1-100, the higher the value, the more thorough the reasoning)\n\n",
+            "is_default": true,
+            "notes": ""
+          },
+          {
+            "name": "max",
+            "numeric_value": 100,
+            "rendering": "<｜System｜>Reasoning Effort: 100 (range 1-100, the higher the value, the more thorough the reasoning)\n\n",
+            "is_default": false,
+            "notes": ""
+          }
+        ],
+        "applies_when": "thinking_mode=thinking; prefix inserted at conversation index 0 before the system text.",
+        "invalid_value_behavior": "Reference render_reasoning_effort asserts: only exact Python ints within 1-100 or low/high/max aliases are accepted; None selects high. Validation runs even when the prefix is not rendered.",
+        "training_method": "[Unknown/Not Disclosed]",
+        "notes": "Current encoding.py and encoding/README.md. The September report describes effort-conditioned RL, but the 1017 update does not restate its training method."
+      },
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "<｜DSML｜ calls>",
+        "end_token": "</｜DSML｜ calls>",
+        "arguments_schema": "<｜DSML｜ invoke name=\"...\"> with per-argument <｜DSML｜ parameter name=\"...\" string=\"true|false\">; raw strings or JSON for non-strings.",
+        "parser_flags": {},
+        "notes": "Current encoding supports namespace::function; leading spaces in V4.1 DSML tags differ from V4. No published production parser flag in the current model card."
+      }
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed]"
+    },
+    "quantization": {
+      "weight_format": "fp4+fp8 mixed",
+      "activation_format": "fp8 dynamic (config.quantization_config.activation_scheme=dynamic)",
+      "method": "[Unknown/Not Disclosed]",
+      "scope": "FP4 routed-expert weights; FP8 quantization configuration for other quantized weights. This is a deployment format, not proof of the current training precision.",
+      "granularity": "FP8 weight blocks [32, 32]; scale_fmt=ue8m0.",
+      "stage": "",
+      "notes": "Current config uses quant_method=fp8 together with expert_dtype=fp4. The dated checkpoint does not disclose a new quantization training recipe."
+    },
+    "stability_notes": "Current config/reference Expert clamps SwiGLU activations at 10. The update does not disclose loss-spike handling or a full training-stability recipe."
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image"
+    ],
+    "fusion": "native_early",
+    "fusion_notes": "Linked V4.1 family report describes multimodal training from the start; current 1017 code retains the same architecture. Current inference/vision.py: 3×3 spatial merging followed by two linear aligner layers with GELU; projected image features replace image positions in the shared LM stream.",
+    "vision_encoder": {
+      "architecture": "DeepSeek ViT with full bidirectional attention, 2D RoPE, linear RGB patch embedding, RMSNorm and SwiGLU (current inference/vision.py)",
+      "depth": 32,
+      "hidden_size": 1024,
+      "intermediate_size": 2816,
+      "num_heads": 16,
+      "patch_size": 14,
+      "in_channels": 3,
+      "output_dim": 5120,
+      "spatial_merge_size": 3,
+      "temporal_patch_size": "[Unknown/Not Disclosed]",
+      "notes": "max image tokens=1024; min pixels=295936; max width/height ratio=None. No video/audio path disclosed."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 129264,
+      "video_token_id": "[Unknown/Not Disclosed]",
+      "vision_start_token_id": "[Unknown/Not Disclosed]",
+      "vision_end_token_id": "[Unknown/Not Disclosed]"
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": ""
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "1017 optimizer, LR schedule, update-token budget, data mixture, SFT/distillation and exact RL algorithm are undisclosed; do not carry over September Muon/45T/GRPO/OPD claims.",
+    "Self-feedback RL does not disclose whether AI generates preference labels; rlaif remains UNKNOWN.",
+    "Parameter figures are architecture-level figures from the linked September report; no separate 1017 accounting is published. HF safetensors element totals include packed/quantized and auxiliary tensors and are not substituted for paper parameter counts.",
+    "The minimal reference executes all 40 backbone blocks for prefill; encoder-only prefill, SWA bounded replay and production cache performance are described by the linked family report, not benchmarked for 1017."
+  ]
+}

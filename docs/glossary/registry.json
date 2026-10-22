@@ -32,7 +32,8 @@
       "[Unknown/Not Disclosed]"
     ],
     "training.quantization.weight_format": [
-      "FP8 (e4m3)"
+      "FP8 (e4m3)",
+      "fp4+fp8 mixed"
     ],
     "multimodal.fusion": [
       "native_early",
@@ -237,6 +238,19 @@
       "title": "Reasoning effort",
       "presence": [
         "training.alignment.reasoning_effort"
+      ]
+    },
+    "lightning-attention": {
+      "title": "Lightning Attention",
+      "aliases": [
+        "lightning_attention",
+        "hybrid-lightning extrapolation"
+      ]
+    },
+    "msa": {
+      "title": "MiniMax Sparse Attention (MSA)",
+      "aliases": [
+        "msa"
       ]
     }
   },

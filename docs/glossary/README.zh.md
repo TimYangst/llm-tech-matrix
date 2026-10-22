@@ -13,7 +13,7 @@
 3. 在下方相关分类的索引里加一行。
 4. 抽取一个新模型且它使用了这项技术时，给该条目的 "Used by" / "使用此技术的模型" 表格加一行。
 
-"Used by" 表目前手工维护。未来一个综合分析工具可以扫 `data/extracted/*.json` 中提到的技术，自动建议补充。
+“使用此技术的模型”表由人工维护。现有综合分析依据 [`registry.json`](./registry.json) 映射结构化采用声明，不把任意正文提及当作采用；[覆盖报告](../../data/reports/coverage.md) 检查这些关系与表格的差异。
 
 **"实现此技术的引擎"** 小节则不同：它由 `uv run python -m llm_tech_matrix.synthesis.index` 根据引擎快照的 `technique_support[]` 自动生成，位于 `<!-- BEGIN GENERATED ... -->` / `<!-- END GENERATED ... -->` 标记之间。不要手工修改标记内的内容；过期时 CI 会失败。
 
@@ -21,16 +21,30 @@
 
 ### 注意力（Attention）
 
+- [Lightning Attention](./lightning-attention.zh.md)
+
+- [MiniMax Sparse Attention (MSA)](./msa.zh.md)
+
 - [Multi-head Latent Attention (MLA)](./mla.zh.md)
+
 - [Grouped Query Attention (GQA)](./gqa.zh.md)
+
 - [QK-Norm](./qk-norm.zh.md)
+
 - [Gated DeltaNet](./gated-deltanet.zh.md)
+
 - [DeepSeek Sparse Attention (DSA)](./dsa.zh.md)
+
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.zh.md)
+
 - [Kimi Delta Attention (KDA)](./kda.zh.md)
+
 - [Qwen 稀疏注意力（QSA）](./qsa.zh.md)
+
 - [IndexShare / IndexCache（跨层索引复用）](./indexshare.zh.md)
+
 - [压缩稀疏注意力 2（CSA2）—— 跨层 KV + 索引复用](./csa2.zh.md)
+
 - [因果编码器-解码器（CED）+ SWA 有界重放](./causal-encoder-decoder.zh.md)
 
 ### FFN / MoE

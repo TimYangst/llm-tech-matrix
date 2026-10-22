@@ -1,135 +1,97 @@
 # Pipeline Architecture
 
-Three decoupled layers. Each layer's input/output contract is the boundary — implementations can be swapped without touching neighbors.
+Three layers communicate through cached source bytes and schema-validated JSON.
+Sourcing retrieves evidence; extraction interprets one release; synthesis reads
+structured records to build comparisons. Each record belongs to one track.
 
-```
-┌─────────────────┐    raw files     ┌──────────────────┐    JSON     ┌─────────────────┐
-│  1. Sourcing    │ ───────────────► │  2. Extraction   │ ──────────► │  3. Synthesis   │
-│                 │  data/sources/   │                  │  data/      │                 │
-│  HF, ArXiv,     │                  │  Schema-strict   │  extracted/ │  Reports,       │
-│  Blog scrape    │                  │  LLM extraction  │             │  comparison     │
-└─────────────────┘                  └──────────────────┘             └─────────────────┘
-```
+## Record contracts
+
+| Track                          | Source manifests                            | Canonical JSON                       | Contract                                               | Readable output            |
+| ------------------------------ | ------------------------------------------- | ------------------------------------ | ------------------------------------------------------ | -------------------------- |
+| LLM / multimodal understanding | `data/sources/<slug>/manifest.json`         | `data/extracted/<slug>.json`         | [LLM schema](schema.md), `schema.py`                   | `extraction.render`        |
+| Engines                        | `data/sources/engines/<slug>/manifest.json` | `data/extracted/engines/<slug>.json` | [engine schema](engines/schema.md), `engine_schema.py` | `extraction.render_engine` |
+| Media generation               | `data/sources/<slug>/manifest.json`         | `data/extracted/media/<slug>.json`   | [media schema](media/schema.md), `media_schema.py`     | `extraction.render_media`  |
+
+Versions are independent. Root model globs are non-recursive; engine and media
+records do not enter the LLM renderer or technique registry. Media records use the
+source CLI's default source root; `--track engines` selects the engine subtree.
 
 ## Layer 1: Data sourcing
 
-**Input**: a model identifier (e.g. `deepseek-v3`) plus public URLs to source assets.
-**Output**: a `manifest.json` (committed) and locally cached files (gitignored) under
-`data/sources/<model>/`.
+Input is a release identifier and public source URLs. The sourcing CLI writes
+cached files plus a committed manifest containing URLs, SHA256, byte sizes, fetch
+dates, source kinds and optional archive URLs. Cached files are gitignored.
 
-What lives here:
+- `add` registers and fetches an asset, then records its hash.
+- `fetch` downloads missing assets, verifies known hashes and reports individual
+  failures. A mismatch does not replace previously accepted bytes.
+- `verify` checks cached bytes without downloading.
+- `list` enumerates manifests for the selected source track.
+- `sourcing.pdf_to_text` derives text from cached PDFs for extraction.
 
-- `manifest.py` — Pydantic schema for `SourceManifest` (committed) and `Asset` entries
-  (URL, sha256, filename, kind, optional archive_url).
-- `fetch.py` — CLI for downloading assets and verifying checksums:
-  - `add` — register a new asset (downloads, computes sha256, appends to manifest)
-  - `fetch` — re-download every asset listed in a manifest into the cache directory; continues past
-    failures and ends with a `FETCH REPORT` (see conventions, "When `fetch` reports a failure")
-  - `verify` — compare cached files against recorded sha256 without re-downloading
-  - `list` — enumerate all manifests in the repo
-
-What does **not** live here: any interpretation of file content. Sourcing's only job
-is "get the bytes, record where they came from." Sources must be **publicly accessible**
-(no paywalled or login-gated material — HF gated models with a personal token are OK,
-but the requirement is that the asset is reachable without privileged access).
-
-Why this split: papers and configs can be tens of MB; mirroring them in git wastes
-space and adds nothing — the canonical hosts (HF, arxiv) are already authoritative.
-The committed manifest plus sha256 gives us reproducibility without the bloat.
-
-Code: `src/llm_tech_matrix/sourcing/`
+Sources follow the existing public-source eligibility convention: ordinary HF
+account/token access is permitted, while payment or privileged/nonpublic access
+is not. A token does not authorize private sources. Pin model-hub/repository
+files and versioned papers; distinguish mutable announcement snapshots. See [source conventions](conventions.md#source-assets-committed-vs-cached).
+Sourcing records bytes and provenance, without interpreting technical claims.
 
 ## Layer 2: Information extraction
 
-**Input**: `data/sources/<model>/` directory.
-**Output**: `data/extracted/<model>.json` conforming to `docs/schema.md`.
+An agent reads the source manifest and cached assets and writes one release's
+JSON using the matching contract. There is no automated prompt-template runner
+or multi-source reconcile service. Procedures live in
+[extract-model](../.claude/skills/extract-model/SKILL.md),
+[extract-engine](../.claude/skills/extract-engine/SKILL.md) and the
+[media guide](media/overview.md).
 
-This is the AI-driven layer. The extraction prompt frames the model as a "Senior AI Researcher" and enforces the no-hallucination rule (see `schema.md` cardinal rule).
+Missing descriptive values remain `[Unknown/Not Disclosed]`; preserve each
+schema's optional null/default structures. Version-specific facts, predecessor
+training claims, shipped components and hosted product capabilities need explicit
+scope. Source disagreements remain open questions. Media and engine claims carry
+field/row evidence; model records retain source URLs and attribution in their
+structured fields and notes.
 
-What actually lives here today:
+Renderers deterministically produce English and Chinese summaries. Labels are
+translated; extracted technical values stay in their source language. Change JSON
+or the renderer, then regenerate; do not hand-edit generated Markdown.
 
-- `.claude/skills/extract-model/SKILL.md` — the extraction procedure itself. Extraction is
-  agent-driven, not code-driven: there is no prompt-template module and no automated
-  multi-source merge step. The skill reads the cached sources and writes the JSON.
-- `src/llm_tech_matrix/extraction/render.py` — deterministic JSON → Markdown renderer,
-  producing **two** committed files per model: `<slug>.md` (English chrome) and
-  `<slug>.zh.md` (Chinese chrome). Field values stay in source-language English so the
-  Markdown remains a faithful view of the JSON. Never hand-edit the output; change the
-  JSON, or the `LABELS` dicts in `render.py`.
-- `scripts/validate_extractions.py` — Pydantic validation of every extracted JSON against
-  `schema.py`. This is the CI gate, and it is the real enforcement point for the contract.
-- `docs/glossary/` — the shared vocabulary the rendered summaries lean on. Each entry
-  carries a "Used by" table, so extraction has a step that writes *back* into the glossary.
+`scripts/validate_extractions.py` validates all three record types and engine
+cross-links. For media it also verifies manifest/evidence consistency and
+view/index freshness from committed files; cached downloads are not required in
+CI. `sourcing verify` separately checks actual cached bytes. Formatting hooks do
+not replace schema validation.
 
-Not built (and not currently missed): prompt templates per source type, an automated
-merge/reconcile step, structured logging of `[Unknown/Not Disclosed]` rates.
+## Layer 3: Synthesis and browse surfaces
 
-What does **not** live here: cross-model logic. One model in, one JSON out.
+Synthesis reads canonical JSON without fetching sources or rerunning extraction.
+Implemented generators are:
 
-Code: `src/llm_tech_matrix/extraction/`, `scripts/`, and `.claude/skills/extract-model/`
+- `synthesis.index`: model index, technique matrix, coverage report, engine support
+  matrix/adoption report, and generated bilingual glossary engine sections.
+- `synthesis.media`: independent bilingual media index.
 
-## Layer 3: Synthesis & analytics
+The model technique registry matches **typed assertions**. A prose mention such
+as “unlike MLA” does not assert adoption. Techniques recorded only in free text
+(optimizer, RL method, routing) keep hand-maintained glossary adoption rows;
+`data/reports/coverage.md` exposes missing or unexplained mappings.
 
-**Input**: a set of `data/extracted/*.json` files.
-**Output**: `data/reports/` — markdown reports, charts, diff tables.
+Engine snapshots name glossary slugs directly. Their support matrix joins only
+explicit recorded model mappings, distinguishes unassessed from not-found, and
+preserves delegation and snapshot-version scope. Media is outside those joins.
+Current indexes and reports do not read `inferred_fields`; an analysis that uses
+inferences would need an explicit policy.
 
-What lives here:
+Interpretive trend narratives and scientific charts remain future work. Existing
+reports provide structured browse/adoption evidence, not runtime benchmarks.
 
-- Cross-model comparison along a single dimension (e.g. "all MoE routing algorithms")
-- Time-series trend reports (e.g. "optimizer evolution Adam → Muon")
-- Static charts (matplotlib/plotly) saved alongside the report
+## Regeneration and checks
 
-This layer is intentionally last: it cannot work until enough extractions exist. **Don't over-build it early.** Start with one or two reports driven by real questions, not infrastructure-first.
+After LLM/engine or glossary changes, run `synthesis.index`. After media changes,
+run its renderer and `synthesis.media`. The
+[session guide](session-start.md#common-workflows) lists commands per track.
 
-**Status: started, deliberately narrow.** The first synthesis output is an *index*, not a
-report: `synthesis/registry.py` + `synthesis/index.py` turn the typed fields of every
-extracted record into technique↔model edges and generate three browse surfaces —
-`data/extracted/README.md`, `data/reports/technique-index.md`, `data/reports/coverage.md`.
-
-The load-bearing design rule is **assertions, not mentions**. A typed slot
-(`sparse_attention.kind = "dsa"`) is the model asserting it uses a technique. Prose is
-often the opposite — *"unlike MLA…"*, *"the family report documents Muon but 5.2 does not
-restate it"*. A naive keyword index over the extraction text yields ~39% more edges than
-the hand-maintained tables, and a large share of them are mentions, not uses. Publishing
-those would violate the no-hallucination rule from the inside. So only typed slots
-produce edges; everything else lands in `coverage.md` as a review queue.
-
-The consequence worth knowing: the schema types the *architecture* axis, so optimizer,
-RL method and MoE-routing techniques have no typed slot and their "Used by" tables stay
-hand-maintained. `registry.json`'s `prose_only` block lists them, and promoting one to a
-typed slot is a schema change, not a registry change.
-
-Interpretive reports (trend narratives, "optimizer evolution Adam → Muon") are still
-unwritten — and still should be driven by a real question, not by infrastructure.
-
-Code: `src/llm_tech_matrix/synthesis/`
-
-## Why decoupled
-
-- **Sourcing** breaks when websites change layout. Extraction shouldn't care.
-- **Extraction** prompts evolve as we learn what works. Sourcing and synthesis shouldn't care.
-- **Synthesis** asks new questions over time. It should re-read extracted JSON, not re-trigger extraction.
-
-The contract is the JSON file. As long as `data/extracted/<model>.json` validates against `schema.py`, all three layers can iterate independently.
-
-## Engines track
-
-The engines track (vLLM, SGLang, verl, VeOmni, Megatron-LM, Megatron-Bridge) reuses all three layers and the same
-contract, in parallel subtrees: `data/sources/engines/<slug>/` and
-`data/extracted/engines/<slug>.json`. It has its own schema and version. Every model-side
-glob is non-recursive, so the two tracks cannot interfere, and model and engine records meet
-only in synthesis. Design: [`engines/overview.md`](./engines/overview.md).
-
-Code per layer:
-
-- **Sourcing:** `sourcing --track engines`, with asset kinds `repo_file` and `release_notes`.
-- **Extraction:** `engine_schema.py`, `extraction/render_engine.py`, `.claude/skills/extract-engine/`,
-  plus the engine branch of `scripts/validate_extractions.py`, which also checks the cross-links
-  to model and glossary slugs.
-- **Synthesis:** `synthesis/engines.py`, called from `synthesis.index` and covered by the same
-  staleness check in `scripts/validate_registry.py`. It generates
-  `data/reports/engine-support-matrix.md` (models × snapshots, techniques × snapshots,
-  per-model details, integration version constraints), `data/reports/engine-adoption.md`
-  (month-precision lag from model release to engine support) and the "Implemented by
-  (engines)" glossary sections. Engine rows name glossary slugs directly, so no registry
-  slots are needed.
+Run both `scripts/validate_extractions.py` and `scripts/validate_registry.py`;
+the latter checks controlled vocabulary and generated report freshness.
+[Development checks](development.md#what-ci-runs-on-every-pull-request) also cover
+formatting and media regression tests. Each track can iterate independently when
+its records and generated outputs satisfy these contracts.

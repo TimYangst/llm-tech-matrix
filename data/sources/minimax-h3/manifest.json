@@ -1,0 +1,115 @@
+{
+  "slug": "minimax-h3",
+  "assets": [
+    {
+      "name": "card",
+      "kind": "model_card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/README.md",
+      "archive_url": null,
+      "filename": "card.md",
+      "description": "Official H3 README.md pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "f0116a90332496bdfcc827320c603a26b849c73bf804f2674d03682fbbd2334a",
+      "size_bytes": 38406,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "license",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/LICENSE",
+      "archive_url": null,
+      "filename": "license.txt",
+      "description": "Official H3 LICENSE pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "59b99642b95ea21630e311198ddbfffbfe05aadba0c2f5d884cbdf4efcc90f44",
+      "size_bytes": 17604,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "index",
+      "kind": "repo_file",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/model_index.json",
+      "archive_url": null,
+      "filename": "index.json",
+      "description": "Official H3 model_index.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "5a587fe13b2371427415ac892463142683aefcd8d322e274a3a095eac37ac7d2",
+      "size_bytes": 2936,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "transformer-fl2va",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/FL2VA/transformer/config.json",
+      "archive_url": null,
+      "filename": "transformer-fl2va.json",
+      "description": "Official H3 FL2VA/transformer/config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "f619093a231fcfbcc3d035bec26c50ad864e7331a500d5c519f5045dc1e50458",
+      "size_bytes": 604,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "transformer-ref2va",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/Ref2VA/transformer/config.json",
+      "archive_url": null,
+      "filename": "transformer-ref2va.json",
+      "description": "Official H3 Ref2VA/transformer/config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "f619093a231fcfbcc3d035bec26c50ad864e7331a500d5c519f5045dc1e50458",
+      "size_bytes": 604,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "visual-vae",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/FL2VA/video_vae/config.json",
+      "archive_url": null,
+      "filename": "visual-vae.json",
+      "description": "Official H3 FL2VA/video_vae/config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "3edd2cdd1ebc823c868be55ef917e1b3b8a398fde4d3150dae44a3bf05d9f627",
+      "size_bytes": 1807,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "audio-vae",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/FL2VA/audio_vae/config.json",
+      "archive_url": null,
+      "filename": "audio-vae.json",
+      "description": "Official H3 FL2VA/audio_vae/config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "d8f3bcc62e23c7e9806970fa63cca6139c06faa3797cf9c94034f60db8512771",
+      "size_bytes": 1973,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "scheduler",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/scheduler/scheduler_config.json",
+      "archive_url": null,
+      "filename": "scheduler.json",
+      "description": "Official H3 scheduler/scheduler_config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "8fa6c3aa70dc9e691e1a6df899fd1b6f75f70481a27cee6e18a303817075c304",
+      "size_bytes": 97,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "audio-scheduler",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/audio_scheduler/scheduler_config.json",
+      "archive_url": null,
+      "filename": "audio-scheduler.json",
+      "description": "Official H3 audio_scheduler/scheduler_config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "804780f7133477067bd6bbfbc02dc8b3cf9feeb400f97c08f5b1d5f6cbab3840",
+      "size_bytes": 96,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "text-encoder",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/42ed227ee7df40d41602854ae760620d6eb651fe/FL2VA/text_encoder/config.json",
+      "archive_url": null,
+      "filename": "text-encoder.json",
+      "description": "Official H3 FL2VA/text_encoder/config.json pinned at 42ed227ee7df40d41602854ae760620d6eb651fe; media generation source.",
+      "sha256": "d2dd0c60d01b9e195d9447c52da61c7302d28828524914c044d9c6e1b81d0427",
+      "size_bytes": 1474,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

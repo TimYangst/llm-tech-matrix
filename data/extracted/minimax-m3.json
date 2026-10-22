@@ -1,0 +1,200 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "MiniMax-M3",
+    "family": "minimax-m3",
+    "release_date": "2026-06",
+    "openness": "open_weights",
+    "params_total": "~428B",
+    "params_active": "~23B",
+    "sources": [
+      "https://huggingface.co/MiniMaxAI/MiniMax-M3/resolve/f0e1c1e04d40177e4673a22097036854f536e9c0/config.json",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M3/resolve/f0e1c1e04d40177e4673a22097036854f536e9c0/README.md",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M3/resolve/f0e1c1e04d40177e4673a22097036854f536e9c0/chat_template.jinja",
+      "https://huggingface.co/MiniMaxAI/MiniMax-M3/resolve/f0e1c1e04d40177e4673a22097036854f536e9c0/generation_config.json",
+      "https://arxiv.org/pdf/2606.13392v1",
+      "https://www.minimax.io/blog/minimax-m3"
+    ],
+    "variant_policy": "One native text/image/video checkpoint with enabled/adaptive/disabled thinking modes; MXFP8 is separately packaged and outside this record."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 60,
+      "hidden_dim": 6144,
+      "context_window": 1048576,
+      "context_window_notes": "Native 1M context; config.max_position_embeddings=1048576.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "GQA",
+      "num_heads": 64,
+      "num_kv_heads": 4,
+      "head_dim": 128,
+      "rope": {
+        "type": "standard",
+        "base": 5000000,
+        "scaling": null
+      },
+      "mla": null,
+      "variants": [],
+      "layer_pattern": "First 3 layers use dense GQA; layers 3–59 (zero-indexed) use MSA on GQA (sparse_attention_freq).",
+      "sparse_attention": {
+        "kind": "msa",
+        "selection": "Lightweight Index Branch max-pools token scores into blocks, independently selects top-k blocks per GQA group; always includes the local block. Main Branch performs exact softmax attention over selected blocks (MSA report §3).",
+        "top_k": "[Unknown/Not Disclosed]",
+        "indexer_heads": 4,
+        "indexer_head_dim": 128,
+        "kv_compression_ratio": "[Unknown/Not Disclosed]",
+        "training_recipe": "MSA mechanism: KL alignment of index distribution with group-averaged Main Branch distribution, stop-gradient at index inputs; dense-indexer warmup then sparse training. Production M3 stage/token budget is not disclosed.",
+        "notes": "Pinned production config: sparse_topk_blocks=16, sparse_block_size=128, sparse_score_type=max, sparse_local_block=1, sparse_init_block=0. This is a BLOCK budget, not 16 individual KV tokens; at most 2048 token slots per group before causal masking. No KV compression ratio is asserted."
+      },
+      "cross_layer_sharing": [],
+      "notes": "Pinned config: rotary_dim=64 of head_dim=128; RoPE applies to half of each attention head. Per-head QK normalization (qk_norm_type=per_head); use_gemma_norm=true; attention_output_gate=false."
+    },
+    "ffn": {
+      "ffn_type": "hybrid",
+      "dense_intermediate_size": 12288,
+      "moe": {
+        "num_experts": 128,
+        "num_active_experts": 4,
+        "shared_experts": 1,
+        "expert_intermediate_size": 3072,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Sigmoid top-4 routing over 128 local experts with routing bias and routed_scaling_factor=2.0; one shared expert, shared_intermediate_size=3072 (config)."
+      },
+      "layer_partition": "First 3 layers dense (moe_layer_freq=0), remaining 57 layers MoE; dense_intermediate_size=12288, routed expert intermediate_size=3072, shared expert intermediate_size=3072."
+    },
+    "components": {
+      "activation": "swigluoai (config), alpha=1.702, limit=7.0; precise clamp formula not inferred from identifier alone.",
+      "normalization": "RMSNorm epsilon=1e-6; use_gemma_norm=true; per-head QK normalization (config).",
+      "embedding_notes": "vocab_size=200064; tie_word_embeddings=false"
+    },
+    "residual_connections": null,
+    "auxiliary_modules": [
+      {
+        "name": "Configured MTP modules",
+        "purpose": "multi_token_prediction",
+        "architecture": "text_config.num_mtp_modules=7 and num_nextn_predict_layers=1; mapping between module count and prediction horizon is not documented in the registered sources.",
+        "shipped_in_checkpoint": "[Unknown/Not Disclosed]",
+        "activation": "",
+        "notes": ""
+      }
+    ],
+    "memory_modules": [],
+    "parallelism_notes": "[Unknown/Not Disclosed]"
+  },
+  "training": {
+    "optimizer": "[Unknown/Not Disclosed]",
+    "lr_schedule": "[Unknown/Not Disclosed]",
+    "data_total_tokens": "[Unknown/Not Disclosed]",
+    "data_mix": {},
+    "data_mix_notes": "",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": [
+        "Native mixed text/image/video training from the first step (model card); detailed production losses and weights undisclosed."
+      ]
+    },
+    "alignment": {
+      "sft": "[Unknown/Not Disclosed]",
+      "rl_method": "[Unknown/Not Disclosed]",
+      "rlaif": "[Unknown/Not Disclosed]",
+      "stages": [],
+      "inference_modes": [
+        {
+          "name": "enabled",
+          "trigger": "API thinking=enabled; local chat template thinking_mode=enabled.",
+          "description": "Always reason, including after tool results; local generation prefix <mm:think>.",
+          "kwargs": {
+            "thinking": "enabled",
+            "thinking_mode": "enabled"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95"
+          }
+        },
+        {
+          "name": "adaptive",
+          "trigger": "API thinking=adaptive; local chat template thinking_mode=adaptive.",
+          "description": "Model decides whether to reason; local template default when thinking_mode is absent.",
+          "kwargs": {
+            "thinking": "adaptive",
+            "thinking_mode": "adaptive"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95"
+          }
+        },
+        {
+          "name": "disabled",
+          "trigger": "API thinking=disabled; local chat template thinking_mode=disabled.",
+          "description": "Suppress reasoning; local generation prefix </mm:think>.",
+          "kwargs": {
+            "thinking": "disabled",
+            "thinking_mode": "disabled"
+          },
+          "sampling_recommended": {
+            "temperature": "1.0",
+            "top_p": "0.95"
+          }
+        }
+      ],
+      "reasoning_effort": null,
+      "tool_call_protocol": {
+        "format": "xml-like",
+        "start_token": "]<]minimax[>[<tool_call>",
+        "end_token": "]<]minimax[>[</tool_call>",
+        "arguments_schema": "Namespace prefix ]<]minimax[>[ before XML elements; <invoke name=\"FUNCTION\"> with argument-name elements. Recursive XML expansion for nested mappings and arrays; null-valued mappings omitted.",
+        "parser_flags": {},
+        "notes": "New wire format differs from M2 <parameter name=...>; reasoning markers <mm:think>...</mm:think>. Pinned template renders reasoning for all assistant turns."
+      }
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed]"
+    },
+    "quantization": null,
+    "stability_notes": ""
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
+    "fusion": "native_early",
+    "fusion_notes": "Model card states mixed-modality training from the first step. Vision features are projected into the 6144-wide text stream; native training does not imply absence of a vision encoder/projector.",
+    "vision_encoder": {
+      "architecture": "ViT (clip_vision_model config), 3D RoPE",
+      "depth": 32,
+      "hidden_size": 1280,
+      "intermediate_size": 5120,
+      "num_heads": 16,
+      "patch_size": 14,
+      "in_channels": 3,
+      "output_dim": 6144,
+      "spatial_merge_size": 2,
+      "temporal_patch_size": 2,
+      "notes": "image_size=2016; vision_segment_max_frames=4; patch_merge compression; vision RoPE base 10000, mode 3d (config). Pretrained initialization source not disclosed."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 200025,
+      "video_token_id": 200026,
+      "vision_start_token_id": "[Unknown/Not Disclosed]",
+      "vision_end_token_id": "[Unknown/Not Disclosed]"
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": ""
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "MSA paper experiments use a 109B MoE and 3T-token budget; these do not disclose production M3 (~428B, ~23B active) training tokens, optimizer, schedule or post-training pipeline.",
+    "MSA typed top_k remains UNKNOWN because the config defines 16 blocks ×128 tokens, while schema field describes KV-entry count. Block count/size recorded explicitly in sparse_attention.notes.",
+    "MTP config has num_mtp_modules=7 and num_nextn_predict_layers=1. Exact objective depth, horizon, loss weight and public weight shipment require further vendor/code evidence.",
+    "MiniMax M3.1 Flash (October 19) is a later API release with weights promised later; it is not the M3 checkpoint or an open-weight update in this snapshot.",
+    "Unknown fields are deliberate; no optimizer, token mixture, full training precision or version deltas are inherited from neighboring checkpoints without source attribution."
+  ]
+}

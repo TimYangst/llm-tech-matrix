@@ -1,0 +1,170 @@
+{
+  "schema_version": 8,
+  "metadata": {
+    "name": "MiniMax-VL-01",
+    "family": "minimax-01",
+    "release_date": "2025-01",
+    "openness": "open_weights",
+    "params_total": "456B language backbone + 303M vision encoder + projector (aggregate not stated)",
+    "params_active": "45.9B language backbone (vision/projector additional)",
+    "sources": [
+      "https://huggingface.co/MiniMaxAI/MiniMax-VL-01/resolve/308b79934be140a43a0fb80f82b4e20d0ebe3cb8/config.json",
+      "https://huggingface.co/MiniMaxAI/MiniMax-VL-01/resolve/308b79934be140a43a0fb80f82b4e20d0ebe3cb8/README.md",
+      "https://arxiv.org/pdf/2501.08313v1"
+    ],
+    "variant_policy": "Separate Text-01 and VL-01 checkpoints; VL-01 adds a vision encoder and projector to Text-01."
+  },
+  "architecture": {
+    "backbone": {
+      "layers": 80,
+      "hidden_dim": 6144,
+      "context_window": "[Unknown/Not Disclosed]",
+      "context_window_notes": "Released VL config text_config.max_position_embeddings=8192, whereas inherited Text-01 long-context statements do not establish the supported VL product limit. No silent inheritance of 4M.",
+      "context_extension": null
+    },
+    "attention": {
+      "variant": "hybrid",
+      "num_heads": 64,
+      "num_kv_heads": 8,
+      "head_dim": 128,
+      "rope": {
+        "type": "standard",
+        "base": 10000000,
+        "scaling": null
+      },
+      "mla": null,
+      "variants": [
+        {
+          "name": "lightning_attention",
+          "family": "linear_attention",
+          "num_query_heads": 64,
+          "num_kv_heads": "[Unknown/Not Disclosed]",
+          "head_dim": 128,
+          "rope": "RoPE is documented for the softmax branch; no rotary operation assumed for linear attention.",
+          "notes": "Lightning Attention: I/O-aware linear attention with recurrent state and blockwise execution (MiniMax-01 report §§2.1–2.2)."
+        },
+        {
+          "name": "gqa",
+          "family": "gqa",
+          "num_query_heads": 64,
+          "num_kv_heads": 8,
+          "head_dim": 128,
+          "rope": "Partial RoPE, rotary_dim=64; final checkpoint base 10000000.",
+          "notes": ""
+        }
+      ],
+      "layer_pattern": "(7 Lightning Attention layers, 1 GQA softmax layer) × 10, 80 total; config.attn_type_list has GQA at zero-based indices 7,15,...,79.",
+      "sparse_attention": null,
+      "cross_layer_sharing": [],
+      "notes": "Pinned config: rotary_dim=64 of head_dim=128; RoPE applies to half of each attention head."
+    },
+    "ffn": {
+      "ffn_type": "moe",
+      "dense_intermediate_size": null,
+      "moe": {
+        "num_experts": 32,
+        "num_active_experts": 2,
+        "shared_experts": 0,
+        "expert_intermediate_size": 9216,
+        "latent_dim": "[Unknown/Not Disclosed]",
+        "routing": "Top-2 routing; MoE auxiliary loss coefficient 0.01 in original Text-01 pre-training (paper §4.2)."
+      },
+      "layer_partition": ""
+    },
+    "components": {
+      "activation": "[Unknown/Not Disclosed]",
+      "normalization": "RMSNorm, epsilon=1e-05; postnorm=true; DeepNorm scaling in the original Text-01 report.",
+      "embedding_notes": "vocab_size=200064; tie_word_embeddings=false"
+    },
+    "residual_connections": null,
+    "auxiliary_modules": [],
+    "memory_modules": [],
+    "parallelism_notes": "Original MiniMax-01 report §3: expert/tensor/data parallelism, Expert Tensor Parallel (ETP), varlen ring attention for softmax, LASP+ for linear-attention sequence parallelism. Exact M1 deployment degrees not assumed."
+  },
+  "training": {
+    "optimizer": "Text-01 backbone pre-training: AdamW, beta1=0.9, beta2=0.95, weight_decay=0.1 (MiniMax-01 report §4.2). Multimodal-stage optimizer not stated.",
+    "lr_schedule": "Text-01 backbone: 500-step warmup to 2e-4; constant for 7.2T tokens; 1.3e-4 for next 3.2T; exponential decay over 1T to 3e-5; context extension adds 300B+32B+26B tokens (report §4.2).",
+    "data_total_tokens": "Model card says 512B multimodal tokens; paper §6.3 states 80B+420B+44.8B across stages I–III (544.8B). Discrepancy unresolved; inherited Text-01 training is additional.",
+    "data_mix": {},
+    "data_mix_notes": "Text-01: academic literature, books, web content and code; byte-level BPE, multilingual upsampling and model-scored quality filtering. Exact domain percentages undisclosed (report §4.1).",
+    "objectives": {
+      "multi_token_prediction": null,
+      "fill_in_middle": null,
+      "other": [
+        "Vision encoder trained with CoCa-style contrastive image-text loss plus decoder cross-entropy (report §6.2.2)."
+      ]
+    },
+    "alignment": {
+      "sft": "Four-stage VL instruction/alignment pipeline (report §6.3).",
+      "rl_method": "DPO on model-scored multimodal preference pairs (report §6.3).",
+      "rlaif": true,
+      "stages": [
+        {
+          "name": "Modality alignment",
+          "method": "sft",
+          "description": "Update vision encoder and adapter using 80B caption tokens at 336×336."
+        },
+        {
+          "name": "Vision instruction tuning",
+          "method": "sft",
+          "description": "Unfreeze all parameters; 420B multimodal tokens mixed 20:1 with Text-01 post-training data."
+        },
+        {
+          "name": "User-experience tuning",
+          "method": "sft",
+          "description": "44.8B multimodal tokens; one epoch."
+        },
+        {
+          "name": "Preference tuning",
+          "method": "dpo",
+          "description": "40K image-text preference pairs scored by LLMs, including Text-01; mix pure-text pairs, early stopping before one epoch."
+        }
+      ],
+      "inference_modes": [],
+      "reasoning_effort": null,
+      "tool_call_protocol": null
+    },
+    "advanced": {
+      "self_distillation": "[Unknown/Not Disclosed]",
+      "mixed_precision": "[Unknown/Not Disclosed]"
+    },
+    "quantization": null,
+    "stability_notes": ""
+  },
+  "multimodal": {
+    "modalities": [
+      "text",
+      "image"
+    ],
+    "fusion": "projection_mlp",
+    "fusion_notes": "303M from-scratch ViT-L/14 → randomly initialized two-layer MLP → Text-01. Dynamic image grids 336×336 to 2016×2016 plus 336×336 thumbnail; patches encoded separately and concatenated, with no pooling compression (report §6.2).",
+    "vision_encoder": {
+      "architecture": "ViT-L/14 (from scratch)",
+      "depth": 24,
+      "hidden_size": 1024,
+      "intermediate_size": 4096,
+      "num_heads": 16,
+      "patch_size": 14,
+      "in_channels": "[Unknown/Not Disclosed]",
+      "output_dim": 6144,
+      "spatial_merge_size": "[Unknown/Not Disclosed]",
+      "temporal_patch_size": "[Unknown/Not Disclosed]",
+      "notes": "CLIPVisionModel config architecture; CoCa-style training, not imported CLIP pretrained weights."
+    },
+    "vision_token_anchors": {
+      "image_token_id": 200025,
+      "video_token_id": "[Unknown/Not Disclosed]",
+      "vision_start_token_id": "[Unknown/Not Disclosed]",
+      "vision_end_token_id": "[Unknown/Not Disclosed]"
+    },
+    "audio_encoder": "[Unknown/Not Disclosed]",
+    "audio_notes": ""
+  },
+  "inferred_fields": [],
+  "open_questions": [
+    "VL-01 supported user-facing context remains unresolved: checkpoint text_config says 8192, the shared report describes Text-01 trained 1M/extrapolated 4M; vendor does not reconcile the VL-specific limit.",
+    "VL-01 model card says 512B multimodal tokens; paper stage budgets 80B+420B+44.8B sum to 544.8B. Neither figure is silently chosen as an exact whole-model total.",
+    "Vision training count differs by unit/scope: card says 694M image-caption pairs; paper §6.2.2 says 37B low-resolution training pairs followed by 1.2B high-resolution pairs. Likely repeated exposures versus unique pairs, but not equated without an explicit statement.",
+    "Unknown fields are deliberate; no optimizer, token mixture, full training precision or version deltas are inherited from neighboring checkpoints without source attribution."
+  ]
+}

@@ -21,8 +21,10 @@ by collecting cross-model adoption in one place.
 4. When extracting a new model that uses the technique, add a row to the entry's
    "Used by" table.
 
-The "Used by" tables are maintained by hand for now. A future synthesis tool can scan
-`data/extracted/*.json` for technique mentions and propose additions.
+The "Used by" tables remain hand-maintained. Existing synthesis maps typed
+assertions through [`registry.json`](./registry.json), not arbitrary prose mentions.
+[`coverage.md`](../../data/reports/coverage.md) compares those edges with adoption
+rows; prose-only techniques remain explicitly listed in the registry.
 
 The **"Implemented by (engines)"** sections are different: they are generated from engine
 snapshots' `technique_support[]` rows by `uv run python -m llm_tech_matrix.synthesis.index`,
@@ -33,16 +35,30 @@ inside the markers; CI fails when they are stale.
 
 ### Attention
 
+- [Lightning Attention](./lightning-attention.md)
+
+- [MiniMax Sparse Attention (MSA)](./msa.md)
+
 - [Multi-head Latent Attention (MLA)](./mla.md)
+
 - [Grouped Query Attention (GQA)](./gqa.md)
+
 - [QK-Norm](./qk-norm.md)
+
 - [Gated DeltaNet](./gated-deltanet.md)
+
 - [DeepSeek Sparse Attention (DSA)](./dsa.md)
+
 - [Compressed Sparse Attention + Heavily Compressed Attention (CSA + HCA)](./csa-hca.md)
+
 - [Kimi Delta Attention (KDA)](./kda.md)
+
 - [Qwen Sparse Attention (QSA)](./qsa.md)
+
 - [IndexShare / IndexCache (cross-layer index reuse)](./indexshare.md)
+
 - [Compressed Sparse Attention 2 (CSA2) — cross-layer KV + index reuse](./csa2.md)
+
 - [Causal Encoder-Decoder (CED) + SWA Bounded Replay](./causal-encoder-decoder.md)
 
 ### FFN / MoE
