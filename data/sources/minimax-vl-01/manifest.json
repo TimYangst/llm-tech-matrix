@@ -1,0 +1,38 @@
+{
+  "slug": "minimax-vl-01",
+  "assets": [
+    {
+      "name": "config",
+      "kind": "hf_config",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-VL-01/resolve/308b79934be140a43a0fb80f82b4e20d0ebe3cb8/config.json",
+      "archive_url": null,
+      "filename": "config.json",
+      "description": "Official MiniMax-VL-01 config.json, pinned HF revision 308b79934be140a43a0fb80f82b4e20d0ebe3cb8",
+      "sha256": "a63d0fab034489009b0eebba2018a6c365a96f79a93049a802fd7a406f7c0787",
+      "size_bytes": 3923,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "readme",
+      "kind": "model_card",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-VL-01/resolve/308b79934be140a43a0fb80f82b4e20d0ebe3cb8/README.md",
+      "archive_url": null,
+      "filename": "README.md",
+      "description": "Official MiniMax-VL-01 README.md, pinned HF revision 308b79934be140a43a0fb80f82b4e20d0ebe3cb8",
+      "sha256": "a7f1f280e54164bafe3f33a8423f37c037dd4e52c50c94f2b703f05dce48a196",
+      "size_bytes": 23374,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "paper",
+      "kind": "arxiv_pdf",
+      "url": "https://arxiv.org/pdf/2501.08313v1",
+      "archive_url": null,
+      "filename": "paper.pdf",
+      "description": "Official technical report, pinned arXiv revision 2501.08313v1",
+      "sha256": "e5fe73cf990aa81f8e2fa43f2a5b650418308b0a07e0c5e1a994287afa77c0f2",
+      "size_bytes": 5552980,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}
