@@ -7,7 +7,7 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 **October DeepSeek / MiniMax refresh:** 35 LLM/VL records across 5 vendors,
 plus 3 media-generation records and the existing 6 engine snapshots. LLM schema
 remains v8; media schema v1 is independent. Validation and independent review are
-tracked in the sole [refresh state](deepseek-minimax-refresh.md).
+tracked in the sole [refresh state](projects/deepseek-minimax-refresh.md).
 
 New DeepSeek checkpoints: V4.1-Flash-1017 (the exact official name), V4-Pro-0813,
 and V4-Flash-Vision-Exp. MiniMax core coverage now spans Text-01, VL-01, M1-80k,
@@ -22,7 +22,7 @@ other vendors' audio/video models are outside this refresh by user choice.
 
 ## Next work
 
-The active [refresh state](deepseek-minimax-refresh.md) owns this phase's tasks,
+The active [refresh state](projects/deepseek-minimax-refresh.md) owns this phase's tasks,
 review, authorization and PR #21 handoff. After that delivery, select one bounded
 question from the inventory below: remaining DeepSeek lineage, a cross-vendor
 dense baseline, a closed LLM, an interpretive report, or historical media coverage.

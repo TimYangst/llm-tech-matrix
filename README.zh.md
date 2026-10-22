@@ -10,7 +10,7 @@
 
 最新补录 DeepSeek-V4.1-Flash-1017、V4-Pro-0813、Flash-Vision-Exp，以及 MiniMax 从 Text-01/VL-01、M1 到 M3 的主线。音视频记录明确区分开放权重和托管服务；M3.1 Flash 尚未发布权重，不计入已抽取记录。
 
-浏览 [LLM 模型索引](data/extracted/README.md)、[媒体生成索引](data/extracted/media/README.zh.md)与[媒体 schema](docs/media/schema.md)。本轮任务、review 和交接见[协调状态](tasks/deepseek-minimax-refresh.md)；完整排期见 [tasks/ROADMAP.md](tasks/ROADMAP.md)。
+浏览 [LLM 模型索引](data/extracted/README.md)、[媒体生成索引](data/extracted/media/README.zh.md)与[媒体 schema](docs/media/schema.md)。本轮任务、review 和交接见[协调状态](tasks/projects/deepseek-minimax-refresh.md)；完整排期见 [tasks/ROADMAP.md](tasks/ROADMAP.md)。
 
 ## 文档导航
 
@@ -50,6 +50,7 @@ data/
   extracted/README.md     生成的模型索引（勿手改）
   reports/             生成物：technique-index.md（技术↔模型矩阵）、coverage.md
 tasks/
+  projects/            项目和阶段的协调状态与交接
   ENGINES.md           引擎快照状态和排期
   ROADMAP.md           各模型状态总表 + Current focus
   models/<model>.md    每个模型的笔记、数据源、未决问题

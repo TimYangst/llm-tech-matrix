@@ -36,7 +36,7 @@ causal-LLM schema. H3, Music3 and Speech 2.8 exercise joint audio/video, hybrid
 music synthesis, and closed speech respectively. Source evidence and bilingual
 views are validated in CI. Current scope and historical gaps live in the
 [model roadmap](../tasks/ROADMAP.md); coordination lives in the
-[refresh state](../tasks/deepseek-minimax-refresh.md).
+[refresh state](../tasks/projects/deepseek-minimax-refresh.md).
 
 Other vendors' image/audio/video generators remain future work. Media coverage
 does not imply completion of M1's closed-LLM or interpretive-report goals.

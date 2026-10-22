@@ -35,4 +35,4 @@ July creation is not used as the release date.
 - No complete encoder + transformer + VAE parameter accounting is published.
 - No inference validation was run; serving and output claims are source-derived.
 
-Tracking: [refresh state](../deepseek-minimax-refresh.md), T05.
+Tracking: [refresh state](../projects/deepseek-minimax-refresh.md), T05.

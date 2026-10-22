@@ -10,7 +10,7 @@ A structured, continuously updatable knowledge base that tracks and decomposes t
 
 Newest additions cover DeepSeek-V4.1-Flash-1017, V4-Pro-0813, Flash-Vision-Exp, and MiniMax's Text-01/VL-01 and M1–M3 lineage. Media records distinguish released weights from hosted services. M3.1 Flash is sourced but has no released weights and is not counted as extracted.
 
-Browse the [LLM index](data/extracted/README.md), [media index](data/extracted/media/README.md), and [media schema](docs/media/schema.md). This refresh's tasks, review and handoff live in the [coordination state](tasks/deepseek-minimax-refresh.md); the full model inventory is in [tasks/ROADMAP.md](tasks/ROADMAP.md).
+Browse the [LLM index](data/extracted/README.md), [media index](data/extracted/media/README.md), and [media schema](docs/media/schema.md). This refresh's tasks, review and handoff live in the [coordination state](tasks/projects/deepseek-minimax-refresh.md); the full model inventory is in [tasks/ROADMAP.md](tasks/ROADMAP.md).
 
 ## Where to find things
 
@@ -52,6 +52,7 @@ data/
   extracted/README.md     Generated model index (do not hand-edit)
   reports/             Generated: technique-index.md (technique↔model matrix), coverage.md
 tasks/
+  projects/            Project/phase coordination state and handoffs
   ENGINES.md           Engine snapshot inventory and calendar
   ROADMAP.md           Per-model status table + Current focus
   models/<model>.md    Per-model notes, sources, open questions
