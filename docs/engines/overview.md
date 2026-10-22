@@ -1,37 +1,27 @@
 # Engines track: design
 
-Status: **E5 done** (2026-Q3 snapshots of vLLM, SGLang, verl, VeOmni, Megatron-LM and Megatron-Bridge; synthesis since E4). Engine schema v3 is implemented in
-[`src/llm_tech_matrix/engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py), with the
-field spec in [`schema.md`](./schema.md). The first record is
-[`vllm-v0.29.0`](../../data/extracted/engines/vllm-v0.29.0.md). The draft schema section below
-is kept as the E0 design record; where the two differ, `schema.md` wins. Live status is in
-[`../../tasks/ENGINES.md`](../../tasks/ENGINES.md).
+The engine track is implemented through E5, with six 2026-Q3 snapshots, engine
+schema v3 and generated synthesis. The authoritative contract is
+[schema.md](schema.md), implemented in
+[`engine_schema.py`](../../src/llm_tech_matrix/engine_schema.py). Live status and
+snapshot selection are maintained in [tasks/ENGINES.md](../../tasks/ENGINES.md).
 
 ## Why a second record type
 
 The model track records what a *vendor* built. Engines are where those designs meet
 production: inference servers (vLLM, SGLang), training frameworks (VeOmni) and RL
-post-training systems (verl). The repo already shows the gap:
-
-- `deepseek-v4-flash-0731` records vendor-published serving flags for vLLM and SGLang, but
-  nothing in the repo says which engine version implements DSpark, or how.
-- `deepseek-v4.1-flash` carries an open question that no serving command was published. It
-  can only be closed from the engine side.
-- The engine repos document model-specific work that has no home here, for example:
-  - verl: `docs/advance/deepseek_v4_integration.rst`
-  - VeOmni: `docs/design/deepseek_v4_indexer_loss.md`
-  - vLLM: `docs/design/hisparse.md` (on `main` since 2026-09-12, so not in the `v0.29.0` snapshot)
-
-So the goal is **not** to summarize engine documentation, which would duplicate upstream
-and go stale. The goal is the **model ↔ technique ↔ engine** triangle, which neither the
-model records nor the engines' own docs provide.
+post-training systems (verl). The [support matrix](../../data/reports/engine-support-matrix.md) and
+[adoption report](../../data/reports/engine-adoption.md) connect pinned engine-side
+implementation evidence with model-side architecture records. Model vendor
+serving examples and an engine's actual release support are distinct evidence.
 
 ### Questions this track must answer
 
 These are the questions the track is built to answer, in priority order:
 
 1. **Support matrix.** For each extracted model, which engine versions can serve or train
-   it, at what status (day-0 / supported / experimental), with which flags?
+   it, with which recorded support category (registered, model-specific, delegated,
+   not-found or unassessed), and which documented flags?
 2. **Technique adoption lag.** For a technique in the glossary (DSA, MXFP4, DSpark, a
    reasoning parser), when did it first appear in a model, and when did each engine
    implement it?
@@ -71,13 +61,13 @@ The engine track reuses the three layers and their contract, in parallel subtree
 
 ```
 docs/engines/overview.md                     this document
-docs/engines/schema.md                       field spec (created in E1)
-src/llm_tech_matrix/engine_schema.py         Pydantic, ENGINE_SCHEMA_VERSION (created in E1)
+docs/engines/schema.md                       authoritative field specification
+src/llm_tech_matrix/engine_schema.py         Pydantic, ENGINE_SCHEMA_VERSION
 data/sources/engines/<engine-slug>/manifest.json
 data/extracted/engines/<engine-slug>.json    + .md / .zh.md, rendered like models
 tasks/ENGINES.md                             tactical status + snapshot calendar
 tasks/engines/<engine-slug>.md               per-snapshot notes and open questions
-.claude/skills/extract-engine/SKILL.md       extraction procedure (created in E1)
+.claude/skills/extract-engine/SKILL.md       extraction procedure
 ```
 
 - **Separate subtrees on purpose.** Every model-side glob is non-recursive:
@@ -129,37 +119,19 @@ tasks/engines/<engine-slug>.md               per-snapshot notes and open questio
   the model's entry in the engine's model registry; when the two disagree, record both and
   add an open question.
 - **Size.** Record URLs and hashes for the specific files used, not whole repositories. The
-  `add` flow stays the same; E1 adds a way to target the `engines/` subtree.
+  `add` flow uses `--track engines` to target the `engines/` subtree.
 
-## Draft schema (E1 finalizes)
+## Record contract
 
-The draft is deliberately small. Following the model track's rule, fields are promoted
-when real snapshots need them.
+The [current field specification](schema.md) owns the full contract: metadata,
+parallelism, role subobjects, integrations, model support, technique support and
+open questions. Model mappings use explicit `model_slugs[]`; per-model parser and
+version facts live in `model_details[]`. Delegated support names another recorded
+engine snapshot. Schema validation checks these cross-links.
 
-```text
-EngineRecord
-  engine_schema_version
-  metadata          name, slug, organization, repository, license, release_tag, commit_sha,
-                    release_date, snapshot_date, roles[], hardware[], languages[]
-  parallelism       tp / pp / dp / ep / cp / sp — each {supported, implementation, evidence}
-  serving           (inference role)
-  training          (training role)
-  rl                (rl_post_training role)
-  integrations[]    {engine_slug?, name, relation, evidence}
-                    relation: rollout_backend | training_backend | kernel_library | other
-  model_support[]   {model_slug?, hf_architecture, status, since_version?, flags, notes, evidence}
-                    status: day0 | supported | experimental
-  technique_support[] {glossary_slug, implementation, since_version?, flags, notes, evidence}
-  open_questions[]
-```
-
-- `model_support[].model_slug` links to a record in `data/extracted/` when one exists. The
-  architecture class string (e.g. `DeepseekV41ForCausalLM`) is the join key that works even
-  when it doesn't.
-- `since_version` is filled only when release notes or history show it. The version where
-  a feature first appeared is otherwise computed in synthesis by comparing snapshots.
-- `technique_support[].glossary_slug` must be a glossary/registry slug, so it produces
-  typed edges exactly like the model side ("assertions, not mentions").
+Earlier E0 design alternatives remain in
+[Git history](https://github.com/TimYangst/llm-tech-matrix/blob/1b72ed94d6ba7378e3da805d6ff498bfd2a13881/docs/engines/overview.md).
+They do not define a second maintained schema.
 
 ## Glossary and synthesis
 
@@ -200,5 +172,5 @@ EngineRecord
 | E4    | "Implemented by" tables, support matrix, first adoption-lag report (registry slots dropped as unneeded)                     | Matrix covers all extracted models                       |
 | E5    | `megatron-lm-core_v0.19.0` (training + RL + inference, no model registry) and `megatron-bridge-v0.6.0` (HF bridge registry) | Both validate; the Megatron dependency chain is explicit |
 
-vLLM goes first because its `docs/design/` is the most complete. The pilot is where the
-schema gets tested against real material, just as DeepSeek-V3 was for models.
+E0–E5 are completed. Current refresh triggers and snapshot selection live in
+[tasks/ENGINES.md](../../tasks/ENGINES.md); the phase table describes delivered scope.

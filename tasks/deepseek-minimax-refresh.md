@@ -42,6 +42,11 @@ repository and completed browser authorization. The repository-scoped CLI login
 is verified as `TimYangst` with admin/push permission; use `git gh` here. Its
 configuration is local to the Git directory and is not part of this PR.
 
+Additional instruction A05 (2026-10-22): user requested checking project progress,
+README and related documentation for stale information, cleanup and synchronization.
+T09 covers this documentation-only extension within PR #21; A03/A04 continue to
+permit updates and pushes. Merge remains manual.
+
 ## Tasks
 
 Dependencies consumed validated artifacts on this shared feature branch before
@@ -59,6 +64,7 @@ review section records the final head without another self-referencing commit.
 | T06 | Registry/glossary, generated indexes, roadmap and bilingual entry points             | required / P1    | T02/T03/T05: validated artifacts         | awaiting_merge | coordinator; 928c996, ab72b27, 088ca08, 6681cff                                                         |
 | T07 | Independent review, cumulative cleanup inventory and bounded repairs                 | required / P1    | T02–T06: fixed commits                   | done           | Prior reviews accepted through 34d98c3; final publication checkpoint evidence is in PR #21 description. |
 | T08 | Final checks, summary, checkpoint and reviewable PR                                  | required / P1    | T07: accepted review evidence            | awaiting_merge | PR #21 created under A03/A04; remote CI running at snapshot; manual merge.                              |
+| T09 | Audit and synchronize project progress, README, procedures and related docs          | required / P1    | T02–T08: reviewed/published artifacts    | running        | coordinator implements independent inventory from review_pipeline; A05; docs only                       |
 | F01 | Other vendors' audio/video generation                                                | enhancement / P2 | Current scope delivered                  | planned        | Explicitly deferred by user; select representative checkpoints first                                    |
 | F02 | Historical/specialized DeepSeek and MiniMax inventory; precision/packaging siblings  | enhancement / P2 | Choose comparison question               | planned        | ROADMAP follow-up inventory; not counted as extracted                                                   |
 | F03 | Closed LLM unknown FFN support, then M3.1 canonical extraction                       | enhancement / P2 | Schema design and fresh weight/API audit | planned        | M3.1 source-only notes; no guessed MoE label                                                            |
@@ -139,8 +145,8 @@ other vendors' media remain F01 under the user's scope choice.
 
 **Cumulative cleanup:** independent data review found no data refactor or source
 migration needed. Pipeline review identified stale session/development/roadmap
-claims, reconciled in 6681cff. The pre-existing long extraction history is labeled
-as earlier context rather than rewritten. No speculative runtime refactor or
+claims, reconciled in 6681cff. T09 removes superseded progress narratives from live model/engine roadmaps and
+links fixed pre-cleanup commit 1b72ed9 plus preserved canonical notes/changelog. No speculative runtime refactor or
 finfer/anywiki migration is warranted; canonical records and linked model notes
 already hold the reusable findings. Nothing remains only in personal notes.
 
@@ -157,3 +163,25 @@ Implementation and independent review are complete; PR #21 is published under
 A03/A04 with the intended repository account. Earlier publication/account blocks
 are resolved. Remote checks are recorded against their actual head in the PR;
 main remains unmerged and merge authorization remains manual.
+
+## T09 documentation synchronization
+
+A05 expanded the final cleanup to current project documentation. Independent
+inventory by `review_pipeline` identified stale media/engine progress claims,
+obsolete next-task queues, placeholder Quickstart, missing synthesis-regeneration
+steps, unsafe whole-tree Markdown formatting instructions, and inconsistent
+track/unknown/default guidance. The documentation-only repair covers 19 maintained
+files; model/engine/media records, source manifests and generated outputs are
+unchanged. Native multimodal 1017 and M3 entries now sit in the multimodal table.
+
+The model roadmap keeps current inventory and one next-work entry; older narratives
+are available at fixed Git history rather than as actionable instructions. Engine
+status now reflects E5 complete and distinguishes historical mapping gaps from
+unsupported models. README, vision, pipeline and procedures route all three record
+contracts correctly. Default null/empty structures follow the executable schemas.
+
+Validation: changed-file pre-commit hooks, both data/registry validators and local
+link/incoming-anchor checks pass. Existing media tests and remote CI passed before
+this documentation-only addition; no GPU or new data extraction is required.
+Independent review of the concrete T09 commit is pending at this snapshot; its
+fixed-head result and remote CI outcome belong in PR #21's review section.

@@ -6,7 +6,7 @@ scheduler do not fit causal-LM fields such as KV heads and context windows. A mu
 model may combine autoregressive codebook prediction with flow matching; the record
 must preserve both stages.
 
-This track starts with MiniMax H3 and Music 3. Multimodal **understanding** models
+This track covers MiniMax H3, Music3 and closed Speech 2.8. Multimodal **understanding** models
 continue to use the model schema when their architecture fits it. Media records cover
 image, audio and video **generation**, including mixed autoregressive/diffusion systems.
 Other vendors remain follow-up work in the active project plan.
@@ -31,7 +31,7 @@ uv run python scripts/validate_extractions.py
 ```
 
 Both generators support `--check`. The extraction validator also checks source-manifest
-consistency, fetch hashes and generated view/index freshness. It reads committed
+consistency, recorded fetch/hash metadata and generated view/index freshness. It reads committed
 manifests without requiring cached downloads. Schema, field evidence and missing/stale
 output validation therefore run through the existing CI command.
 

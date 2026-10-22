@@ -6,7 +6,7 @@
 - **Engine slug** — `<engine>-<release-tag>`, lowercase: `vllm-v0.29.0`, `sglang-v0.5.19`. One slug per snapshot; snapshots accumulate and are never renamed. Lives under `data/sources/engines/` and `data/extracted/engines/` (see [`engines/overview.md`](./engines/overview.md)).
 - **Media slug** — same kebab-case model naming, with records under `data/extracted/media/` and sources at the existing `data/sources/<slug>/` root. Media generation uses an independent schema and index (see [`media/overview.md`](./media/overview.md)).
 - **Family slug** — kebab-case family root: `deepseek`, `llama`, `qwen`. Used for grouping in synthesis.
-- **Date format** — `YYYY-MM` for release dates (day-precision is rarely meaningful for model releases). Use full `YYYY-MM-DD` only inside `manifest.json` for fetch dates.
+- **Date format** — LLM release dates use `YYYY-MM`; source fetch dates and engine release/snapshot dates use `YYYY-MM-DD`. Media releases use the precision supported by official evidence (month or day). Unknown dates use the schema’s unknown marker.
 
 ## File layout per model
 
@@ -83,7 +83,12 @@ Never edit a recorded sha256 just to make it pass.
 
 ## Marking unknowns
 
-Always use the literal string `"[Unknown/Not Disclosed]"` — exact spelling, exact brackets. Synthesis tools rely on this string to detect missing data. Do not use `null`, `""`, `"unknown"`, `"N/A"`, or omit the field.
+Use the literal string `"[Unknown/Not Disclosed]"` for undisclosed descriptive
+scalar values — exact spelling and brackets. Do not substitute guessed values,
+`"unknown"` or `"N/A"`. Preserve schema-defined optional structures and defaults:
+for example `multimodal: null`, empty lists/maps and empty optional notes. A null
+optional subobject is not an unknown scalar, and the marker must not be inserted
+where the field type rejects it.
 
 ## Inferred values (closed models)
 
@@ -91,7 +96,7 @@ If a value is **public-but-not-officially-confirmed** (leaks, papers reverse-eng
 
 - The primary field still uses `"[Unknown/Not Disclosed]"`.
 - An entry is added to `inferred_fields` with `{field, basis, confidence}`.
-- Synthesis tools can opt into using inferred values, but the default is to ignore them.
+- Current synthesis does not consume inferred values. Any future inference-aware analysis must state its policy explicitly.
 
 ## Math notation
 

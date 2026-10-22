@@ -1,8 +1,9 @@
 # Extraction Schema (v8)
 
 This schema is the **contract** between the extraction layer and the synthesis layer.
-Every extracted model must conform — downstream comparison and trend analysis assume
-identical field structure across models.
+LLM/VL records in `data/extracted/*.json` conform to this contract. Engine
+snapshots and media generation records use their independent
+[engine](engines/schema.md) and [media](media/schema.md) contracts.
 
 The executable version lives in `src/llm_tech_matrix/schema.py` (Pydantic). This
 document is the human-readable spec; if the two diverge, **the Pydantic version wins**

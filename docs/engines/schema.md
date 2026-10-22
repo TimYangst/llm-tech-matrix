@@ -131,8 +131,13 @@ recipe. Unassertable near-misses belong in `open_questions`.
 Doc/code disagreements, name-based near-misses, reproducibility caveats, and things a later
 snapshot should settle.
 
-## Not in v2 (deliberately)
+## Current limits and synthesis
 
-- Registry slots / generated "Implemented by (engines)" tables / support matrix — phase E4.
-- Assessing non-native loading paths (Transformers modeling backend, plugins) for absent
-  architectures.
+Assessing generic/non-native loading paths (Transformers modeling backends,
+plugins) for absent architectures remains outside snapshot scope. Absence is not
+proof that a model cannot run.
+
+Generated glossary engine tables, support matrix and adoption report are
+implemented by `synthesis.engines` through `synthesis.index`. They consume the
+engine records directly; no engine-specific technique-registry slots are needed.
+Media generation is outside the current LLM/engine mapping contract.
