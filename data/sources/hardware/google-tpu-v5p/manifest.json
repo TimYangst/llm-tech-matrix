@@ -1,0 +1,16 @@
+{
+  "slug": "google-tpu-v5p",
+  "assets": [
+    {
+      "name": "architecture",
+      "kind": "other",
+      "url": "https://docs.cloud.google.com/tpu/docs/v5p",
+      "archive_url": null,
+      "filename": "architecture.html",
+      "description": "Google Cloud TPU v5p architecture and configurations; official mutable webpage snapshot",
+      "sha256": "d2acde85b32cdfe375d3d0b19d35d5b065ae908a8c189080201ff449eff298f8",
+      "size_bytes": 169809,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

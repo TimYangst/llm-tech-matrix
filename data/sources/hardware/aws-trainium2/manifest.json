@@ -1,0 +1,27 @@
+{
+  "slug": "aws-trainium2",
+  "assets": [
+    {
+      "name": "architecture",
+      "kind": "other",
+      "url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html",
+      "archive_url": null,
+      "filename": "architecture.html",
+      "description": "AWS Neuron Trainium2 chip architecture; official mutable webpage snapshot",
+      "sha256": "accc3c1f720faa36cfa85deced27c7c5d453841030cce0be5f5260cfbd05b828",
+      "size_bytes": 258652,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "neuroncore",
+      "kind": "other",
+      "url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v3.html",
+      "archive_url": null,
+      "filename": "neuroncore.html",
+      "description": "AWS NeuronCore-v3 engines; official public documentation snapshot",
+      "sha256": "9daa01b0b79173999f4721dd9bb091376c5e76d2a57ee222b0f918cd43ccca2a",
+      "size_bytes": 254745,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "vendor": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "accelerator_type": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "variant": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "record_scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "device_count": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "snapshot_date": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "name": "AWS Inferentia2",
+    "vendor": "AWS",
+    "accelerator_type": "ASIC",
+    "variant": "inferentia2 chip",
+    "form_factor": "[Unknown/Not Disclosed]",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html",
+      "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v2.html"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "compute_units": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "execution_model": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/neuron-core-v2.html#neuroncore-v2-architecture"
+      ]
+    },
+    "family": "AWS Inferentia2",
+    "process": "[Unknown/Not Disclosed]",
+    "compute_units": "2 NeuronCore-v2.",
+    "cache": "[Unknown/Not Disclosed]",
+    "on_chip_memory": "[Unknown/Not Disclosed]",
+    "execution_model": "Heterogeneous Tensor, Vector, Scalar and GPSIMD engines; software-managed SRAM.",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "capacity_gib": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "notes": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "technology": "HBM",
+    "capacity_gb": "[Unknown/Not Disclosed]",
+    "capacity_gib": 32.0,
+    "bandwidth_tb_s": "[Unknown/Not Disclosed]",
+    "scope": "per_accelerator",
+    "notes": [
+      "Published HBM capacity: 32 GiB per chip; retained in source units, not relabeled GB.",
+      "Published bandwidth: 820 GiB/s; not relabeled decimal GB/s or TB/s."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "INT8",
+        "operation": "undisclosed",
+        "throughput": 380.0,
+        "unit": "TOPS",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "undisclosed",
+        "throughput": 190.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "undisclosed",
+        "throughput": 190.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      },
+      {
+        "precision": "cFP8",
+        "operation": "undisclosed",
+        "throughput": 190.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "undisclosed",
+        "throughput": 190.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "undisclosed",
+        "throughput": 47.5,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+        ]
+      }
+    ],
+    "notes": [
+      "Published aggregate chip rates: INT8 380 TOPS; FP16/BF16/cFP8/TF32 190 TFLOP/s; FP32 47.5 TFLOP/s. Engine decomposition, sparsity, accumulation and FMA counting are unspecified."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "scale_up": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "host": "[Unknown/Not Disclosed]",
+    "scale_up": "NeuronLink-v2; bandwidth and directionality are unspecified in this source.",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "scope": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "tdp_w": "[Unknown/Not Disclosed]",
+    "scope": "per_accelerator",
+    "notes": []
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "isa": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ],
+      "programming_model": [
+        "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html#inferentia2-architecture"
+      ]
+    },
+    "ecosystem": "AWS Neuron",
+    "isa": "NeuronCore-v2 ISA extensions support dynamic shapes and control flow.",
+    "programming_model": "Custom operators through embedded GPSIMD engines."
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Per-chip TDP, manufacturing process and exact matrix/vector chip throughput require additional public evidence."
+  ]
+}

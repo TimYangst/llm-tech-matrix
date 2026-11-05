@@ -1,0 +1,38 @@
+{
+  "slug": "nvidia-h100-sxm-80gb",
+  "assets": [
+    {
+      "name": "product",
+      "kind": "blog_html",
+      "url": "https://www.nvidia.com/en-us/data-center/h100/",
+      "archive_url": null,
+      "filename": "product.html",
+      "description": "NVIDIA H100 product specifications; use H100 SXM column only.",
+      "sha256": "fa8a2aba20f56ff23127078447419a5ae94643c54aba181dc2a7f8b6c08db5fb",
+      "size_bytes": 302797,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "architecture",
+      "kind": "blog_html",
+      "url": "https://www.nvidia.com/en-us/data-center/technologies/hopper-architecture/",
+      "archive_url": null,
+      "filename": "architecture.html",
+      "description": "Official Hopper architecture overview and NVLink direction.",
+      "sha256": "0ad9c690d09fb434705011e593994b4948294f182a7e954c900cf1061e5c522d",
+      "size_bytes": 300007,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "technical-blog",
+      "kind": "blog_html",
+      "url": "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/",
+      "archive_url": null,
+      "filename": "technical-blog.html",
+      "description": "Official H100 technical architecture article; SXM5-specific SM/cache counts and memory hierarchy, not preliminary launch compute rates.",
+      "sha256": "29de170a1079fe9747535a752eb45ce27a6376a3f452f118ed7b515f1414f95b",
+      "size_bytes": 452026,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

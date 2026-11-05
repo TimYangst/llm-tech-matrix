@@ -18,7 +18,7 @@ public signals (paper leaks, public talks) with explicit `inferred_fields` annot
 Three load-bearing rules:
 
 - **No hallucination.** Missing data → the literal string `"[Unknown/Not Disclosed]"`.
-- **Schema-strict.** LLM/VL, engine and media JSON use `schema.py`, `engine_schema.py` and `media_schema.py` respectively.
+- **Schema-strict.** LLM/VL, engine, media and hardware JSON use `schema.py`, `engine_schema.py`, `media_schema.py` and `hardware_schema.py` respectively.
 - **Public-source-only.** No paywall or privileged/nonpublic access. Ordinary HF-account access follows the [source convention](conventions.md#source-assets-committed-vs-cached).
 
 For depth: [`docs/vision.md`](./vision.md), [`docs/schema.md`](./schema.md),
@@ -92,11 +92,15 @@ its own status file. If the user asks for engine work, or the quarterly snapshot
 start from [`tasks/ENGINES.md`](../tasks/ENGINES.md) and
 [`docs/engines/overview.md`](./engines/overview.md) instead of the priority list above.
 
-### Active DeepSeek / MiniMax refresh
+### Delivered DeepSeek / MiniMax refresh
 
 Start from [the sole coordination state](../tasks/projects/deepseek-minimax-refresh.md)
 when continuing this phase. It records scope, permissions, review evidence and the
 next action; do not create a second task table.
+
+### Public hardware catalog
+
+The [hardware coordination state](../tasks/projects/public-hardware-catalog.md) owns the current datacenter-first accelerator phase. Browse [the generated index](../data/extracted/hardware/README.md); read [the procedure](hardware/overview.md) before adding variants. Sources must be public vendor webpages/PDFs; internal measurements and private notes are excluded. This track is separate from the model queue and engine support joins.
 
 ## Common workflows
 
@@ -158,6 +162,19 @@ uv run python -m llm_tech_matrix.synthesis.media
 uv run python scripts/validate_extractions.py
 uv run python scripts/validate_registry.py
 ```
+
+### Extract a public accelerator variant
+
+Register exact-variant vendor sources using `sourcing --track hardware add <slug> ...`, then write `data/extracted/hardware/<slug>.json` following the [hardware contract](hardware/schema.md). Preserve source units and performance qualifications.
+
+```bash
+uv run python -m llm_tech_matrix.extraction.render_hardware <slug>
+uv run python -m llm_tech_matrix.synthesis.hardware
+uv run python scripts/validate_extractions.py
+uv run python -m unittest discover -s tests -v
+```
+
+Update `tasks/hardware/<slug>.md` with page/table locators, unknowns and source disagreements. Independent source review precedes publication.
 
 ### Add or update a glossary entry
 

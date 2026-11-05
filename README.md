@@ -6,11 +6,13 @@ A structured, continuously updatable knowledge base that tracks and decomposes t
 
 ## Status
 
-**M1 in progress; media generation track started.** **35 LLM/VL records across 5 vendors** (DeepSeek, Qwen, Kimi, Z.AI, MiniMax) validate against LLM schema v8. **3 media records** (H3, Music3, Speech 2.8) use independent media schema v1; 6 engine snapshots remain separate. Generated technique/coverage and engine-support reports exist; an interpretive trend report is still outstanding.
+**M1 in progress; public accelerator catalog added.** **35 LLM/VL records across 5 vendors** (DeepSeek, Qwen, Kimi, Z.AI, MiniMax) validate against LLM schema v8. **3 media records** (H3, Music3, Speech 2.8) use independent media schema v1; 6 engine snapshots remain separate. Generated technique/coverage and engine-support reports exist; an interpretive trend report is still outstanding.
 
 Newest additions cover DeepSeek-V4.1-Flash-1017, V4-Pro-0813, Flash-Vision-Exp, and MiniMax's Text-01/VL-01 and M1–M3 lineage. Media records distinguish released weights from hosted services. M3.1 Flash is sourced but has no released weights and is not counted as extracted.
 
 Browse the [LLM index](data/extracted/README.md), [media index](data/extracted/media/README.md), and [media schema](docs/media/schema.md). This refresh's tasks, review and handoff live in the [coordination state](tasks/projects/deepseek-minimax-refresh.md); the full model inventory is in [tasks/ROADMAP.md](tasks/ROADMAP.md).
+
+The [hardware catalog](data/extracted/hardware/README.md) adds **10 representative accelerators** across NVIDIA, AMD, Google, AWS and Intel, using independent hardware schema v1. Public specifications carry source links, exact variants, units and peak-performance qualifications. Internal measurements are excluded. Start with the [hardware procedure](docs/hardware/overview.md) or [active coordination state](tasks/projects/public-hardware-catalog.md).
 
 ## Where to find things
 
@@ -37,6 +39,7 @@ docs/                  Authoritative reference docs (vision, schema, pipeline, c
 src/llm_tech_matrix/   Python package
   engine_schema.py     Engine snapshots (schema v3)
   media_schema.py      Media generation (schema v1)
+  hardware_schema.py   Public accelerator specifications (schema v1)
   schema.py            Pydantic models — executable version of docs/schema.md
   sourcing/            Layer 1 — fetch HF configs, papers, blogs; manifest + sha256
   extraction/          Layer 2 — agent extraction; render*.py generate bilingual views.
@@ -49,6 +52,8 @@ data/
   extracted/<model>.zh.md Rendered Chinese summary (committed, generated from the .json)
   extracted/engines/     Engine JSON + bilingual summaries (schema v3)
   extracted/media/       Media JSON + bilingual summaries/index (schema v1)
+  sources/hardware/      Per-variant public source manifests + ignored cached files
+  extracted/hardware/    Hardware JSON + bilingual summaries/index (schema v1)
   extracted/README.md     Generated model index (do not hand-edit)
   reports/             Generated: technique-index.md (technique↔model matrix), coverage.md
 tasks/
@@ -56,10 +61,11 @@ tasks/
   ENGINES.md           Engine snapshot inventory and calendar
   ROADMAP.md           Per-model status table + Current focus
   models/<model>.md    Per-model notes, sources, open questions
+  hardware/<slug>.md   Per-variant source/evidence notes and open questions
 .claude/skills/        LLM/engine extraction and PR drafting procedures
 ```
 
-Run `uv run python -m unittest discover -s tests -v` for media regression checks. CI also runs schema, source-evidence and generated-view validation via `scripts/validate_extractions.py`.
+Run `uv run python -m unittest discover -s tests -v` for media and hardware regression checks. CI also runs schema, source-evidence and generated-view validation via `scripts/validate_extractions.py`.
 
 ## Quickstart
 
@@ -69,7 +75,7 @@ This project is built with [`uv`](https://docs.astral.sh/uv/) on Python 3.13.
 # Install the locked dependencies
 uv sync --locked
 
-# Validate committed LLM, engine and media records and generated indexes
+# Validate committed LLM, engine, media and hardware records and generated indexes
 uv run python scripts/validate_extractions.py
 uv run python scripts/validate_registry.py
 ```
@@ -120,7 +126,7 @@ fetching sources; model-weight downloads and inference are outside this workflow
 
 These steps are for LLM/VL records. Audio/video generation uses the
 [media procedure](docs/media/overview.md) and `data/extracted/media/`; engine
-snapshots use the [engine procedure](docs/engines/overview.md).
+snapshots use the [engine procedure](docs/engines/overview.md). Accelerator specifications use the [hardware procedure](docs/hardware/overview.md), `--track hardware` sourcing and `data/extracted/hardware/`.
 
 The full LLM/VL procedure lives in [`.claude/skills/extract-model/SKILL.md`](./.claude/skills/extract-model/SKILL.md).
 

@@ -1,0 +1,364 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "vendor": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "accelerator_type": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "variant": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "form_factor": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "record_scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "device_count": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ],
+      "snapshot_date": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf"
+      ]
+    },
+    "name": "AMD Instinct MI300X",
+    "vendor": "AMD",
+    "accelerator_type": "GPU",
+    "variant": "AMD Instinct MI300X 192GB OAM module",
+    "form_factor": "OAM module",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf",
+      "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=2"
+      ],
+      "process": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=5",
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "compute_units": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=2"
+      ],
+      "cache": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=2"
+      ],
+      "on_chip_memory": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=9"
+      ],
+      "execution_model": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=6"
+      ]
+    },
+    "family": "CDNA 3",
+    "process": "TSMC 5nm XCDs; 6nm I/O dies",
+    "compute_units": "304 CUs; 1216 Matrix Cores; 19,456 stream processors; eight XCDs",
+    "cache": "32 KB L1 per CU; 4 MB L2 per XCD; 256 MB shared Infinity Cache",
+    "on_chip_memory": "64 KB LDS per CU",
+    "execution_model": "GPU compute units with scalar, vector and matrix instruction execution",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "capacity_gb": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "bandwidth_tb_s": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ]
+    },
+    "technology": "HBM3",
+    "capacity_gb": 192.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 5.3,
+    "scope": "per_accelerator",
+    "notes": [
+      "Peak local on-package GPU memory bandwidth; capacity and rate are for one OAM module."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP64",
+        "operation": "vector",
+        "throughput": 81.7,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 163.4,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP64",
+        "operation": "matrix",
+        "throughput": 163.4,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "matrix",
+        "throughput": 163.4,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 653.7,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 1307.4,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value. Registered structure description lists INT8/FP8/FP16/BF16; TF32 pattern is not established.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 1307.4,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 2614.9,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value. CDNA 3 whitepaper page 8 specifies at least two zero inputs per group of four for INT8/FP8/FP16/BF16.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 1307.4,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 2614.9,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value. CDNA 3 whitepaper page 8 specifies at least two zero inputs per group of four for INT8/FP8/FP16/BF16.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 2614.9,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 5229.8,
+        "unit": "TFLOP/s",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value. CDNA 3 whitepaper page 8 specifies at least two zero inputs per group of four for INT8/FP8/FP16/BF16.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 2614.9,
+        "unit": "TOPS",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 5229.8,
+        "unit": "TOPS",
+        "sparsity": "structured_sparse",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor with-sparsity column; explicitly published rate, not calculated from the dense value. CDNA 3 whitepaper page 8 specifies at least two zero inputs per group of four for INT8/FP8/FP16/BF16.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+          "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=8"
+        ]
+      }
+    ],
+    "notes": [
+      "Theoretical peaks preserve source rounding. Accumulation formats are not supplied by the product table. No performance measurements are included."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "scale_up": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1",
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=2"
+      ]
+    },
+    "host": "PCIe Gen5 x16; 128 GB/s published total bandwidth",
+    "scale_up": "Seven Infinity Fabric links; 128 GB/s bidirectional per link",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "scope": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ],
+      "notes": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf#page=1"
+      ]
+    },
+    "tdp_w": 750.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Vendor metric is maximum total board power (TBP), 750 W per OAM module; stored in catalog power field, not measured power."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=20"
+      ],
+      "programming_model": [
+        "https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf#page=20"
+      ]
+    },
+    "ecosystem": "AMD ROCm",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "HIP runtime, API and C++-like language"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Exact matrix accumulation modes are not stated in the product specification table.",
+    "No public benchmark selected; application performance depends on software and workload."
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "vendor": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "accelerator_type": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "variant": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "record_scope": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "device_count": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "snapshot_date": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "name": "Google TPU v5p",
+    "vendor": "Google",
+    "accelerator_type": "TPU",
+    "variant": "v5p chip",
+    "form_factor": "[Unknown/Not Disclosed]",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://docs.cloud.google.com/tpu/docs/v5p"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "compute_units": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "execution_model": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "family": "TPU v5p",
+    "process": "[Unknown/Not Disclosed]",
+    "compute_units": "2 TensorCores and 4 SparseCores per chip; each TensorCore has 4 MXUs, a vector unit, and a scalar unit.",
+    "cache": "[Unknown/Not Disclosed]",
+    "on_chip_memory": "[Unknown/Not Disclosed]",
+    "execution_model": "Matrix Multiply Units (MXUs), vector and scalar execution.",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "capacity_gib": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "bandwidth_tb_s": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "scope": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "notes": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "technology": "HBM",
+    "capacity_gb": "[Unknown/Not Disclosed]",
+    "capacity_gib": 95.0,
+    "bandwidth_tb_s": 2.765,
+    "scope": "per_accelerator",
+    "notes": [
+      "Published HBM capacity is 95 GiB per chip; retained in the source unit, not relabeled GB.",
+      "Bandwidth is published as 2765 GB/s; decimal conversion to TB/s."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "BF16",
+        "operation": "undisclosed",
+        "throughput": 459.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "undisclosed",
+        "throughput": 459.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "[Unknown/Not Disclosed]",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+        ]
+      }
+    ],
+    "notes": [
+      "Published chip peaks: BF16 459 TFLOP/s and FP8 459 TFLOP/s. The table does not state engine breakdown, sparsity, accumulation, or FMA counting."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "scale_up": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "scale_out": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ],
+      "topology": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "host": "[Unknown/Not Disclosed]",
+    "scale_up": "ICI: 1200 GB/s total bidirectional bandwidth per chip.",
+    "scale_out": "DCN: 50 Gbit/s per chip.",
+    "topology": "3D torus for slices of 4x4x4 chips and larger; smaller slices lack wrap-around links."
+  },
+  "power": {
+    "evidence": {
+      "scope": [
+        "https://docs.cloud.google.com/tpu/docs/v5p#system-architecture"
+      ]
+    },
+    "tdp_w": "[Unknown/Not Disclosed]",
+    "scope": "per_accelerator",
+    "notes": []
+  },
+  "software": {
+    "evidence": {},
+    "ecosystem": "[Unknown/Not Disclosed]",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "[Unknown/Not Disclosed]"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Per-chip power, process technology, and exact matrix/vector decomposition are not disclosed in this source snapshot."
+  ]
+}

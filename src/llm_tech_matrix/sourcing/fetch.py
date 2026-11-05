@@ -14,6 +14,7 @@ cached file; it is kept beside it as `<filename>.fetched`.
 release `body` is stored, so mutable counters in the API response (download counts,
 reactions) cannot break reproducibility while a real edit to the notes still does.
 
+`--track hardware` uses data/sources/hardware/ for public accelerator documentation.
 `--track engines` switches the root to data/sources/engines/ (engine snapshots, see
 docs/engines/overview.md). The default track is `models`.
 
@@ -40,10 +41,15 @@ from typing import get_args
 import httpx
 from dotenv import load_dotenv
 
+from llm_tech_matrix.hardware_schema import validate_public_url
 from llm_tech_matrix.sourcing.manifest import Asset, AssetKind, SourceManifest
 
 DATA_SOURCES_DIR = Path("data/sources")
-TRACK_ROOTS = {"models": DATA_SOURCES_DIR, "engines": DATA_SOURCES_DIR / "engines"}
+TRACK_ROOTS = {
+    "models": DATA_SOURCES_DIR,
+    "engines": DATA_SOURCES_DIR / "engines",
+    "hardware": DATA_SOURCES_DIR / "hardware",
+}
 LARGE_FILE_WARN_BYTES = 50 * 1024 * 1024  # 50 MiB
 CHUNK_BYTES = 1 << 20  # 1 MiB
 
@@ -214,9 +220,22 @@ def _failure_report(
     return "\n".join(lines)
 
 
+def _validate_track_urls(track: str, assets: list[Asset]) -> None:
+    if track == "hardware":
+        for asset in assets:
+            validate_public_url(asset.url)
+            if asset.archive_url:
+                validate_public_url(asset.archive_url)
+
+
 def cmd_fetch(args: argparse.Namespace) -> int:
     root = TRACK_ROOTS[args.track]
     manifest = load_manifest(args.slug, root)
+    try:
+        _validate_track_urls(args.track, manifest.assets)
+    except ValueError as err:
+        print(f"Invalid hardware public source: {err}", file=sys.stderr)
+        return 1
     dest_dir = root / args.slug
     print(f"Fetching {len(manifest.assets)} asset(s) for '{args.slug}' into {dest_dir}")
     new_assets: list[Asset] = []
@@ -259,6 +278,11 @@ def cmd_add(args: argparse.Namespace) -> int:
         filename=args.filename or args.name,
         description=args.description or args.name,
     )
+    try:
+        _validate_track_urls(args.track, [asset])
+    except ValueError as err:
+        print(f"Invalid hardware public source: {err}", file=sys.stderr)
+        return 1
     dest_dir = root / args.slug
     print(f"Adding '{args.name}' to {args.slug} manifest")
     try:
@@ -329,7 +353,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--track",
         choices=sorted(TRACK_ROOTS),
         default="models",
-        help="Which source tree to use: data/sources/ (models) or data/sources/engines/",
+        help="Source tree: data/sources/ (models), data/sources/engines/ or data/sources/hardware/",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 

@@ -1,0 +1,288 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "vendor": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "accelerator_type": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "variant": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "form_factor": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "record_scope": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "device_count": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "snapshot_date": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ]
+    },
+    "name": "Intel Gaudi 3 OAM",
+    "vendor": "Intel",
+    "accelerator_type": "ASIC",
+    "variant": "HL-325L OAM",
+    "form_factor": "OCP OAM 2.0 mezzanine module",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=3"
+      ],
+      "process": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=2"
+      ],
+      "compute_units": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=3"
+      ],
+      "cache": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ],
+      "on_chip_memory": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ],
+      "execution_model": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=3"
+      ]
+    },
+    "family": "Gaudi 3",
+    "process": "TSMC 5 nm",
+    "compute_units": "2 compute dies; 8 MMEs and 64 TPCs in total.",
+    "cache": "96 MB SRAM configurable as unified L3 or four 24 MB L2 slices.",
+    "on_chip_memory": "96 MB SRAM",
+    "execution_model": "MMEs for matrix operations; programmable TPCs use VLIW SIMD.",
+    "notes": []
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ],
+      "capacity_gb": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ],
+      "bandwidth_tb_s": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ],
+      "scope": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=16"
+      ]
+    },
+    "technology": "8 HBM2e devices",
+    "capacity_gb": 128.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 3.7,
+    "scope": "per_accelerator",
+    "notes": []
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=2",
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 1678.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 1678.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "FP16 (signed)",
+        "operation": "matrix",
+        "throughput": 459.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 459.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "matrix",
+        "throughput": 229.0,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "vector",
+        "throughput": 57.3,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "vector",
+        "throughput": 28.7,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "vector",
+        "throughput": 28.7,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      },
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 14.3,
+        "unit": "TFLOP/s",
+        "sparsity": "undisclosed",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Table 5 peak rate; clock and sparsity conditions not specified.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=11"
+        ]
+      }
+    ],
+    "notes": [
+      "Exact rates follow Table 5; the introduction separately rounds BF16/FP8 capability to 1.8 PFLOP/s."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=3"
+      ],
+      "scale_up": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=3",
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=18"
+      ],
+      "topology": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "scale_out": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ]
+    },
+    "host": "PCIe Gen5 x16, 128 GB/s bidirectional total (64 GB/s per direction).",
+    "scale_up": "24x200 Gbit/s Ethernet RDMA ports; total networking 1200 GB/s bidirectional.",
+    "scale_out": "Three 200 Gbit/s ports per OAM routed for scale-out in the HLB-325 baseboard.",
+    "topology": "HLB-325 baseboard: eight OAMs all-to-all using 21 ports per module, with three remaining ports for scale-out."
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "scope": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ],
+      "notes": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=4"
+      ]
+    },
+    "tdp_w": 900.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "HL-325L OAM supports up to 900 W Total Device Power with passive or liquid cooling."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=19"
+      ],
+      "programming_model": [
+        "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf#page=19"
+      ]
+    },
+    "ecosystem": "Intel Gaudi software suite with PyTorch integration.",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "Graph compiler, kernel fusion, kernel libraries and programmable TPC kernels."
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Table 5 does not specify sparse/dense conditions, accumulation precision, clock or FMA counting."
+  ]
+}

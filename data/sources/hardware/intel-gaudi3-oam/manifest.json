@@ -1,0 +1,16 @@
+{
+  "slug": "intel-gaudi3-oam",
+  "assets": [
+    {
+      "name": "whitepaper",
+      "kind": "tech_report",
+      "url": "https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf",
+      "archive_url": null,
+      "filename": "whitepaper.pdf",
+      "description": "Intel Gaudi3 architecture whitepaper, OAM product specifications distinguished from PCIe",
+      "sha256": "cecab8cf5e553e81a11c06256e949570625ef3b1a5f440765ee8b3a847d5816e",
+      "size_bytes": 3111089,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

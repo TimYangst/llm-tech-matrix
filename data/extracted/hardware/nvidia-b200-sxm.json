@@ -1,0 +1,282 @@
+{
+  "hardware_schema_version": 1,
+  "metadata": {
+    "evidence": {
+      "name": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "vendor": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "accelerator_type": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "variant": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "form_factor": [
+        "https://www.nvidia.com/en-us/data-center/hgx/"
+      ],
+      "record_scope": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "device_count": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ],
+      "snapshot_date": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf"
+      ]
+    },
+    "name": "NVIDIA B200 SXM (HGX B200 variant)",
+    "vendor": "NVIDIA",
+    "accelerator_type": "GPU",
+    "variant": "Individual B200 GPU in HGX B200; 180 GB HBM3E; excludes GB200 NVL4/NVL72",
+    "form_factor": "Blackwell SXM module",
+    "record_scope": "per_accelerator",
+    "device_count": 1,
+    "snapshot_date": "2026-10-22",
+    "sources": [
+      "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf",
+      "https://www.nvidia.com/en-us/data-center/hgx/"
+    ]
+  },
+  "architecture": {
+    "evidence": {
+      "family": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=9"
+      ],
+      "process": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=9"
+      ],
+      "execution_model": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=9"
+      ],
+      "notes": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=9"
+      ]
+    },
+    "family": "Blackwell",
+    "process": "TSMC 4NP",
+    "compute_units": "[Unknown/Not Disclosed]",
+    "cache": "[Unknown/Not Disclosed]",
+    "on_chip_memory": "[Unknown/Not Disclosed]",
+    "execution_model": "Blackwell Tensor Cores; second-generation Transformer Engine",
+    "notes": [
+      "One logical Blackwell GPU combines two reticle-limited dies using a 10 TB/s chip-to-chip link."
+    ]
+  },
+  "memory": {
+    "evidence": {
+      "technology": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "capacity_gb": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "bandwidth_tb_s": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "scope": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "notes": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ]
+    },
+    "technology": "HBM3E",
+    "capacity_gb": 180.0,
+    "capacity_gib": "[Unknown/Not Disclosed]",
+    "bandwidth_tb_s": 7.7,
+    "scope": "per_accelerator",
+    "notes": [
+      "Directly transcribed individual HGX B200 GPU column. The GB200 columns list a different 186 GB / 8 TB/s configuration.",
+      "Bandwidth is peak local device memory bandwidth; no division of aggregate HGX totals."
+    ]
+  },
+  "compute": {
+    "evidence": {
+      "notes": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ]
+    },
+    "peaks": [
+      {
+        "precision": "FP32",
+        "operation": "vector",
+        "throughput": 75.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Vendor-published theoretical peak; not a measured workload result.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP64 / FP64 Tensor Core",
+        "operation": "undisclosed",
+        "throughput": 37.0,
+        "unit": "TFLOP/s",
+        "sparsity": "dense",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Datasheet combines FP64 / FP64 Tensor Core in one row; operation-specific vector and matrix peaks are not independently established.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP4",
+        "operation": "matrix",
+        "throughput": 18000.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP8",
+        "operation": "matrix",
+        "throughput": 9000.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP6",
+        "operation": "matrix",
+        "throughput": 9000.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "INT8",
+        "operation": "matrix",
+        "throughput": 9000.0,
+        "unit": "TOPS",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "FP16",
+        "operation": "matrix",
+        "throughput": 4500.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "BF16",
+        "operation": "matrix",
+        "throughput": 4500.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      },
+      {
+        "precision": "TF32",
+        "operation": "matrix",
+        "throughput": 2200.0,
+        "unit": "TFLOP/s",
+        "sparsity": "sparse_unspecified",
+        "scope": "per_accelerator",
+        "accumulation": "[Unknown/Not Disclosed]",
+        "conditions": "Individual HGX B200 GPU column; footnote 2 marks sparse rates. Dense values are not derived by division.",
+        "fma_counting": "[Unknown/Not Disclosed]",
+        "evidence": [
+          "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+        ]
+      }
+    ],
+    "notes": [
+      "PFLOP/s-to-TFLOP/s conversion is a decimal unit conversion only; no system-to-device or sparse-to-dense derivation."
+    ]
+  },
+  "interconnect": {
+    "evidence": {
+      "host": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "scale_up": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ]
+    },
+    "host": "PCIe Gen5; 128 GB/s published aggregate bandwidth, direction not specified in this table",
+    "scale_up": "Fifth-generation NVLink; 1.8 TB/s per GPU, direction not specified in this table",
+    "scale_out": "[Unknown/Not Disclosed]",
+    "topology": "[Unknown/Not Disclosed]"
+  },
+  "power": {
+    "evidence": {
+      "tdp_w": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "scope": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ],
+      "notes": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=8"
+      ]
+    },
+    "tdp_w": 1000.0,
+    "scope": "per_accelerator",
+    "notes": [
+      "Maximum configurable individual HGX B200 GPU TDP; GB200 columns have a different up-to-1200 W limit."
+    ]
+  },
+  "software": {
+    "evidence": {
+      "ecosystem": [
+        "https://dam-cdn.nvd.orangelogic.com/AssetLink/y441155802qub41q118b2852i557jem5.pdf#page=6"
+      ]
+    },
+    "ecosystem": "NVIDIA TensorRT-LLM; NeMo Framework",
+    "isa": "[Unknown/Not Disclosed]",
+    "programming_model": "[Unknown/Not Disclosed]"
+  },
+  "public_measurements": [],
+  "open_questions": [
+    "Operation-specific FP64 vector and FP64 Tensor Core values cannot be separated from the combined vendor row.",
+    "SM counts and cache capacities for this exact shipped B200 variant are not established by the registered datasheet.",
+    "Dense matrix peaks are omitted rather than deriving half of sparse specifications."
+  ]
+}

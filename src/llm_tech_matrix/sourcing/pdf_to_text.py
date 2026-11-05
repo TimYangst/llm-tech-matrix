@@ -17,7 +17,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-from llm_tech_matrix.sourcing.fetch import DATA_SOURCES_DIR, load_manifest
+from llm_tech_matrix.sourcing.fetch import DATA_SOURCES_DIR, TRACK_ROOTS, load_manifest
 
 PDF_KINDS = {"arxiv_pdf", "tech_report"}
 
@@ -33,9 +33,9 @@ def pdf_to_text(pdf_path: Path) -> str:
     return "".join(parts).replace("\x00", "")
 
 
-def derive_for_slug(slug: str, *, force: bool = False) -> int:
-    manifest = load_manifest(slug)
-    src_dir = DATA_SOURCES_DIR / slug
+def derive_for_slug(slug: str, *, force: bool = False, root: Path = DATA_SOURCES_DIR) -> int:
+    manifest = load_manifest(slug, root)
+    src_dir = root / slug
     derived = 0
     for asset in manifest.assets:
         if asset.kind not in PDF_KINDS:
@@ -65,11 +65,12 @@ def main(argv: list[str] | None = None) -> int:
         description="Derive .txt artifacts from cached PDF assets in a model's manifest.",
     )
     parser.add_argument("slug")
+    parser.add_argument("--track", choices=sorted(TRACK_ROOTS), default="models")
     parser.add_argument(
         "--force", action="store_true", help="Regenerate even if .txt already exists"
     )
     args = parser.parse_args(argv)
-    return derive_for_slug(args.slug, force=args.force)
+    return derive_for_slug(args.slug, force=args.force, root=TRACK_ROOTS[args.track])
 
 
 if __name__ == "__main__":

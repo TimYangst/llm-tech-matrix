@@ -1,0 +1,27 @@
+{
+  "slug": "nvidia-rtx-5090",
+  "assets": [
+    {
+      "name": "whitepaper",
+      "kind": "tech_report",
+      "url": "https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf",
+      "archive_url": null,
+      "filename": "whitepaper.pdf",
+      "description": "NVIDIA RTX Blackwell v1.1 architecture whitepaper; Appendix A RTX5090 product (not full GB202) specs.",
+      "sha256": "906ff2a409d7a7e4cbc56f5d3a179d574120d19aaba99520670e1a0c064595fa",
+      "size_bytes": 8283392,
+      "fetched_at": "2026-10-22"
+    },
+    {
+      "name": "product",
+      "kind": "blog_html",
+      "url": "https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/",
+      "archive_url": null,
+      "filename": "product.html",
+      "description": "Official NVIDIA RTX5090 reference/Founders Edition product specifications.",
+      "sha256": "7861ae59ae7cae13fbf31fd42f2f1c85e68c14380e2329d4d3b4de71588910bd",
+      "size_bytes": 488436,
+      "fetched_at": "2026-10-22"
+    }
+  ]
+}

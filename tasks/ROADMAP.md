@@ -4,7 +4,9 @@ Tactical, model-by-model status. For strategic milestones (M1/M2 scope, sequenci
 
 ## Current focus
 
-**October DeepSeek / MiniMax refresh:** 35 LLM/VL records across 5 vendors,
+**Public accelerator catalog:** ten representative NVIDIA/AMD GPUs, Google TPUs, AWS Trainium/Inferentia and Intel Gaudi variants, including one consumer GPU reference. Public specifications only, with exact source URLs/PDFs and explicit peak/unit/scope qualifiers. Hardware uses independent schema v1 and [bilingual browse surfaces](../data/extracted/hardware/README.md); the sole [hardware state](projects/public-hardware-catalog.md) owns current execution/review and follow-ups.
+
+**Delivered October DeepSeek / MiniMax refresh:** 35 LLM/VL records across 5 vendors,
 plus 3 media-generation records and the existing 6 engine snapshots. LLM schema
 remains v8; media schema v1 is independent. Validation and independent review are
 tracked in the sole [refresh state](projects/deepseek-minimax-refresh.md).
@@ -22,11 +24,7 @@ other vendors' audio/video models are outside this refresh by user choice.
 
 ## Next work
 
-The active [refresh state](projects/deepseek-minimax-refresh.md) owns this phase's tasks,
-review, authorization and PR #21 handoff. After that delivery, select one bounded
-question from the inventory below: remaining DeepSeek lineage, a cross-vendor
-dense baseline, a closed LLM, an interpretive report, or historical media coverage.
-Closed LLMs first need a schema check: v8 cannot represent an unknown FFN type.
+Continue the hardware phase from [its coordination state](projects/public-hardware-catalog.md). The model refresh was delivered in PR #21 and its state relocation in PR #22; the [refresh state](projects/deepseek-minimax-refresh.md) retains historical review evidence. For a subsequent model task, select one bounded question from the inventory below: remaining DeepSeek lineage, a cross-vendor dense baseline, a closed LLM, an interpretive report, or historical media coverage. Closed LLMs first need a schema check: v8 cannot represent an unknown FFN type.
 
 Per-model notes and canonical JSON retain extraction findings and unresolved
 source disagreements. Prior phase narratives and superseded queues are available
